@@ -1,28 +1,36 @@
 body {
-    /* 1. Указываем путь к новому вертикальному файлу */
     background-image: url('farm_background_vertical.png');
-    
-    /* 2. Главное изменение: заставляем фон заполнить весь экран */
     background-size: cover;
-
-    /* 3. Центрируем изображение, чтобы обрезка была равномерной */
     background-position: center center;
-    
-    /* Остальные свойства для корректного отображения */
     background-repeat: no-repeat;
-    height: 100vh; /* Высота на весь видимый экран */
-    width: 100vw;  /* Ширина на весь видимый экран */
+    height: 100vh;
+    width: 100vw;
     margin: 0;
     font-family: 'Arial', sans-serif;
-    overflow: hidden; /* Убираем любую возможную прокрутку */
+    overflow: hidden;
 }
 
-/* --- СТИЛИ ДЛЯ МЕНЮ --- */
+/* --- СТИЛИ ДЛЯ БАЛАНСА ИГРОКА --- */
+#player-balance {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* --- СТИЛИ ДЛЯ ГЛАВНОГО МЕНЮ --- */
 #menu-container {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 100; /* Меню всегда сверху */
+    z-index: 100;
 }
 
 #menu-button {
@@ -37,14 +45,14 @@ body {
 }
 
 #menu-nav {
-    display: none; /* Изначально меню скрыто */
+    display: none;
     position: absolute;
-    top: 50px; /* Появляется под кнопкой */
+    top: 50px;
     left: 0;
     background-color: rgba(255, 253, 246, 0.9);
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    overflow: hidden; /* Чтобы скруглить углы у ссылок */
+    overflow: hidden;
     min-width: 150px;
 }
 
@@ -65,20 +73,18 @@ body {
     background-color: #D2B48C;
 }
 
-/* Класс для отображения меню */
 #menu-nav.show {
     display: block;
 }
 
-
-/* --- Стили для грядок (остаются почти без изменений) --- */
+/* --- СТИЛИ ДЛЯ ГРЯДОК --- */
 #garden-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
     padding: 20px;
-    margin: 80px auto 20px auto; /* Добавили отступ сверху, чтобы не мешать меню */
+    margin: 80px auto 20px auto;
     max-width: 500px;
 }
 
@@ -122,13 +128,13 @@ body {
     to { transform: scale(1); }
 }
 
-/* --- НОВЫЕ СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ --- */
+/* --- СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ --- */
 #seed-menu {
     position: absolute;
-    width: 100px; /* Размер контейнера */
+    width: 100px;
     height: 100px;
     z-index: 200;
-    pointer-events: none; /* Контейнер не мешает кликам */
+    pointer-events: none;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
     transform-origin: center center;
 }
@@ -136,14 +142,14 @@ body {
 #seed-menu.hidden {
     transform: scale(0);
     opacity: 0;
-    display: block; /* Важно, чтобы display не был none для анимации */
+    display: block;
 }
 
 .seed-option {
     position: absolute;
     background-color: rgba(255, 253, 246, 0.95);
     border-radius: 50%;
-    width: 48px; /* Размер круглой кнопки */
+    width: 48px;
     height: 48px;
     display: flex;
     justify-content: center;
@@ -153,31 +159,93 @@ body {
     border: 2px solid #8B5A2B;
     box-shadow: 0 4px 8px rgba(0,0,0,0.25);
     transition: transform 0.2s ease-out;
-    pointer-events: all; /* Кнопки можно нажимать */
-    
-    /* Начальная позиция всех кнопок в центре */
+    pointer-events: all;
     top: 50%;
     left: 50%;
-    margin-left: -24px; /* Половина ширины */
-    margin-top: -24px; /* Половина высоты */
+    margin-left: -24px;
+    margin-top: -24px;
 }
 
 .seed-option:hover {
-    transform: scale(1.15) !important; /* Увеличиваем при наведении */
+    transform: scale(1.15) !important;
 }
 
-/* Магия CSS: расставляем иконки по полукругу */
-/* Для каждой кнопки задаем свой угол поворота и сдвиг от центра */
 #seed-menu:not(.hidden) .seed-option:nth-child(1) { transform: rotate(-60deg) translateX(70px) rotate(60deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(2) { transform: rotate(-30deg) translateX(70px) rotate(30deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(3) { transform: rotate(0deg) translateX(70px) rotate(0deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(4) { transform: rotate(30deg) translateX(70px) rotate(-30deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(5) { transform: rotate(60deg) translateX(70px) rotate(-60deg); }
 
-/* Добавляем эмодзи в кнопки через CSS */
 .seed-option[data-seed="🥕"]::after { content: '🥕'; }
 .seed-option[data-seed="🍅"]::after { content: '🍅'; }
 .seed-option[data-seed="🍆"]::after { content: '🍆'; }
 .seed-option[data-seed="🌽"]::after { content: '🌽'; }
 .seed-option[data-seed="🍓"]::after { content: '🍓'; }
 
+/* --- СТИЛИ ДЛЯ ОКНА СКЛАДА --- */
+#warehouse-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#warehouse-modal:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: #fff8e1;
+    padding: 20px;
+    border-radius: 15px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    border: 3px solid #8B5A2B;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+#warehouse-modal:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #8B5A2B;
+    cursor: pointer;
+}
+
+#warehouse-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: left;
+    font-size: 18px;
+    color: #4a2c0f;
+}
+
+#sell-all-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
