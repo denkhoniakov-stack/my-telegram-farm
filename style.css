@@ -1,42 +1,75 @@
 body {
-    font-family: sans-serif;
+    /* --- Устанавливаем фон --- */
+    background-image: url('farm_background.jpg');
+    background-size: cover; /* Растягиваем на весь экран */
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 100vh; /* Занимаем всю высоту */
+    margin: 0;
+
+    /* --- Стили для текста --- */
+    font-family: 'Arial', sans-serif;
     text-align: center;
-    background-color: #f0f8ff; /* Небесно-голубой фон */
-    color: #333;
+    color: #4a2c0f; /* Темно-коричневый цвет для текста */
 }
 
-#garden {
+h1 {
+    background-color: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый фон */
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 20px;
+    border: 2px solid #8B5A2B;
+}
+
+#garden-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
+    gap: 15px; /* Расстояние между грядками */
     padding: 20px;
     margin: 20px auto;
-    width: 90%;
-    min-height: 150px;
-    background-color: #8b4513; /* Цвет земли */
-    border: 5px solid #d2691e; /* Цвет грядки */
-    border-radius: 10px;
+    max-width: 500px;
 }
 
-.plant {
-    width: 50px;
-    height: 50px;
+.garden-bed {
+    width: 80px;
+    height: 80px;
+    background-color: #8B5A2B; /* Цвет земли */
+    border: 5px solid #D2B48C; /* Светлая деревянная рамка */
+    border-radius: 15px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* 3D-эффект тени */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 40px;
-    cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
 }
 
-.plant:hover {
-    transform: scale(1.1);
+.garden-bed.available:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+    cursor: pointer;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50; /* Зеленый */
-    color: white;
-    border: none;
-    border-radius: 5px;
+.garden-bed.locked {
+    background-color: #a9a9a9; /* Серый цвет */
+    border-color: #777;
+    cursor: not-allowed; /* Запрещающий курсор */
+}
+
+/* Иконка замка для недоступных грядок */
+.garden-bed.locked::after {
+    content: '🔒';
+    font-size: 35px;
+    opacity: 0.8;
+}
+
+/* Стиль для растения внутри грядки */
+.plant {
+    animation: grow 0.5s ease; /* Анимация появления */
+}
+
+@keyframes grow {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
 }
