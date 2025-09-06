@@ -122,34 +122,62 @@ body {
     to { transform: scale(1); }
 }
 
-/* --- СТИЛИ ДЛЯ МЕНЮ ВЫБОРА СЕМЯН --- */
+/* --- НОВЫЕ СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ --- */
 #seed-menu {
-    position: absolute; /* Позиционируется относительно всего экрана */
-    background-color: rgba(255, 253, 246, 0.95);
-    border: 2px solid #8B5A2B;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-    z-index: 200; /* Должно быть выше всего остального */
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    transform: scale(0.95);
-    opacity: 0;
+    position: absolute;
+    width: 100px; /* Размер контейнера */
+    height: 100px;
+    z-index: 200;
+    pointer-events: none; /* Контейнер не мешает кликам */
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    transform-origin: center center;
 }
 
 #seed-menu.hidden {
-    display: none;
+    transform: scale(0);
+    opacity: 0;
+    display: block; /* Важно, чтобы display не был none для анимации */
 }
 
 .seed-option {
-    padding: 10px 20px;
+    position: absolute;
+    background-color: rgba(255, 253, 246, 0.95);
+    border-radius: 50%;
+    width: 48px; /* Размер круглой кнопки */
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
     cursor: pointer;
-    font-size: 18px;
-    border-bottom: 1px solid #D2B48C;
-}
-
-.seed-option:last-child {
-    border-bottom: none;
+    border: 2px solid #8B5A2B;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease-out;
+    pointer-events: all; /* Кнопки можно нажимать */
+    
+    /* Начальная позиция всех кнопок в центре */
+    top: 50%;
+    left: 50%;
+    margin-left: -24px; /* Половина ширины */
+    margin-top: -24px; /* Половина высоты */
 }
 
 .seed-option:hover {
-    background-color: #D2B48C;
+    transform: scale(1.15) !important; /* Увеличиваем при наведении */
 }
+
+/* Магия CSS: расставляем иконки по полукругу */
+/* Для каждой кнопки задаем свой угол поворота и сдвиг от центра */
+#seed-menu:not(.hidden) .seed-option:nth-child(1) { transform: rotate(-60deg) translateX(70px) rotate(60deg); }
+#seed-menu:not(.hidden) .seed-option:nth-child(2) { transform: rotate(-30deg) translateX(70px) rotate(30deg); }
+#seed-menu:not(.hidden) .seed-option:nth-child(3) { transform: rotate(0deg) translateX(70px) rotate(0deg); }
+#seed-menu:not(.hidden) .seed-option:nth-child(4) { transform: rotate(30deg) translateX(70px) rotate(-30deg); }
+#seed-menu:not(.hidden) .seed-option:nth-child(5) { transform: rotate(60deg) translateX(70px) rotate(-60deg); }
+
+/* Добавляем эмодзи в кнопки через CSS */
+.seed-option[data-seed="🥕"]::after { content: '🥕'; }
+.seed-option[data-seed="🍅"]::after { content: '🍅'; }
+.seed-option[data-seed="🍆"]::after { content: '🍆'; }
+.seed-option[data-seed="🌽"]::after { content: '🌽'; }
+.seed-option[data-seed="🍓"]::after { content: '🍓'; }
+

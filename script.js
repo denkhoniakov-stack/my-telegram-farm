@@ -30,10 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Сохраняем грядку, на которую кликнули
             activeBed = bed;
 
-            // Показываем меню выбора семян рядом с курсором (или грядкой)
+            // Позиционируем меню по центру кликнутой грядки
             const rect = bed.getBoundingClientRect();
-            seedMenu.style.left = `${rect.left + window.scrollX}px`;
-            seedMenu.style.top = `${rect.bottom + window.scrollY + 5}px`; // 5px отступ снизу
+// Вычисляем центр грядки и вычитаем половину размера меню, чтобы отцентровать его
+            seedMenu.style.left = `${rect.left + rect.width / 2 - 50 + window.scrollX}px`; // 50 - половина ширины #seed-menu
+            seedMenu.style.top = `${rect.top + rect.height / 2 - 50 + window.scrollY}px`; // 50 - половина высоты #seed-menu
+
             seedMenu.classList.remove('hidden');
             
             // Плавное появление
