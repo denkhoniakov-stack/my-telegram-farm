@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя Ферма</title>
-    <link rel="stylesheet" href="style.css?v=1.1">
-
+    <!-- Не забываем про версию для сброса кэша! -->
+    <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 <body>
-    <h1>Моя Веселая Ферма</h1>
-    
+    <!-- Новое меню -->
+    <div id="menu-container">
+        <button id="menu-button">Меню ☰</button>
+        <nav id="menu-nav">
+            <a href="#">Урожай 🌾</a>
+            <a href="#">Магазин 🏪</a>
+            <a href="#">Задания 🏆</a>
+            <a href="#">Настройки ⚙️</a>
+        </nav>
+    </div>
+
     <div id="garden-container">
-        <!-- Здесь будут наши грядки -->
         <!-- 3 доступные грядки -->
         <div class="garden-bed available" data-id="1"></div>
         <div class="garden-bed available" data-id="2"></div>
@@ -30,9 +38,8 @@
         <div class="garden-bed locked"></div>
     </div>
 
-    <!-- Подключаем скрипты в самом конце -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="script.js?v=1.1"></script>
-
+    <!-- Не забываем про версию для сброса кэша! -->
+    <script src="script.js?v=1.2"></script>
 </body>
 </html>

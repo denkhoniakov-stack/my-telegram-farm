@@ -1,44 +1,88 @@
 body {
-    /* --- Устанавливаем фон --- */
+    /* --- ИСПРАВЛЯЕМ ФОН --- */
     background-image: url('farm_background.jpg');
-    background-size: cover; /* Растягиваем на весь экран */
+    background-size: contain; /* Вписываем картинку целиком */
+    background-color: #75cff0; /* Цвет неба для областей, не покрытых фоном */
     background-repeat: no-repeat;
-    background-position: center center;
-    height: 100vh; /* Занимаем всю высоту */
+    background-position: center bottom; /* Прижимаем фон к низу */
+    height: 100vh;
     margin: 0;
-
-    /* --- Стили для текста --- */
     font-family: 'Arial', sans-serif;
-    text-align: center;
-    color: #4a2c0f; /* Темно-коричневый цвет для текста */
+    overflow: hidden; /* Убираем лишнюю прокрутку */
 }
 
-h1 {
-    background-color: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый фон */
-    padding: 10px;
+/* --- СТИЛИ ДЛЯ МЕНЮ --- */
+#menu-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 100; /* Меню всегда сверху */
+}
+
+#menu-button {
+    background-color: #8B5A2B;
+    color: white;
+    border: 2px solid #D2B48C;
+    padding: 10px 15px;
     border-radius: 10px;
-    display: inline-block;
-    margin-top: 20px;
-    border: 2px solid #8B5A2B;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
+#menu-nav {
+    display: none; /* Изначально меню скрыто */
+    position: absolute;
+    top: 50px; /* Появляется под кнопкой */
+    left: 0;
+    background-color: rgba(255, 253, 246, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow: hidden; /* Чтобы скруглить углы у ссылок */
+    min-width: 150px;
+}
+
+#menu-nav a {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #4a2c0f;
+    border-bottom: 1px solid #D2B48C;
+    text-align: left;
+}
+
+#menu-nav a:last-child {
+    border-bottom: none;
+}
+
+#menu-nav a:hover {
+    background-color: #D2B48C;
+}
+
+/* Класс для отображения меню */
+#menu-nav.show {
+    display: block;
+}
+
+
+/* --- Стили для грядок (остаются почти без изменений) --- */
 #garden-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px; /* Расстояние между грядками */
+    gap: 15px;
     padding: 20px;
-    margin: 20px auto;
+    margin: 80px auto 20px auto; /* Добавили отступ сверху, чтобы не мешать меню */
     max-width: 500px;
 }
 
 .garden-bed {
     width: 80px;
     height: 80px;
-    background-color: #8B5A2B; /* Цвет земли */
-    border: 5px solid #D2B48C; /* Светлая деревянная рамка */
+    background-color: #8B5A2B;
+    border: 5px solid #D2B48C;
     border-radius: 15px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* 3D-эффект тени */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -47,26 +91,24 @@ h1 {
 }
 
 .garden-bed.available:hover {
-    transform: scale(1.05); /* Увеличение при наведении */
+    transform: scale(1.05);
     cursor: pointer;
 }
 
 .garden-bed.locked {
-    background-color: #a9a9a9; /* Серый цвет */
+    background-color: #a9a9a9;
     border-color: #777;
-    cursor: not-allowed; /* Запрещающий курсор */
+    cursor: not-allowed;
 }
 
-/* Иконка замка для недоступных грядок */
 .garden-bed.locked::after {
     content: '🔒';
     font-size: 35px;
     opacity: 0.8;
 }
 
-/* Стиль для растения внутри грядки */
 .plant {
-    animation: grow 0.5s ease; /* Анимация появления */
+    animation: grow 0.5s ease;
 }
 
 @keyframes grow {
