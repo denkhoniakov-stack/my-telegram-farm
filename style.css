@@ -1,14 +1,20 @@
 body {
-    /* --- ИСПРАВЛЯЕМ ФОН --- */
-    background-image: url('farm_background.jpg');
-    background-size: contain; /* Вписываем картинку целиком */
-    background-color: #75cff0; /* Цвет неба для областей, не покрытых фоном */
+    /* 1. Указываем путь к новому вертикальному файлу */
+    background-image: url('farm_background_vertical.png');
+    
+    /* 2. Главное изменение: заставляем фон заполнить весь экран */
+    background-size: cover;
+
+    /* 3. Центрируем изображение, чтобы обрезка была равномерной */
+    background-position: center center;
+    
+    /* Остальные свойства для корректного отображения */
     background-repeat: no-repeat;
-    background-position: center; /* Прижимаем фон 
-    height: 100vh;
+    height: 100vh; /* Высота на весь видимый экран */
+    width: 100vw;  /* Ширина на весь видимый экран */
     margin: 0;
     font-family: 'Arial', sans-serif;
-    overflow: hidden; /* Убираем лишнюю прокрутку */
+    overflow: hidden; /* Убираем любую возможную прокрутку */
 }
 
 /* --- СТИЛИ ДЛЯ МЕНЮ --- */
