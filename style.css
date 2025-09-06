@@ -1,0 +1,42 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #f0f8ff; /* Небесно-голубой фон */
+    color: #333;
+}
+
+#garden {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 90%;
+    min-height: 150px;
+    background-color: #8b4513; /* Цвет земли */
+    border: 5px solid #d2691e; /* Цвет грядки */
+    border-radius: 10px;
+}
+
+.plant {
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.plant:hover {
+    transform: scale(1.1);
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50; /* Зеленый */
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
