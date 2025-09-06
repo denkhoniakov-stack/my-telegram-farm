@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.ready();
 
     // --- НАСТРОЙКИ ИГРЫ ---
-    const CROP_DATA = {
+    const PLANT_DATA = {
         '🥕': { name: 'Морковь', growTime: 1000, seedCost: 1.00, sellPrice: 1.54 },
         '🍅': { name: 'Помидор', growTime: 3000, seedCost: 3.00, sellPrice: 4.62 },
         '🍆': { name: 'Баклажан', growTime: 5000, seedCost: 5.00, sellPrice: 7.70 },
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '🍓': { name: 'Клубника', growTime: 10000, seedCost: 10.00, sellPrice: 15.40 }
     };
     
-    // --- ДАННЫЕ ИГРОКА (дефолтные значения) ---
+    // --- ДАННЫЕ ИГРОКА ---
     let gameState = {
         balance: 100,
         warehouse: {}
@@ -19,11 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ЭЛЕМЕНТЫ DOM ---
     const balanceAmountElement = document.getElementById('balance-amount');
-    const warehouseModal = document.getElementById('warehouse-modal');
     const warehouseList = document.getElementById('warehouse-list');
-    const closeButton = warehouseModal.querySelector('.close-button');
     const sellAllButton = document.getElementById('sell-all-button');
-    const warehouseButton = document.getElementById('warehouse-button');
     const menuButton = document.getElementById('menu-button');
     const menuNav = document.getElementById('menu-nav');
     const seedMenu = document.getElementById('seed-menu');
@@ -41,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gameState = JSON.parse(savedData);
         }
         updateBalanceDisplay();
-        updateWarehouseDisplay();
     }
 
     // --- ФУНКЦИИ ОБНОВЛЕНИЯ ИНТЕРФЕЙСА ---
@@ -54,21 +50,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = Object.keys(gameState.warehouse);
         if (items.length === 0) {
             warehouseList.innerHTML = '<li>Склад пуст</li>';
+            sellAllButton.style.display = 'none'; // Прячем кнопку, если нечего продавать
             return;
         }
+        sellAllButton.style.display = 'block'; // Показываем кнопку
         items.forEach(crop => {
             const li = document.createElement('li');
-            li.innerText = `${crop} ${CROP_DATA[crop].name}: ${gameState.warehouse[crop]} шт.`;
+            li.innerText = `${crop} ${PLANT_DATA[crop].name}: ${gameState.warehouse[crop]} шт.`;
             warehouseList.appendChild(li);
         });
     }
 
     // --- ЛОГИКА ГЛАВНОГО МЕНЮ ---
     menuButton.addEventListener('click', () => {
+        // Перед тем как показать меню, обновляем информацию на складе
+        if (!menuNav.classList.contains('show')) {
+            updateWarehouseDisplay();
+        }
         menuNav.classList.toggle('show');
     });
 
-    // --- ЛОГИКА ГРЯДОК И ПОСАДКИ ---
+    // --- ЛОГИКА ГРЯДОК И ПОСАДКИ (КОНЦЕПЦИЯ СЕМЯН) ---
     availableBeds.forEach(bed => {
         bed.addEventListener('click', () => {
             if (bed.innerHTML !== '') return;
@@ -84,14 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
         option.addEventListener('click', () => {
             if (!activeBed) return;
             const seedType = option.dataset.seed;
-            const crop = CROP_DATA[seedType];
+            const plant = PLANT_DATA[seedType];
 
-            if (gameState.balance < crop.seedCost) {
-                tg.showAlert('Недостаточно монет!');
+            if (gameState.balance < plant.seedCost) {
+                tg.showAlert('Недостаточно монет для покупки семян!');
                 return;
             }
 
-            gameState.balance -= crop.seedCost;
+            gameState.balance -= plant.seedCost;
             updateBalanceDisplay();
             saveGameData();
 
@@ -102,15 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function plantSeed(bed, seed) {
-        const crop = CROP_DATA[seed];
-        const plant = document.createElement('div');
-        plant.classList.add('plant');
-        plant.innerText = '🌱';
-        bed.appendChild(plant);
+        const plantInfo = PLANT_DATA[seed];
+        const plantElement = document.createElement('div');
+        plantElement.classList.add('plant');
+        plantElement.innerText = '🌱'; // Сажаем росток
+        bed.appendChild(plantElement);
 
         setTimeout(() => {
-            plant.innerText = seed;
-            plant.addEventListener('click', (e) => {
+            plantElement.innerText = seed; // Росток вырастает в овощ
+            plantElement.addEventListener('click', (e) => {
                 e.stopPropagation();
                 
                 gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
@@ -120,34 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 tg.HapticFeedback.notificationOccurred('success');
                 tg.showPopup({
                     title: 'Урожай собран!',
-                    message: `1 ${crop.name} добавлен на склад.`,
+                    message: `1 ${plantInfo.name} добавлен на склад.`,
                     buttons: [{type: 'ok'}]
                 });
             }, { once: true });
-        }, crop.growTime);
+        }, plantInfo.growTime);
     }
 
-    // --- ЛОГИКА СКЛАДА ---
-    warehouseButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        updateWarehouseDisplay();
-        warehouseModal.classList.remove('hidden');
-    });
-
-    closeButton.addEventListener('click', () => {
-        warehouseModal.classList.add('hidden');
-    });
-    
-    warehouseModal.addEventListener('click', (event) => {
-        if (event.target === warehouseModal) {
-            warehouseModal.classList.add('hidden');
-        }
-    });
-
+    // --- ЛОГИКА ПРОДАЖИ СО СКЛАДА ---
     sellAllButton.addEventListener('click', () => {
         let totalProfit = 0;
         Object.keys(gameState.warehouse).forEach(crop => {
-            totalProfit += gameState.warehouse[crop] * CROP_DATA[crop].sellPrice;
+            totalProfit += gameState.warehouse[crop] * PLANT_DATA[crop].sellPrice;
         });
 
         if (totalProfit === 0) {

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя Ферма</title>
-    <!-- Не забудьте потом поменять на ?v=1.9 или выше! -->
-    <link rel="stylesheet" href="style.css?v=1.8">
+    <!-- Новая версия для сброса кэша -->
+    <link rel="stylesheet" href="style.css?v=1.9">
 </head>
 <body>
     <!-- Баланс игрока -->
@@ -17,7 +17,16 @@
     <div id="menu-container">
         <button id="menu-button">Меню ☰</button>
         <nav id="menu-nav">
-            <a href="#" id="warehouse-button">Урожай 🌾</a>
+            <!-- НОВАЯ СТРУКТУРА СКЛАДА ВНУТРИ МЕНЮ -->
+            <div id="warehouse-section">
+                <h3>Урожай 🌾</h3>
+                <ul id="warehouse-list">
+                    <!-- Содержимое склада будет здесь -->
+                </ul>
+                <button id="sell-all-button">Продать всё</button>
+            </div>
+            <hr>
+            <!-- Остальные пункты меню -->
             <a href="#">Магазин 🏪</a>
             <a href="#">Задания 🏆</a>
             <a href="#">Настройки ⚙️</a>
@@ -47,20 +56,8 @@
         <div class="seed-option" data-seed="🍓"></div>
     </div>
 
-    <!-- Модальное окно Склада -->
-    <div id="warehouse-modal" class="hidden">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Склад</h2>
-            <ul id="warehouse-list">
-                <!-- Сюда JS будет добавлять собранный урожай -->
-            </ul>
-            <button id="sell-all-button">Продать всё</button>
-        </div>
-    </div>
-
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Не забудьте потом поменять на ?v=1.9 или выше! -->
-    <script src="script.js?v=1.8"></script>
+    <!-- Новая версия для сброса кэша -->
+    <script src="script.js?v=1.9"></script>
 </body>
 </html>

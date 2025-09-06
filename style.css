@@ -49,35 +49,67 @@ body {
     position: absolute;
     top: 50px;
     left: 0;
-    background-color: rgba(255, 253, 246, 0.9);
+    background-color: rgba(255, 253, 246, 0.95);
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     overflow: hidden;
-    min-width: 150px;
-}
-
-#menu-nav a {
-    display: block;
-    padding: 12px 20px;
-    text-decoration: none;
-    color: #4a2c0f;
-    border-bottom: 1px solid #D2B48C;
-    text-align: left;
-}
-
-#menu-nav a:last-child {
-    border-bottom: none;
-}
-
-#menu-nav a:hover {
-    background-color: #D2B48C;
+    min-width: 200px;
+    padding: 10px;
 }
 
 #menu-nav.show {
     display: block;
 }
 
-/* --- СТИЛИ ДЛЯ ГРЯДОК --- */
+#menu-nav hr {
+    border: none;
+    border-top: 1px solid #D2B48C;
+    margin: 10px 0;
+}
+
+#menu-nav a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #4a2c0f;
+    border-radius: 5px;
+}
+
+#menu-nav a:hover {
+    background-color: #D2B48C;
+}
+
+/* --- НОВЫЕ СТИЛИ ДЛЯ СЕКЦИИ СКЛАДА --- */
+#warehouse-section {
+    padding: 0 5px;
+}
+
+#warehouse-section h3 {
+    margin: 0 0 10px 0;
+    color: #4a2c0f;
+    font-size: 18px;
+}
+
+#warehouse-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #4a2c0f;
+}
+
+#sell-all-button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* --- СТИЛИ ДЛЯ ГРЯДОК (без изменений) --- */
 #garden-container {
     display: flex;
     flex-wrap: wrap;
@@ -87,165 +119,26 @@ body {
     margin: 80px auto 20px auto;
     max-width: 500px;
 }
+.garden-bed { width: 80px; height: 80px; background-color: #8B5A2B; border: 5px solid #D2B48C; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); display: flex; justify-content: center; align-items: center; font-size: 40px; transition: transform 0.2s ease; }
+.garden-bed.available:hover { transform: scale(1.05); cursor: pointer; }
+.garden-bed.locked { background-color: #a9a9a9; border-color: #777; cursor: not-allowed; }
+.garden-bed.locked::after { content: '🔒'; font-size: 35px; opacity: 0.8; }
+.plant { animation: grow 0.5s ease; }
+@keyframes grow { from { transform: scale(0); } to { transform: scale(1); } }
 
-.garden-bed {
-    width: 80px;
-    height: 80px;
-    background-color: #8B5A2B;
-    border: 5px solid #D2B48C;
-    border-radius: 15px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 40px;
-    transition: transform 0.2s ease;
-}
-
-.garden-bed.available:hover {
-    transform: scale(1.05);
-    cursor: pointer;
-}
-
-.garden-bed.locked {
-    background-color: #a9a9a9;
-    border-color: #777;
-    cursor: not-allowed;
-}
-
-.garden-bed.locked::after {
-    content: '🔒';
-    font-size: 35px;
-    opacity: 0.8;
-}
-
-.plant {
-    animation: grow 0.5s ease;
-}
-
-@keyframes grow {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
-}
-
-/* --- СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ --- */
-#seed-menu {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    z-index: 200;
-    pointer-events: none;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
-    transform-origin: center center;
-}
-
-#seed-menu.hidden {
-    transform: scale(0);
-    opacity: 0;
-    display: block;
-}
-
-.seed-option {
-    position: absolute;
-    background-color: rgba(255, 253, 246, 0.95);
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 28px;
-    cursor: pointer;
-    border: 2px solid #8B5A2B;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-    transition: transform 0.2s ease-out;
-    pointer-events: all;
-    top: 50%;
-    left: 50%;
-    margin-left: -24px;
-    margin-top: -24px;
-}
-
-.seed-option:hover {
-    transform: scale(1.15) !important;
-}
-
+/* --- СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ (без изменений) --- */
+#seed-menu { position: absolute; width: 100px; height: 100px; z-index: 200; pointer-events: none; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; transform-origin: center center; }
+#seed-menu.hidden { transform: scale(0); opacity: 0; display: block; }
+.seed-option { position: absolute; background-color: rgba(255, 253, 246, 0.95); border-radius: 50%; width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; font-size: 28px; cursor: pointer; border: 2px solid #8B5A2B; box-shadow: 0 4px 8px rgba(0,0,0,0.25); transition: transform 0.2s ease-out; pointer-events: all; top: 50%; left: 50%; margin-left: -24px; margin-top: -24px; }
+.seed-option:hover { transform: scale(1.15) !important; }
 #seed-menu:not(.hidden) .seed-option:nth-child(1) { transform: rotate(-60deg) translateX(70px) rotate(60deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(2) { transform: rotate(-30deg) translateX(70px) rotate(30deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(3) { transform: rotate(0deg) translateX(70px) rotate(0deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(4) { transform: rotate(30deg) translateX(70px) rotate(-30deg); }
 #seed-menu:not(.hidden) .seed-option:nth-child(5) { transform: rotate(60deg) translateX(70px) rotate(-60deg); }
-
 .seed-option[data-seed="🥕"]::after { content: '🥕'; }
 .seed-option[data-seed="🍅"]::after { content: '🍅'; }
 .seed-option[data-seed="🍆"]::after { content: '🍆'; }
 .seed-option[data-seed="🌽"]::after { content: '🌽'; }
 .seed-option[data-seed="🍓"]::after { content: '🍓'; }
 
-/* --- СТИЛИ ДЛЯ ОКНА СКЛАДА --- */
-#warehouse-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 300;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-#warehouse-modal:not(.hidden) {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-content {
-    background: #fff8e1;
-    padding: 20px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-    border: 3px solid #8B5A2B;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-#warehouse-modal:not(.hidden) .modal-content {
-    transform: scale(1);
-}
-
-.close-button {
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #8B5A2B;
-    cursor: pointer;
-}
-
-#warehouse-list {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    text-align: left;
-    font-size: 18px;
-    color: #4a2c0f;
-}
-
-#sell-all-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
