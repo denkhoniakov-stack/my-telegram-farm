@@ -121,3 +121,35 @@ body {
     from { transform: scale(0); }
     to { transform: scale(1); }
 }
+
+/* --- СТИЛИ ДЛЯ МЕНЮ ВЫБОРА СЕМЯН --- */
+#seed-menu {
+    position: absolute; /* Позиционируется относительно всего экрана */
+    background-color: rgba(255, 253, 246, 0.95);
+    border: 2px solid #8B5A2B;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    z-index: 200; /* Должно быть выше всего остального */
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+#seed-menu.hidden {
+    display: none;
+}
+
+.seed-option {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 18px;
+    border-bottom: 1px solid #D2B48C;
+}
+
+.seed-option:last-child {
+    border-bottom: none;
+}
+
+.seed-option:hover {
+    background-color: #D2B48C;
+}

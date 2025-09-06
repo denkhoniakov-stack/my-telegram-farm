@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя Ферма</title>
-    <!-- Не забываем про версию для сброса кэша! -->
-    <link rel="stylesheet" href="style.css?v=1.31">
+    <!-- Меняем версию, чтобы сбросить кэш -->
+    <link rel="stylesheet" href="style.css?v=1.5">
 </head>
 <body>
-    <!-- Новое меню -->
+    <!-- Главное меню -->
     <div id="menu-container">
         <button id="menu-button">Меню ☰</button>
         <nav id="menu-nav">
@@ -19,16 +19,11 @@
         </nav>
     </div>
 
+    <!-- Грядки -->
     <div id="garden-container">
-        <!-- 3 доступные грядки -->
         <div class="garden-bed available" data-id="1"></div>
         <div class="garden-bed available" data-id="2"></div>
         <div class="garden-bed available" data-id="3"></div>
-        
-        <!-- 10 недоступных грядок -->
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
         <div class="garden-bed locked"></div>
         <div class="garden-bed locked"></div>
         <div class="garden-bed locked"></div>
@@ -38,8 +33,17 @@
         <div class="garden-bed locked"></div>
     </div>
 
+    <!-- НОВОЕ: Меню выбора семян (изначально скрыто) -->
+    <div id="seed-menu" class="hidden">
+        <div class="seed-option" data-seed="🥕">🥕 Морковь</div>
+        <div class="seed-option" data-seed="🍅">🍅 Помидор</div>
+        <div class="seed-option" data-seed="🍆">🍆 Баклажан</div>
+        <div class="seed-option" data-seed="🌽">🌽 Кукуруза</div>
+        <div class="seed-option" data-seed="🍓">🍓 Клубника</div>
+    </div>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Не забываем про версию для сброса кэша! -->
-    <script src="script.js?v=1.31"></script>
+    <!-- Меняем версию, чтобы сбросить кэш -->
+    <script src="script.js?v=1.5"></script>
 </body>
 </html>
