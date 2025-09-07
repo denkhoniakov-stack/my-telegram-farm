@@ -5,23 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 <body>
-    <!-- Баланс игрока (остается наверху) -->
+    <!-- Баланс игрока -->
     <div id="player-balance">
         <span id="balance-amount">100.00</span> 🪙
     </div>
 
     <!-- Основной игровой контейнер -->
     <main id="game-container">
-        <!-- Грядки -->
         <div id="garden-container">
             <div class="garden-bed available"></div>
             <div class="garden-bed available"></div>
             <div class="garden-bed available"></div>
             <div class="garden-bed locked"></div>
-            <div class.="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
             <div class="garden-bed locked"></div>
             <div class="garden-bed locked"></div>
             <div class="garden-bed locked"></div>
@@ -54,40 +53,24 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Магазин Семян 🏪</h2>
-            <ul id="shop-list"></ul>
+            <ul id="shop-list">
+                <!-- Сюда JS будет добавлять товары с подробной информацией -->
+            </ul>
         </div>
     </div>
     
-    <!-- НОВАЯ НИЖНЯЯ НАВИГАЦИЯ -->
+    <!-- Нижняя навигация (в стиле "аватарок") -->
     <footer class="bottom-nav">
-        <button class="nav-button active" id="nav-farm">
-            <div class="nav-icon">🏞️</div>
-            <div class="nav-label">Ферма</div>
-        </button>
-        <button class="nav-button" id="nav-warehouse">
-            <div class="nav-icon">🌾</div>
-            <div class="nav-label">Склад</div>
-        </button>
-        <button class="nav-button" id="nav-shop">
-            <div class="nav-icon">🏪</div>
-            <div class="nav-label">Магазин</div>
-        </button>
-        <button class="nav-button" id="nav-tasks">
-            <div class="nav-icon">🏆</div>
-            <div class="nav-label">Задания</div>
-        </button>
-        <button class="nav-button" id="nav-leaders">
-            <div class="nav-icon">📈</div>
-            <div class="nav-label">Лидеры</div>
-        </button>
-        <button class="nav-button" id="nav-settings">
-            <div class="nav-icon">⚙️</div>
-            <div class="nav-label">Настройки</div>
-        </button>
+        <button class="nav-button active" id="nav-farm"><div class="nav-icon">🏞️</div></button>
+        <button class="nav-button" id="nav-warehouse"><div class="nav-icon">🌾</div></button>
+        <button class="nav-button" id="nav-shop"><div class="nav-icon">🏪</div></button>
+        <button class="nav-button" id="nav-tasks"><div class="nav-icon">🏆</div></button>
+        <button class="nav-button" id="nav-leaders"><div class="nav-icon">📈</div></button>
+        <button class="nav-button" id="nav-settings"><div class="nav-icon">⚙️</div></button>
     </footer>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
-    <script src="script.js?v=3.0"></script>
+    <script src="script.js?v=4.0"></script>
 </body>
 </html>
