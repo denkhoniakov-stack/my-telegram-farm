@@ -73,14 +73,18 @@ body {
     padding: 0 10px;
     box-sizing: border-box;
 }
-
 .nav-button {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1); /* Легкий белый фон */
     border: none;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
     border-radius: 50%;
     transition: background-color 0.3s ease;
+    backdrop-filter: blur(2px); /* Небольшое размытие для эффекта стекла */
+}
+
+.nav-button.active {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .nav-button.active {
@@ -103,13 +107,17 @@ body {
 #garden-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* ГЛАВНОЕ ИЗМЕНЕНИЕ: Устанавливаем минимальный зазор с высоким приоритетом */
-    gap: 0px !important; 
+    /* 
+      ВОТ ЗДЕСЬ НУЖНО ИЗМЕНИТЬ РАССТОЯНИЕ
+      Например, gap: 0px; уберет его полностью.
+      gap: 2px; сделает маленьким.
+    */
+    gap: 2px;
     
     background-color: transparent;
     border: none;
     padding: 3px;
-    margin-top: 150px;
+    margin-top: 50px;
     width: 95vw;
     max-width: 450px;
     margin-left: auto;
@@ -131,6 +139,8 @@ body {
     font-size: 10vw;
     transition: transform 0.2s ease;
     margin: 0;
+    /* ВОТ КЛЮЧЕВОЕ ИЗМЕНЕНИЕ */
+    margin-bottom: -50px; /* Сдвигаем следующий ряд вверх */
 }
 
 .garden-bed:hover {
@@ -145,7 +155,7 @@ body {
 
 .garden-bed.locked::after {
     content: '🔒';
-    font-size: 12vw;
+    font-size: 6vw;
     filter: none;
     opacity: 1;
     text-shadow: 0 2px 5px rgba(0,0,0,0.5);
@@ -361,3 +371,5 @@ body {
 .shop.modal-content h2::before {
     background-image: url('icons/icon-shop.png');
 }
+
+
