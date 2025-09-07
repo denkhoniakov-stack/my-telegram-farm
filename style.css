@@ -99,14 +99,17 @@ body {
     transform: scale(1.1);
 }
 
-/* --- АДАПТИВНЫЕ СТИЛИ ДЛЯ ГРЯДОК --- */
+/* --- СТИЛИ ДЛЯ ГРЯДОК --- */
 #garden-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    margin-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* ГЛАВНОЕ ИЗМЕНЕНИЕ: Устанавливаем минимальный зазор с высоким приоритетом */
+    gap: 0px !important; 
+    
+    background-color: transparent;
+    border: none;
+    padding: 3px;
+    margin-top: 150px;
     width: 95vw;
     max-width: 450px;
     margin-left: auto;
@@ -115,7 +118,7 @@ body {
 }
 
 .garden-bed {
-    width: calc(33.333% - 6px);
+    width: 100%;
     aspect-ratio: 1 / 1;
     background-image: url('garden_bed_tile.png');
     background-size: contain;
@@ -127,10 +130,12 @@ body {
     align-items: center;
     font-size: 10vw;
     transition: transform 0.2s ease;
+    margin: 0;
 }
 
 .garden-bed:hover {
     transform: scale(1.05);
+    z-index: 2;
 }
 
 .garden-bed.locked {
@@ -143,6 +148,7 @@ body {
     font-size: 12vw;
     filter: none;
     opacity: 1;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .plant {
