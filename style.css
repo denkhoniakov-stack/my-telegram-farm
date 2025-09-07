@@ -92,8 +92,8 @@ body {
 }
 
 .nav-icon {
-    width: 45px;
-    height: 45px;
+    width: 47px;
+    height: 47px;
     display: block;
     transition: transform 0.2s ease;
     filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
@@ -140,7 +140,7 @@ body {
     transition: transform 0.2s ease;
     margin: 0;
     /* ВОТ КЛЮЧЕВОЕ ИЗМЕНЕНИЕ */
-    margin-bottom: -50px; /* Сдвигаем следующий ряд вверх */
+    margin-bottom: -40px; /* Сдвигаем следующий ряд вверх */
 }
 
 .garden-bed:hover {
