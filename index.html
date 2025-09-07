@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
-    <link rel="stylesheet" href="style.css?v=6.01">
+    <link rel="stylesheet" href="style.css?v=8.01">
 </head>
 <body>
+    <!-- НОВЫЙ ЭЛЕМЕНТ ДЛЯ РАЗМЫТОГО ФОНА -->
+    <div class="background-overlay"></div>
+
     <!-- Баланс игрока -->
     <div id="player-balance">
         <span id="balance-amount">100.00</span> 🪙
@@ -15,7 +18,7 @@
 
     <!-- Основной игровой контейнер -->
     <main id="game-container">
-        <!-- ВОЗВРАЩАЕМ ПРОСТУЮ СТРУКТУРУ ГРЯДОК -->
+        <!-- ОБНОВЛЕННЫЙ КОНТЕЙНЕР НА 15 ГРЯДОК -->
         <div id="garden-container">
             <div class="garden-bed available"></div>
             <div class="garden-bed available"></div>
@@ -27,41 +30,61 @@
             <div class="garden-bed locked"></div>
             <div class="garden-bed locked"></div>
             <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
         </div>
     </main>
 
     <!-- Меню выбора семян -->
-    <div id="seed-menu" class="hidden"></div>
-
-    <!-- Модальные окна (Склад и Магазин) -->
     <div id="warehouse-modal" class="modal hidden">
-        <div class="modal-content">
+    <!-- Добавляем класс "warehouse" -->
+        <div class="modal-content warehouse">
             <span class="close-button">&times;</span>
-            <h2>Склад Урожая 🌾</h2>
+        <!-- Убираем эмодзи -->
+            <h2>Склад Урожая</h2>
             <ul id="warehouse-list"></ul>
             <button id="sell-all-button">Продать всё</button>
         </div>
     </div>
+
+<!-- Модальное окно Магазина -->
     <div id="shop-modal" class="modal hidden">
-        <div class="modal-content">
+    <!-- Добавляем класс "shop" -->
+        <div class="modal-content shop">
             <span class="close-button">&times;</span>
-            <h2>Магазин Семян 🏪</h2>
+        <!-- Убираем эмодзи -->
+            <h2>Магазин Семян</h2>
             <ul id="shop-list"></ul>
         </div>
     </div>
-    
+
     <!-- Нижняя навигация -->
     <footer class="bottom-nav">
-        <button class="nav-button active" id="nav-farm"><div class="nav-icon">🏞️</div></button>
-        <button class="nav-button" id="nav-warehouse"><div class="nav-icon">🌾</div></button>
-        <button class="nav-button" id="nav-shop"><div class="nav-icon">🏪</div></button>
-        <button class="nav-button" id="nav-tasks"><div class="nav-icon">🏆</div></button>
-        <button class="nav-button" id="nav-leaders"><div class="nav-icon">📈</div></button>
-        <button class="nav-button" id="nav-settings"><div class="nav-icon">⚙️</div></button>
+        <button class="nav-button active" id="nav-farm">
+            <img src="icons/icon-farm.png" alt="Ферма" class="nav-icon">
+        </button>
+        <button class="nav-button" id="nav-warehouse">
+            <img src="icons/icon-warehouse.png" alt="Склад" class="nav-icon">
+        </button>
+        <button class="nav-button" id="nav-shop">
+            <img src="icons/icon-shop.png" alt="Магазин" class="nav-icon">
+        </button>
+        <button class="nav-button" id="nav-tasks">
+            <img src="icons/icon-tasks.png" alt="Задания" class="nav-icon">
+        </button>
+        <button class="nav-button" id="nav-leaders">
+            <img src="icons/icon-leaders.png" alt="Лидеры" class="nav-icon">
+        </button>
+        <button class="nav-button" id="nav-settings">
+            <img src="icons/icon-settings.png" alt="Настройки" class="nav-icon">
+        </button>
     </footer>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
-    <script src="script.js?v=6.01"></script>
+    <script src="script.js?v=8.01"></script>
 </body>
 </html>
