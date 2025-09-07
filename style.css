@@ -1,3 +1,24 @@
+/* --- СБРОС СТИЛЕЙ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ --- */
+* {
+    /* Убираем синюю подсветку при нажатии */
+    -webkit-tap-highlight-color: transparent;
+    
+    /* Отключаем стандартное контекстное меню при долгом нажатии */
+    -webkit-touch-callout: none;
+    
+    /* Запрещаем выделение текста, чтобы игра ощущалась как приложение */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Убираем синюю рамку фокуса, которая может появляться */
+button:focus, a:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 /* --- ОСНОВНЫЕ СТИЛИ --- */
 body {
     background-image: url('farm_background_vertical.png');
@@ -14,7 +35,7 @@ body {
 }
 
 #game-container {
-    padding-bottom: 90px; /* Отступ для нижней навигации */
+    padding-bottom: 90px;
 }
 
 /* --- СТИЛИ ДЛЯ БАЛАНСА --- */
@@ -79,7 +100,7 @@ body {
     font-size: 24px;
 }
 
-/* --- СТИЛИ ДЛЯ ГРЯДОК И РАДИАЛЬНОГО МЕНЮ (без изменений) --- */
+/* --- СТИЛИ ДЛЯ ГРЯДОК И РАСТЕНИЙ --- */
 #garden-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; margin-top: 50px; max-width: 500px; margin-left: auto; margin-right: auto; }
 .garden-bed { width: 80px; height: 80px; background-color: #8B5A2B; border: 5px solid #D2B48C; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); display: flex; justify-content: center; align-items: center; font-size: 40px; transition: transform 0.2s ease; }
 .garden-bed.available:hover { transform: scale(1.05); cursor: pointer; }
@@ -87,20 +108,44 @@ body {
 .garden-bed.locked::after { content: '🔒'; font-size: 35px; opacity: 0.8; }
 .plant { animation: grow 0.5s ease; }
 @keyframes grow { from { transform: scale(0); } to { transform: scale(1); } }
-#seed-menu { position: absolute; width: 100px; height: 100px; z-index: 200; pointer-events: none; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; transform-origin: center center; }
-#seed-menu.hidden { transform: scale(0); opacity: 0; display: block; }
-.seed-option { position: absolute; background-color: rgba(255, 253, 246, 0.95); border-radius: 50%; width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; font-size: 28px; cursor: pointer; border: 2px solid #8B5A2B; box-shadow: 0 4px 8px rgba(0,0,0,0.25); transition: transform 0.2s ease-out; pointer-events: all; top: 50%; left: 50%; margin-left: -24px; margin-top: -24px; }
-.seed-option:hover { transform: scale(1.15) !important; }
-#seed-menu:not(.hidden) .seed-option:nth-child(1) { transform: rotate(-60deg) translateX(70px) rotate(60deg); }
-#seed-menu:not(.hidden) .seed-option:nth-child(2) { transform: rotate(-30deg) translateX(70px) rotate(30deg); }
-#seed-menu:not(.hidden) .seed-option:nth-child(3) { transform: rotate(0deg) translateX(70px) rotate(0deg); }
-#seed-menu:not(.hidden) .seed-option:nth-child(4) { transform: rotate(30deg) translateX(70px) rotate(-30deg); }
-#seed-menu:not(.hidden) .seed-option:nth-child(5) { transform: rotate(60deg) translateX(70px) rotate(-60deg); }
-.seed-option[data-seed="🥕"]::after { content: '🥕'; }
-.seed-option[data-seed="🍅"]::after { content: '🍅'; }
-.seed-option[data-seed="🍆"]::after { content: '🍆'; }
-.seed-option[data-seed="🌽"]::after { content: '🌽'; }
-.seed-option[data-seed="🍓"]::after { content: '🍓'; }
+
+/* --- СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ (ИЗМЕНЕНО) --- */
+#seed-menu {
+    position: absolute;
+    width: 1px; /* Контейнер теперь почти невидимый */
+    height: 1px;
+    z-index: 200;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+
+#seed-menu.hidden {
+    transform: scale(0);
+    opacity: 0;
+}
+
+.seed-option {
+    position: absolute;
+    background-color: rgba(255, 253, 246, 0.95);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    border: 2px solid #8B5A2B;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease-out;
+    pointer-events: all;
+    /* Позиция будет задана через JS */
+    transform-origin: center;
+}
+
+.seed-option:hover {
+    transform: scale(1.15) !important; /* !important нужен для переопределения JS-трансформации */
+}
 
 /* --- ОБЩИЕ СТИЛИ ДЛЯ МОДАЛЬНЫХ ОКОН --- */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1100; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
@@ -109,51 +154,15 @@ body {
 .modal:not(.hidden) .modal-content { transform: scale(1); }
 .close-button { position: absolute; top: 5px; right: 15px; font-size: 28px; font-weight: bold; color: #8B5A2B; cursor: pointer; }
 
-/* --- СТИЛИ ДЛЯ СКЛАДА --- */
-#warehouse-list { list-style: none; padding: 0; margin: 20px 0; }
+/* --- СТИЛИ ДЛЯ СКЛАДА И МАГАЗИНА --- */
+#warehouse-list, #shop-list { list-style: none; padding: 0; margin: 20px 0; max-height: 60vh; overflow-y: auto; }
 #sell-all-button { width: 100%; background-color: #4CAF50; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-
-/* --- НОВЫЕ СТИЛИ ДЛЯ МАГАЗИНА --- */
-#shop-list { list-style: none; padding: 0; margin: 20px 0; max-height: 60vh; overflow-y: auto; }
-.shop-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #D2B48C;
-}
+.shop-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #D2B48C; }
 .shop-item:last-child { border-bottom: none; }
-.shop-item-icon {
-    font-size: 32px;
-    margin-right: 15px;
-}
-.shop-item-details {
-    flex-grow: 1;
-    text-align: left;
-}
-.shop-item-title {
-    font-size: 18px;
-    font-weight: bold;
-}
-.shop-item-info {
-    font-size: 13px;
-    color: #555;
-    margin: 4px 0;
-}
-.shop-item-buy {
-    text-align: right;
-}
-.buy-button {
-    background-color: #f0ad4e;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-}
-.seed-inventory-count {
-    font-size: 12px;
-    color: #006400;
-    margin-top: 4px;
-}
+.shop-item-icon { font-size: 32px; margin-right: 15px; }
+.shop-item-details { flex-grow: 1; text-align: left; }
+.shop-item-title { font-size: 18px; font-weight: bold; }
+.shop-item-info { font-size: 13px; color: #555; margin: 4px 0; }
+.shop-item-buy { text-align: right; }
+.buy-button { background-color: #f0ad4e; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; }
+.seed-inventory-count { font-size: 12px; color: #006400; margin-top: 4px; }

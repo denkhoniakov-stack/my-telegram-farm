@@ -29,13 +29,9 @@
         </div>
     </main>
 
-    <!-- Меню выбора семян (радиальное) -->
+    <!-- Меню выбора семян (теперь пустой контейнер) -->
     <div id="seed-menu" class="hidden">
-        <div class="seed-option" data-seed="🥕"></div>
-        <div class="seed-option" data-seed="🍅"></div>
-        <div class="seed-option" data-seed="🍆"></div>
-        <div class="seed-option" data-seed="🌽"></div>
-        <div class="seed-option" data-seed="🍓"></div>
+        <!-- Иконки будут добавляться сюда динамически -->
     </div>
 
     <!-- Модальное окно Склада -->
@@ -53,13 +49,11 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Магазин Семян 🏪</h2>
-            <ul id="shop-list">
-                <!-- Сюда JS будет добавлять товары с подробной информацией -->
-            </ul>
+            <ul id="shop-list"></ul>
         </div>
     </div>
     
-    <!-- Нижняя навигация (в стиле "аватарок") -->
+    <!-- Нижняя навигация -->
     <footer class="bottom-nav">
         <button class="nav-button active" id="nav-farm"><div class="nav-icon">🏞️</div></button>
         <button class="nav-button" id="nav-warehouse"><div class="nav-icon">🌾</div></button>
