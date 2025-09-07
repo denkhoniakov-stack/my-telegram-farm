@@ -126,6 +126,7 @@ body {
 }
 
 .garden-bed {
+    position: relative;
     width: 100%;
     aspect-ratio: 1 / 1;
     background-image: url('garden_bed_tile.png');
@@ -411,4 +412,18 @@ body {
 
 .shop-tab-content.active {
     display: block; /* Показываем только активную */
+}
+/* --- СТИЛИ ДЛЯ ТАЙМЕРА НА ГРЯДКЕ --- */
+.plant-timer {
+    position: absolute; /* Позиционируем относительно грядки */
+    bottom: 10px;       /* Располагаем внизу с небольшим отступом */
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;       /* Белый цвет текста */
+    font-size: 14px;    /* Размер шрифта можно настроить */
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Тень для лучшей читаемости */
+    pointer-events: none; /* Таймер не будет мешать кликам по грядке */
+    z-index: 5;         /* Отображаем поверх ростка */
 }

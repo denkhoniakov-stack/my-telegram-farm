@@ -243,26 +243,57 @@ document.addEventListener('DOMContentLoaded', () => {
             warehouseList.appendChild(li);
         });
     }
-
     function plantSeed(bed, seed) {
         const plantInfo = PLANT_DATA[seed];
+        const growTimeInSeconds = plantInfo.growTime / 1000;
+        let remainingTime = growTimeInSeconds;
+
+    // 1. Создаем элементы для ростка и таймера
+        bed.innerHTML = ''; // Очищаем грядку на всякий случай
         const plantElement = document.createElement('div');
         plantElement.classList.add('plant');
-        plantElement.innerText = '🌱';
-        bed.appendChild(plantElement);
+        plantElement.innerText = '🌱'; // Росток
 
-        setTimeout(() => {
-            plantElement.innerText = seed;
-            plantElement.addEventListener('click', (e) => {
-                e.stopPropagation();
-                animateHarvest(plantElement, seed);
-                gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
-                saveGameData();
-                bed.innerHTML = '';
-                tg.HapticFeedback.notificationOccurred('success');
-            }, { once: true });
-        }, plantInfo.growTime);
+        const timerElement = document.createElement('div');
+        timerElement.classList.add('plant-timer'); // Новый класс для стилизации
+
+        bed.appendChild(plantElement);
+        bed.appendChild(timerElement);
+
+    // 2. Функция для форматирования времени в формат ММ:СС
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = seconds % 60;
+            return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        timerElement.innerText = formatTime(remainingTime); // Сразу показываем время
+
+    // 3. Запускаем интервал, который обновляется каждую секунду
+        const timerInterval = setInterval(() => {
+            remainingTime--;
+            timerElement.innerText = formatTime(remainingTime);
+
+        // 4. Когда время вышло
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval); // Останавливаем таймер
+                bed.removeChild(timerElement); // Удаляем элемент таймера
+            
+                plantElement.innerText = seed; // Показываем спелый овощ
+            
+            // Добавляем возможность собрать урожай
+                plantElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    animateHarvest(plantElement, seed);
+                    gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
+                    saveGameData();
+                    bed.innerHTML = ''; // Очищаем грядку после сбора
+                    tg.HapticFeedback.notificationOccurred('success');
+                }, { once: true });
+            }
+        }, 1000); // 1000 мс = 1 секунда
     }
+    
     
     function animateHarvest(startElement, seed) {
         const endElement = document.getElementById('nav-warehouse'); // Цель анимации
