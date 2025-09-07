@@ -141,6 +141,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 warehouseModal.classList.remove('hidden'); 
                 break;
             case 'nav-shop': 
+                if (shopTabsContainer) {
+                    shopTabsContainer.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+                }
+    // Убираем класс 'active' со всего содержимого вкладок
+                tabContents.forEach(content => content.classList.remove('active'));
+
+    // 2. Теперь принудительно делаем вкладку "Семена" активной
+                const seedsTabButton = shopTabsContainer.querySelector('.tab-button[data-tab="seeds"]');
+                if (seedsTabButton) {
+                       seedsTabButton.classList.add('active');
+                }
+                const seedsTabContent = document.getElementById('seeds-tab');
+                if (seedsTabContent) {
+                        seedsTabContent.classList.add('active');
+                }
                 populateShopSeeds();  // Заполняем семена
                 populateShopTabs();   // Заполняем остальные вкладки
                 shopModal.classList.remove('hidden'); 
@@ -230,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         warehouseList.innerHTML = '';
         const items = Object.keys(gameState.warehouse).filter(key => gameState.warehouse[key] > 0);
         if (items.length === 0) {
-            warehouseList.innerHTML = '<li>Склад урожая пуст</li>';
+            warehouseList.innerHTML = '<li>Склад пуст</li>';
             sellAllButton.style.display = 'none';
             return;
         }
@@ -326,25 +341,56 @@ document.addEventListener('DOMContentLoaded', () => {
             tg.showAlert('У вас нет семян для посадки. Зайдите в магазин!');
             return;
         }
+
         seedMenu.innerHTML = '';
-        const radius = 80;
-        const angleStep = availableSeeds.length > 1 ? 120 / (availableSeeds.length - 1) : 0;
+    
+    // --- НАЧАЛО ГЛАВНОГО ИЗМЕНЕНИЯ: ЛОГИКА КРУГОВОГО МЕНЮ ---
+
+        const radius = 60; // Радиус круга, по которому будут расположены семена
+        const angleStep = (2 * Math.PI) / availableSeeds.length; // Угол между иконками
+
         availableSeeds.forEach((seed, index) => {
-            const angle = -60 + (angleStep * index);
+        // Вычисляем угол для текущего элемента
+            const angle = index * angleStep;
+        // Вычисляем X и Y координаты на окружности
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+
             const option = document.createElement('div');
             option.className = 'seed-option';
             option.dataset.seed = seed;
-            option.innerText = seed;
-            option.style.transform = `rotate(${angle}deg) translateX(${radius}px) rotate(${-angle}deg)`;
+        // Применяем вычисленные координаты через transform
+            option.style.transform = `translate(${x}px, ${y}px)`;
+
+            const count = gameState.seedInventory[seed];
+            option.innerHTML = `
+                <span class="seed-emoji">${seed}</span>
+                <span class="seed-count">${count}</span>
+            `;
+        
             option.addEventListener('click', (e) => {
                 e.stopPropagation();
                 handleSeedSelection(seed);
             });
             seedMenu.appendChild(option);
         });
+
+    // Добавляем центральную кнопку для закрытия меню
+        const closeButton = document.createElement('div');
+        closeButton.className = 'seed-menu-close-button';
+        closeButton.innerHTML = '&times;'; // Иконка "крестик"
+        closeButton.addEventListener('click', (e) => {
+             e.stopPropagation();
+             hideSeedMenu();
+        });
+        seedMenu.appendChild(closeButton);
+
+    // --- КОНЕЦ ГЛАВНОГО ИЗМЕНЕНИЯ ---
+
         const rect = bed.getBoundingClientRect();
-        seedMenu.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
-        seedMenu.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`;
+        seedMenu.style.left = `${rect.left + rect.width / 2}px`;
+        seedMenu.style.top = `${rect.top + rect.height / 2}px`;
+
         seedMenu.classList.remove('hidden');
     }
     

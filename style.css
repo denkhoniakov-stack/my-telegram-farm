@@ -174,42 +174,107 @@ body {
     to { transform: scale(1); }
 }
 
-/* --- СТИЛИ ДЛЯ РАДИАЛЬНОГО МЕНЮ --- */
+/* --- СТИЛИ ДЛЯ КРУГОВОГО МЕНЮ ВЫБОРА СЕМЯН --- */
+
 #seed-menu {
     position: absolute;
+    /* Делаем контейнер просто точкой-якорем в центре грядки */
     width: 1px;
     height: 1px;
     z-index: 200;
-    pointer-events: none;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none; /* Сам контейнер не кликабельный */
 }
 
 #seed-menu.hidden {
-    transform: scale(0);
-    opacity: 0;
+    transform: scale(0); /* Схлопываем меню для скрытия */
 }
 
 .seed-option {
-    position: absolute;
-    background-color: rgba(255, 253, 246, 0.95);
+    position: absolute; /* Ключевое свойство! */
+    /* Теперь иконка позиционируется относительно центральной точки-якоря */
+    top: -24px;  /* Смещаем наполовину высоты вверх */
+    left: -24px; /* Смещаем наполовину ширины влево */
+    
+    background-color: #fff8e1;
+    border: 2px solid #8B5A2B;
     border-radius: 50%;
     width: 48px;
     height: 48px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 28px;
     cursor: pointer;
-    border: 2px solid #8B5A2B;
     box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-    transition: transform 0.2s ease-out;
-    pointer-events: all;
-    transform-origin: center;
+    
+    /* Плавная анимация "разлетания" иконок от центра */
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    pointer-events: all; /* Иконки должны быть кликабельны */
+    transform: translate(0, 0); /* Исходная позиция - в центре */
+}
+
+#seed-menu.hidden .seed-option {
+    /* При скрытии меню, иконки летят обратно в центр */
+    transform: translate(0, 0) !important;
 }
 
 .seed-option:hover {
-    transform: scale(1.15) !important;
+    transform: scale(1.15) !important; /* Увеличиваем иконку при наведении */
+    z-index: 10; /* Поверх других иконок */
 }
+
+.seed-emoji {
+    font-size: 28px;
+}
+
+.seed-count {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #f0ad4e;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+/* Стили для новой центральной кнопки закрытия */
+.seed-menu-close-button {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    background-color: #c93e3e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    pointer-events: all;
+    transition: transform 0.2s;
+}
+
+.seed-menu-close-button:hover {
+    transform: scale(1.1);
+}
+
+
+
 
 /* --- МОДАЛЬНЫЕ ОКНА --- */
 .modal {
