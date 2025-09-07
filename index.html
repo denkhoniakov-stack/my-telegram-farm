@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
-    <link rel="stylesheet" href="style.css?v=10.0111">
+    <link rel="stylesheet" href="style.css?v=10.01111">
 </head>
 <body>
     <!-- ЭЛЕМЕНТ ДЛЯ РАЗМЫТОГО ФОНА -->
@@ -65,10 +65,33 @@
     <div id="shop-modal" class="modal hidden">
         <div class="modal-content shop">
             <span class="close-button">&times;</span>
-            <h2>Магазин Семян</h2>
-            <ul id="shop-list"></ul>
+            <h2>Магазин</h2>
+            <!-- Навигация по вкладкам -->
+            <div class="shop-tabs">
+                <button class="tab-button active" data-tab="seeds">Семена</button>
+                <button class="tab-button" data-tab="inventory">Инвентарь</button>
+                <button class="tab-button" data-tab="boosters">Ускорители</button>
+                <button class="tab-button" data-tab="decor">Декор</button>
+            </div>
+
+        <!-- Контент вкладок -->
+            <div class="shop-tab-content active" id="seeds-tab">
+                <ul id="shop-list">
+                <!-- Сюда будут загружаться семена -->
+                </ul>
+            </div>
+            <div class="shop-tab-content" id="inventory-tab">
+                <p>Здесь будет ваш инвентарь.</p>
+            </div>
+            <div class="shop-tab-content" id="boosters-tab">
+                <p>Ускорители в разработке!</p>
+            </div>
+            <div class="shop-tab-content" id="decor-tab">
+                <p>Декор скоро появится в продаже!</p>
+            </div>
         </div>
     </div>
+
 
     <!-- Нижняя навигация -->
     <footer class="bottom-nav">
@@ -95,6 +118,6 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
-    <script src="script.js?v=10.0111"></script>
+    <script src="script.js?v=10.01111"></script>
 </body>
 </html>

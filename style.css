@@ -373,3 +373,42 @@ body {
 }
 
 
+/* --- СТИЛИ ДЛЯ ВКЛАДОК В МАГАЗИНЕ --- */
+.shop-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #D2B48C;
+    padding-bottom: 10px;
+}
+
+.tab-button {
+    background-color: #eaddc0;
+    border: 2px solid #c8b89a;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #6a4c2f;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.tab-button:hover {
+    background-color: #f5e8d0;
+}
+
+.tab-button.active {
+    background-color: #f0ad4e;
+    border-color: #e39626;
+    color: white;
+}
+
+.shop-tab-content {
+    display: none; /* Прячем все вкладки по умолчанию */
+}
+
+.shop-tab-content.active {
+    display: block; /* Показываем только активную */
+}
