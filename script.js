@@ -344,29 +344,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
         seedMenu.innerHTML = '';
     
-    // --- НАЧАЛО ГЛАВНОГО ИЗМЕНЕНИЯ: ЛОГИКА КРУГОВОГО МЕНЮ ---
+        const numItems = availableSeeds.length;
+        const itemVisualWidth = 65;
+        const screenEdgePadding = 25; 
 
-        const radius = 60; // Радиус круга, по которому будут расположены семена
-        const angleStep = (2 * Math.PI) / availableSeeds.length; // Угол между иконками
+    // --- Шаг 1: Рассчитываем динамический радиус (логика без изменений) ---
+        const rect = bed.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const maxRadiusByPosition = Math.min(centerX, window.innerWidth - centerX) - screenEdgePadding;
+        const idealCircumference = numItems * itemVisualWidth;
+        let idealRadius = idealCircumference / (2 * Math.PI);
+        if (numItems === 2) { idealRadius = 50; }
+        const finalRadius = Math.max(55, Math.min(maxRadiusByPosition, idealRadius));
 
+    // --- Шаг 2: НОВАЯ ЛОГИКА "УМНОГО ПОВОРОТА" ---
+        const angleStep = (2 * Math.PI) / numItems;
+        let angleOffset = -Math.PI / 2; // Начинаем с иконки наверху (угол -90 градусов)
+
+    // Проверяем, не выходит ли круг за пределы экрана
+        const isTooFarRight = centerX + finalRadius > window.innerWidth - screenEdgePadding;
+        const isTooFarLeft = centerX - finalRadius < screenEdgePadding;
+
+    // Если круг упирается в левый или правый край...
+        if (isTooFarLeft || isTooFarRight) {
+        // ...поворачиваем всё меню на половину шага между иконками.
+        // Это поместит "пустое" место точно на горизонтальную линию, уводя иконки вверх и вниз.
+            angleOffset += angleStep / 2;
+        }  
+    
+    // --- Шаг 3: Генерируем иконки с учетом поворота ---
         availableSeeds.forEach((seed, index) => {
-        // Вычисляем угол для текущего элемента
-            const angle = index * angleStep;
-        // Вычисляем X и Y координаты на окружности
-            const x = radius * Math.cos(angle);
-            const y = radius * Math.sin(angle);
+        // Применяем вычисленный сдвиг угла
+            const angle = angleOffset + index * angleStep;
+        
+            const x = finalRadius * Math.cos(angle);
+            const y = finalRadius * Math.sin(angle);
 
             const option = document.createElement('div');
             option.className = 'seed-option';
-            option.dataset.seed = seed;
-        // Применяем вычисленные координаты через transform
             option.style.transform = `translate(${x}px, ${y}px)`;
-
+        
             const count = gameState.seedInventory[seed];
             option.innerHTML = `
                 <div class="seed-option-inner">
-                   <span class="seed-emoji">${seed}</span>
-                   <span class="seed-count">${count}</span>
+                    <span class="seed-emoji">${seed}</span>
+                    <span class="seed-count">${count}</span>
                 </div>
             `;
         
@@ -377,25 +399,20 @@ document.addEventListener('DOMContentLoaded', () => {
             seedMenu.appendChild(option);
         });
 
-    // Добавляем центральную кнопку для закрытия меню
+    // Остальная часть функции без изменений
         const closeButton = document.createElement('div');
         closeButton.className = 'seed-menu-close-button';
-        closeButton.innerHTML = '&times;'; // Иконка "крестик"
+        closeButton.innerHTML = '&times;';
         closeButton.addEventListener('click', (e) => {
-             e.stopPropagation();
-             hideSeedMenu();
+            e.stopPropagation();
+            hideSeedMenu();
         });
         seedMenu.appendChild(closeButton);
 
-    // --- КОНЕЦ ГЛАВНОГО ИЗМЕНЕНИЯ ---
-
-        const rect = bed.getBoundingClientRect();
-        seedMenu.style.left = `${rect.left + rect.width / 2}px`;
+        seedMenu.style.left = `${centerX}px`;
         seedMenu.style.top = `${rect.top + rect.height / 2}px`;
-
         seedMenu.classList.remove('hidden');
     }
-    
     function handleSeedSelection(seedType) {
         if (!activeBed) return;
         if ((gameState.seedInventory[seedType] || 0) > 0) {
