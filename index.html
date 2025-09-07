@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=6.01">
 </head>
 <body>
     <!-- Баланс игрока -->
@@ -15,6 +15,7 @@
 
     <!-- Основной игровой контейнер -->
     <main id="game-container">
+        <!-- ВОЗВРАЩАЕМ ПРОСТУЮ СТРУКТУРУ ГРЯДОК -->
         <div id="garden-container">
             <div class="garden-bed available"></div>
             <div class="garden-bed available"></div>
@@ -29,12 +30,10 @@
         </div>
     </main>
 
-    <!-- Меню выбора семян (теперь пустой контейнер) -->
-    <div id="seed-menu" class="hidden">
-        <!-- Иконки будут добавляться сюда динамически -->
-    </div>
+    <!-- Меню выбора семян -->
+    <div id="seed-menu" class="hidden"></div>
 
-    <!-- Модальное окно Склада -->
+    <!-- Модальные окна (Склад и Магазин) -->
     <div id="warehouse-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -43,8 +42,6 @@
             <button id="sell-all-button">Продать всё</button>
         </div>
     </div>
-
-    <!-- Модальное окно Магазина -->
     <div id="shop-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -65,6 +62,6 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
-    <script src="script.js?v=4.0"></script>
+    <script src="script.js?v=6.01"></script>
 </body>
 </html>
