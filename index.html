@@ -2,50 +2,33 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
-    <link rel="stylesheet" href="style.css?v=1.9">
+    <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
-    <!-- Баланс игрока -->
+    <!-- Баланс игрока (остается наверху) -->
     <div id="player-balance">
         <span id="balance-amount">100.00</span> 🪙
     </div>
 
-    <!-- Главное меню -->
-    <div id="menu-container">
-        <button id="menu-button">Меню ☰</button>
-        <nav id="menu-nav">
-            <!-- НОВАЯ СТРУКТУРА СКЛАДА ВНУТРИ МЕНЮ -->
-            <div id="warehouse-section">
-                <h3>Урожай 🌾</h3>
-                <ul id="warehouse-list">
-                    <!-- Содержимое склада будет здесь -->
-                </ul>
-                <button id="sell-all-button">Продать всё</button>
-            </div>
-            <hr>
-            <!-- Остальные пункты меню -->
-            <a href="#">Магазин 🏪</a>
-            <a href="#">Задания 🏆</a>
-            <a href="#">Настройки ⚙️</a>
-        </nav>
-    </div>
-
-    <!-- Грядки -->
-    <div id="garden-container">
-        <div class="garden-bed available" data-id="1"></div>
-        <div class="garden-bed available" data-id="2"></div>
-        <div class="garden-bed available" data-id="3"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-        <div class="garden-bed locked"></div>
-    </div>
+    <!-- Основной игровой контейнер -->
+    <main id="game-container">
+        <!-- Грядки -->
+        <div id="garden-container">
+            <div class="garden-bed available"></div>
+            <div class="garden-bed available"></div>
+            <div class="garden-bed available"></div>
+            <div class="garden-bed locked"></div>
+            <div class.="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+            <div class="garden-bed locked"></div>
+        </div>
+    </main>
 
     <!-- Меню выбора семян (радиальное) -->
     <div id="seed-menu" class="hidden">
@@ -56,8 +39,55 @@
         <div class="seed-option" data-seed="🍓"></div>
     </div>
 
+    <!-- Модальное окно Склада -->
+    <div id="warehouse-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Склад Урожая 🌾</h2>
+            <ul id="warehouse-list"></ul>
+            <button id="sell-all-button">Продать всё</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно Магазина -->
+    <div id="shop-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Магазин Семян 🏪</h2>
+            <ul id="shop-list"></ul>
+        </div>
+    </div>
+    
+    <!-- НОВАЯ НИЖНЯЯ НАВИГАЦИЯ -->
+    <footer class="bottom-nav">
+        <button class="nav-button active" id="nav-farm">
+            <div class="nav-icon">🏞️</div>
+            <div class="nav-label">Ферма</div>
+        </button>
+        <button class="nav-button" id="nav-warehouse">
+            <div class="nav-icon">🌾</div>
+            <div class="nav-label">Склад</div>
+        </button>
+        <button class="nav-button" id="nav-shop">
+            <div class="nav-icon">🏪</div>
+            <div class="nav-label">Магазин</div>
+        </button>
+        <button class="nav-button" id="nav-tasks">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">Задания</div>
+        </button>
+        <button class="nav-button" id="nav-leaders">
+            <div class="nav-icon">📈</div>
+            <div class="nav-label">Лидеры</div>
+        </button>
+        <button class="nav-button" id="nav-settings">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Настройки</div>
+        </button>
+    </footer>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
-    <script src="script.js?v=1.9"></script>
+    <script src="script.js?v=3.0"></script>
 </body>
 </html>
