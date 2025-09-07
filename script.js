@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.ready();
     tg.expand();
 
-    // --- НАСТРОЙКИ ИГРЫ ---
     const PLANT_DATA = {
         '🥕': { name: 'Морковь', growTime: 1000, seedCost: 1.00, sellPrice: 1.54 },
         '🍅': { name: 'Помидор', growTime: 3000, seedCost: 3.00, sellPrice: 4.62 },
@@ -12,16 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
         '🍓': { name: 'Клубника', growTime: 10000, seedCost: 10.00, sellPrice: 15.40 }
     };
     
-    // --- ДАННЫЕ ИГРОКА ---
     let gameState = {
         balance: 100,
         warehouse: {},
         seedInventory: { '🥕': 3 }
     };
 
-    // --- ЭЛЕМЕНТЫ DOM ---
     const balanceAmountElement = document.getElementById('balance-amount');
-    const availableBeds = document.querySelectorAll('.garden-bed.available');
+    const gardenContainer = document.getElementById('garden-container');
     const seedMenu = document.getElementById('seed-menu');
     let activeBed = null;
     const warehouseModal = document.getElementById('warehouse-modal');
@@ -33,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navFarmBtn = document.getElementById('nav-farm');
     const navWarehouseBtn = document.getElementById('nav-warehouse');
 
-    // --- СОХРАНЕНИЕ И ЗАГРУЗКА ---
     function saveGameData() { localStorage.setItem('farmGameState_v4', JSON.stringify(gameState)); }
     function loadGameData() {
         const savedData = localStorage.getItem('farmGameState_v4');
@@ -45,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBalanceDisplay();
     }
 
-    // --- ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ---
     function updateBalanceDisplay() { balanceAmountElement.innerText = gameState.balance.toFixed(2); }
     function updateWarehouseDisplay() {
         warehouseList.innerHTML = '';
@@ -65,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ЛОГИКА ПОСАДКИ И СБОРА УРОЖАЯ ---
     function plantSeed(bed, seed) {
         const plantInfo = PLANT_DATA[seed];
         const plantElement = document.createElement('div');
@@ -77,11 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             plantElement.innerText = seed;
             plantElement.addEventListener('click', (e) => {
                 e.stopPropagation();
-                
-                // --- ВЫЗОВ НОВОЙ АНИМАЦИИ ---
                 animateHarvest(plantElement, seed);
-                
-                // Основная логика выполняется сразу
                 gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
                 saveGameData();
                 bed.innerHTML = '';
@@ -90,48 +80,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }, plantInfo.growTime);
     }
     
-    // --- НОВАЯ ФУНКЦИЯ АНИМАЦИИ ---
     function animateHarvest(startElement, seed) {
-        const endElement = navWarehouseBtn; // Цель - кнопка склада
-        
+        const endElement = navWarehouseBtn;
         const flyingCrop = document.createElement('div');
         flyingCrop.innerText = seed;
         flyingCrop.className = 'flying-crop';
         document.body.appendChild(flyingCrop);
-
         const startRect = startElement.getBoundingClientRect();
         const endRect = endElement.getBoundingClientRect();
-
-        // Начальная позиция
-        flyingCrop.style.left = `${startRect.left + startRect.width / 2 - 18}px`; // 18 - половина размера flying-crop
+        flyingCrop.style.left = `${startRect.left + startRect.width / 2 - 18}px`;
         flyingCrop.style.top = `${startRect.top + startRect.height / 2 - 18}px`;
-
-        // Вычисляем смещение для transform: translate()
         const deltaX = (endRect.left + endRect.width / 2) - (startRect.left + startRect.width / 2);
         const deltaY = (endRect.top + endRect.height / 2) - (startRect.top + startRect.height / 2);
-
-        // Устанавливаем CSS переменные для анимации
         flyingCrop.style.setProperty('--target-x', `${deltaX}px`);
         flyingCrop.style.setProperty('--target-y', `${deltaY}px`);
-
-        // Удаляем элемент после завершения анимации
-        flyingCrop.addEventListener('animationend', () => {
-            flyingCrop.remove();
-        });
+        flyingCrop.addEventListener('animationend', () => flyingCrop.remove());
     }
 
-    // --- ДИНАМИЧЕСКОЕ МЕНЮ ПОСАДКИ ---
-    availableBeds.forEach(bed => bed.addEventListener('click', () => {
-        if (bed.innerHTML !== '') return;
-        activeBed = bed;
-        showPlantingMenu(bed);
-    }));
+    gardenContainer.addEventListener('click', (event) => {
+        const bed = event.target.closest('.garden-bed.available');
+        if (bed && bed.innerHTML === '') {
+            activeBed = bed;
+            showPlantingMenu(bed);
+        }
+    });
     
     function showPlantingMenu(bed) {
         const availableSeeds = Object.keys(gameState.seedInventory).filter(seed => gameState.seedInventory[seed] > 0);
-        if (availableSeeds.length === 0) { tg.showAlert('У вас нет семян для посадки. Зайдите в магазин!'); return; }
+        if (availableSeeds.length === 0) {
+            tg.showAlert('У вас нет семян для посадки. Зайдите в магазин!');
+            return;
+        }
         seedMenu.innerHTML = '';
-        const radius = 70;
+        const radius = 80;
         const angleStep = availableSeeds.length > 1 ? 120 / (availableSeeds.length - 1) : 0;
         availableSeeds.forEach((seed, index) => {
             const angle = -60 + (angleStep * index);
@@ -140,7 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
             option.dataset.seed = seed;
             option.innerText = seed;
             option.style.transform = `rotate(${angle}deg) translateX(${radius}px) rotate(${-angle}deg)`;
-            option.addEventListener('click', () => handleSeedSelection(seed));
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleSeedSelection(seed);
+            });
             seedMenu.appendChild(option);
         });
         const rect = bed.getBoundingClientRect();
@@ -151,35 +135,47 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function handleSeedSelection(seedType) {
         if (!activeBed) return;
-        gameState.seedInventory[seedType]--;
-        saveGameData();
-        hideSeedMenu();
-        plantSeed(activeBed, seedType);
-        activeBed = null;
+        if ((gameState.seedInventory[seedType] || 0) > 0) {
+            gameState.seedInventory[seedType]--;
+            saveGameData();
+            hideSeedMenu();
+            plantSeed(activeBed, seedType);
+            activeBed = null;
+        } else {
+            tg.showAlert(`У вас закончились семена ${PLANT_DATA[seedType].name}!`);
+        }
     }
 
-    function hideSeedMenu() { seedMenu.classList.add('hidden'); }
-    document.addEventListener('click', (e) => { if (!e.target.closest('.garden-bed.available') && !e.target.closest('#seed-menu')) { hideSeedMenu(); } });
+    function hideSeedMenu() {
+        seedMenu.classList.add('hidden');
+    }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#garden-container') && !e.target.closest('#seed-menu')) {
+            hideSeedMenu();
+        }
+    });
 
-    // --- ЛОГИКА НИЖНЕЙ НАВИГАЦИИ, МАГАЗИНА, ПРОДАЖИ (без изменений) ---
     navButtons.forEach(btn => btn.addEventListener('click', () => {
         document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
         navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        hideSeedMenu();
         switch (btn.id) {
             case 'nav-warehouse': updateWarehouseDisplay(); warehouseModal.classList.remove('hidden'); break;
             case 'nav-shop': populateShop(); shopModal.classList.remove('hidden'); break;
-            case 'nav-farm': break;
             case 'nav-tasks': case 'nav-leaders': case 'nav-settings':
                 tg.showAlert(`Раздел в разработке!`);
                 navFarmBtn.click();
                 break;
         }
     }));
+    
     sellAllButton.addEventListener('click', () => {
         let totalProfit = 0;
-        Object.keys(gameState.warehouse).forEach(crop => { totalProfit += gameState.warehouse[crop] * PLANT_DATA[crop].sellPrice; });
-        if (totalProfit === 0) { return; }
+        Object.keys(gameState.warehouse).forEach(crop => {
+            totalProfit += gameState.warehouse[crop] * PLANT_DATA[crop].sellPrice;
+        });
+        if (totalProfit === 0) return;
         gameState.balance += totalProfit;
         gameState.warehouse = {};
         saveGameData();
@@ -187,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateWarehouseDisplay();
         tg.showPopup({ title: 'Урожай продан!', message: `Вы заработали ${totalProfit.toFixed(2)} монет.` });
     });
+    
     function populateShop() {
         shopList.innerHTML = '';
         Object.keys(PLANT_DATA).forEach(seed => {
@@ -198,11 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
             shopList.appendChild(li);
         });
     }
+    
     shopList.addEventListener('click', (e) => {
         if (e.target.classList.contains('buy-button')) {
             const seedType = e.target.dataset.seed;
             const plant = PLANT_DATA[seedType];
-            if (gameState.balance < plant.seedCost) { tg.showAlert('Недостаточно монет!'); return; }
+            if (gameState.balance < plant.seedCost) {
+                tg.showAlert('Недостаточно монет!');
+                return;
+            }
             gameState.balance -= plant.seedCost;
             gameState.seedInventory[seedType] = (gameState.seedInventory[seedType] || 0) + 1;
             saveGameData();
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tg.HapticFeedback.notificationOccurred('success');
         }
     });
+
     document.querySelectorAll('.modal').forEach(modal => {
         modal.querySelector('.close-button').addEventListener('click', () => {
             modal.classList.add('hidden');
@@ -218,6 +220,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- НАЧАЛЬНАЯ ЗАГРУЗКА ---
     loadGameData();
 });
