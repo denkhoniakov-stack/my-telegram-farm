@@ -364,8 +364,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const count = gameState.seedInventory[seed];
             option.innerHTML = `
-                <span class="seed-emoji">${seed}</span>
-                <span class="seed-count">${count}</span>
+                <div class="seed-option-inner">
+                   <span class="seed-emoji">${seed}</span>
+                   <span class="seed-count">${count}</span>
+                </div>
             `;
         
             option.addEventListener('click', (e) => {
