@@ -51,9 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabContents = document.querySelectorAll('.shop-tab-content');
     let activeBed = null;
 
+    
     // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ ---
     function saveGameData() { localStorage.setItem('farmGameState_v4', JSON.stringify(gameState)); }
     function loadGameData() {
+        
         const savedData = localStorage.getItem('farmGameState_v4');
         if (savedData) {
             gameState = JSON.parse(savedData);
@@ -78,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Грядка 4 = 100, грядка 5 = 150, грядка 6 = 200, и т.д.
     }
 
-    // ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ:
     function updateGardenBeds() {
         const beds = document.querySelectorAll('.garden-bed');
     
@@ -252,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
         flyingCrop.addEventListener('animationend', () => flyingCrop.remove());
     }
 
+    
+
     gardenContainer.addEventListener('click', (event) => {
         const bed = event.target.closest('.garden-bed');
         if (!bed) return;
@@ -274,10 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateGardenBeds();
             saveGameData();
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showPopup({ 
-                title: 'Грядка куплена!', 
-                message: `Вы открыли новую грядку за ${price} монет.` 
-            });
+            tg.showAlert(`Грядка куплена! Вы открыли новую грядку за ${price} монет.`);
             return;
         }
     
@@ -394,285 +394,426 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработчик продажи и закрытия модалок
     sellAllButton.addEventListener('click', () => {
         let totalProfit = 0;
-        Object.keys(gameState.warehouse).forEach(crop => { totalProfit += gameState.warehouse[crop] * PLANT_DATA[crop].sellPrice; });
+    
+        Object.keys(gameState.warehouse).forEach(crop => {
+            const quantity = gameState.warehouse[crop];
+            if (quantity > 0) {
+            // Проверяем, гибрид это или обычный овощ
+                const plant = PLANT_DATA[crop];
+                const hybrid = getHybridData ? getHybridData(crop) : null;
+            
+                if (plant) {
+                     totalProfit += quantity * plant.sellPrice;
+                } else if (hybrid) {
+                    totalProfit += quantity * hybrid.sellPrice;
+                }
+            }
+        });
+    
         if (totalProfit === 0) return;
-        gameState.balance += totalProfit; gameState.warehouse = {};
-        saveGameData(); updateBalanceDisplay(); updateWarehouseDisplay();
-        tg.showPopup({ title: 'Урожай продан!', message: `Вы заработали ${totalProfit.toFixed(2)} монет.` });
-    });
+    
+        gameState.balance += totalProfit;
+        gameState.warehouse = {};
+        saveGameData();
+        updateBalanceDisplay();
+        updateWarehouseDisplay();
+    
+        tg.showAlert(`Урожай продан! Вы заработали ${totalProfit.toFixed(2)} монет ${totalProfit > 100 ? '🎉' : ''}`);
+    });   
     document.querySelectorAll('.modal').forEach(modal => {
         modal.querySelector('.close-button').addEventListener('click', () => {
             modal.classList.add('hidden');
             navFarmBtn.click();
         });
     });
-    function updateWarehouseDisplay() {
-        warehouseList.innerHTML = '';
-        const items = Object.keys(gameState.warehouse).filter(key => gameState.warehouse[key] > 0);
-        if (items.length === 0) { warehouseList.innerHTML = '<li>Склад урожая пуст</li>'; sellAllButton.style.display = 'none'; return; }
-        sellAllButton.style.display = 'block';
-        items.forEach(crop => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${crop} ${PLANT_DATA[crop].name}:</span> <span>${gameState.warehouse[crop]} шт.</span>`;
-            li.style.display = 'flex'; li.style.justifyContent = 'space-between';
-            warehouseList.appendChild(li);
-        });
-    }
 
-    // --- ЗАПУСК ИГРЫ ---
-    loadGameData();
+     
+     
 
-}); // <-- КОНЕЦ КОДА
-
-// ЗАКОНЧИТЕ КОПИРОВАТЬ ЗДЕСЬ
-
-// ДОБАВЬТЕ ЭТУ ФУНКЦИЮ В script.js:
-
-// ЗАМЕНИТЕ ВСЮ ФУНКЦИЮ showHybridLab() НА ЭТУ ВЕРСИЮ:
-function showHybridLab() {
-    const labContainer = document.getElementById('inventory-tab');
-    if (!labContainer) return;
+    function showHybridLab() {
+        const labContainer = document.getElementById('inventory-tab');
+        if (!labContainer) {
+            console.error('Не найден элемент inventory-tab');
+            return;
+        }
     
-    let selectedSeed1 = null;
-    let selectedSeed2 = null;
+        let crop1 = null;
+        let crop2 = null;
     
-    labContainer.innerHTML = `
-        <div style="padding: 15px; text-align: center;">
-            <h3 style="margin: 10px 0; font-family: 'Nunito', Arial, sans-serif;">🧪 Лаборатория Гибридов</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
-                Выберите два семени для скрещивания
-            </p>
-            
-            <!-- Выбранные семена -->
-            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin: 20px 0;">
-                <div id="selected-seed-1" style="
-                    width: 80px; 
-                    height: 80px; 
-                    border: 3px dashed #ccc; 
-                    border-radius: 12px; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center;
-                    font-size: 40px;
-                    background: #f9f9f9;
-                    cursor: pointer;
-                " onclick="openSeedSelector(1)">
-                    ?
+        labContainer.innerHTML = `
+            <div style="padding: 20px; font-family: 'Nunito', Arial, sans-serif; background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; margin: 10px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 50px; margin-bottom: 10px;">🧪</div>
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 22px;">Лаборатория Гибридов</h3>
+                    <p style="font-size: 12px; color: #6c757d; margin: 8px 0;">
+                        Выберите два овоща для создания уникального гибрида
+                    </p>
                 </div>
-                <span style="font-size: 24px; color: #999;">+</span>
-                <div id="selected-seed-2" style="
-                    width: 80px; 
-                    height: 80px; 
-                    border: 3px dashed #ccc; 
-                    border-radius: 12px; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center;
-                    font-size: 40px;
-                    background: #f9f9f9;
-                    cursor: pointer;
-                " onclick="openSeedSelector(2)">
-                    ?
-                </div>
-            </div>
             
-            <!-- Список доступных семян -->
-            <div id="seed-selector-panel" style="display: none; margin: 20px 0;">
-                <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
-                    <strong>Выберите семя:</strong>
-                </p>
-                <div id="seed-grid" style="
-                    display: grid; 
-                    grid-template-columns: repeat(4, 1fr); 
-                    gap: 8px; 
-                    max-height: 250px; 
-                    overflow-y: auto;
-                    padding: 10px;
-                    background: #f5f5f5;
-                    border-radius: 10px;
+                <!-- Слоты для выбранных овощей -->
+                <div style="
+                    display: flex; 
+                    gap: 15px; 
+                    justify-content: center; 
+                    align-items: center; 
+                    margin: 25px 0;
+                    padding: 20px;
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+                ">
+                    <div id="slot1" style="
+                        width: 85px; 
+                        height: 85px; 
+                        border: 3px dashed #dee2e6; 
+                        border-radius: 15px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center;
+                        font-size: 45px;
+                        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+                    ">?</div>
+                
+                    <div style="
+                     font-size: 28px; 
+                     color: #adb5bd;
+                     font-weight: bold;
+                    ">+</div>
+                
+                    <div id="slot2" style="
+                     width: 85px; 
+                     height: 85px; 
+                     border: 3px dashed #dee2e6; 
+                     border-radius: 15px; 
+                     display: flex; 
+                     align-items: center; 
+                     justify-content: center;
+                     font-size: 45px;
+                     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                     cursor: pointer;
+                     transition: all 0.3s;
+                     box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+                    ">?</div>
+                </div>
+            
+                <!-- Заголовок списка -->
+                <div style="
+                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 color: white;
+                 padding: 10px 15px;
+                 border-radius: 10px 10px 0 0;
+                 font-weight: bold;
+                 font-size: 14px;
+                 display: flex;
+                 align-items: center;
+                 gap: 8px;
+                ">
+                    <span style="font-size: 18px;">🌾</span>
+                    <span>Овощи на складе</span>
+                </div>
+            
+                <!-- Сетка овощей -->
+                <div id="cropsList" style="
+                 display: grid; 
+                 grid-template-columns: repeat(4, 1fr); 
+                 gap: 10px; 
+                 padding: 15px;
+                 background: white;
+                 border-radius: 0 0 10px 10px;
+                 max-height: 300px; 
+                 overflow-y: auto;
+                 box-shadow: 0 4px 6px rgba(0,0,0,0.07);
                 "></div>
-            </div>
             
-            <button id="hybrid-create-btn" style="
-                background-color: #4CAF50; 
-                color: white; 
-                padding: 12px 30px; 
-                border: none; 
-                border-radius: 8px; 
-                font-size: 16px; 
-                cursor: pointer;
-                font-weight: bold;
-                font-family: 'Nunito', Arial, sans-serif;
-                margin-top: 10px;
-            ">Скрестить (50 🪙)</button>
+                <!-- Кнопка скрещивания -->
+                <button id="mixBtn" style="
+                 width: 100%; 
+                 padding: 15px; 
+                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 color: white; 
+                 border: none; 
+                 border-radius: 12px; 
+                 font-size: 16px; 
+                 font-weight: bold; 
+                 cursor: pointer;
+                 margin-top: 20px;
+                 box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                 transition: all 0.3s;
+                 font-family: 'Nunito', Arial, sans-serif;
+                ">✨ Скрестить за 50 🪙</button>
             
-            <div id="hybrid-result" style="margin-top: 20px; font-size: 14px;"></div>
-        </div>
-    `;
-    
-    // Функция открытия селектора семян
-    window.openSeedSelector = function(slotNumber) {
-        const selectorPanel = document.getElementById('seed-selector-panel');
-        const seedGrid = document.getElementById('seed-grid');
-        
-        // Переключаем видимость панели
-        if (selectorPanel.style.display === 'none') {
-            selectorPanel.style.display = 'block';
-            selectorPanel.dataset.currentSlot = slotNumber;
-            
-            // Заполняем сетку семенами
-            seedGrid.innerHTML = '';
-            
-            // Добавляем обычные семена
-            Object.keys(PLANT_DATA).forEach(seed => {
-                if (gameState.seedInventory[seed] > 0) {
-                    const plant = PLANT_DATA[seed];
-                    const seedCard = document.createElement('div');
-                    seedCard.style.cssText = `
-                        background: white;
-                        border: 2px solid #ddd;
-                        border-radius: 10px;
-                        padding: 8px;
-                        cursor: pointer;
-                        text-align: center;
-                        transition: transform 0.2s, border-color 0.2s;
-                    `;
-                    seedCard.innerHTML = `
-                        <div style="font-size: 32px;">${seed}</div>
-                        <div style="font-size: 10px; color: #666; margin-top: 2px;">${plant.name}</div>
-                        <div style="font-size: 9px; color: #999;">${gameState.seedInventory[seed]} шт</div>
-                    `;
-                    seedCard.onmouseover = () => {
-                        seedCard.style.transform = 'scale(1.05)';
-                        seedCard.style.borderColor = '#4CAF50';
-                    };
-                    seedCard.onmouseout = () => {
-                        seedCard.style.transform = 'scale(1)';
-                        seedCard.style.borderColor = '#ddd';
-                    };
-                    seedCard.onclick = () => selectSeed(seed, slotNumber);
-                    seedGrid.appendChild(seedCard);
-                }
-            });
-            
-            // Добавляем гибриды, если они есть
-            Object.keys(HYBRID_DATA).forEach(hybrid => {
-                if (gameState.seedInventory[hybrid] > 0) {
-                    const seedCard = document.createElement('div');
-                    seedCard.style.cssText = `
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        border: 2px solid #5568d3;
-                        border-radius: 10px;
-                        padding: 8px;
-                        cursor: pointer;
-                        text-align: center;
-                        transition: transform 0.2s;
-                        color: white;
-                    `;
-                    seedCard.innerHTML = `
-                        <div style="font-size: 32px;">${hybrid}</div>
-                        <div style="font-size: 10px; margin-top: 2px;">Гибрид</div>
-                        <div style="font-size: 9px; opacity: 0.9;">${gameState.seedInventory[hybrid]} шт</div>
-                    `;
-                    seedCard.onmouseover = () => seedCard.style.transform = 'scale(1.05)';
-                    seedCard.onmouseout = () => seedCard.style.transform = 'scale(1)';
-                    seedCard.onclick = () => selectSeed(hybrid, slotNumber);
-                    seedGrid.appendChild(seedCard);
-                }
-            });
-        } else {
-            selectorPanel.style.display = 'none';
-        }
-    };
-    
-    // Функция выбора семени
-    window.selectSeed = function(seed, slotNumber) {
-        if (slotNumber === 1) {
-            selectedSeed1 = seed;
-            document.getElementById('selected-seed-1').innerHTML = `
-                <div style="font-size: 50px;">${seed}</div>
-            `;
-            document.getElementById('selected-seed-1').style.borderColor = '#4CAF50';
-            document.getElementById('selected-seed-1').style.borderStyle = 'solid';
-        } else {
-            selectedSeed2 = seed;
-            document.getElementById('selected-seed-2').innerHTML = `
-                <div style="font-size: 50px;">${seed}</div>
-            `;
-            document.getElementById('selected-seed-2').style.borderColor = '#4CAF50';
-            document.getElementById('selected-seed-2').style.borderStyle = 'solid';
-        }
-        
-        // Скрываем панель выбора
-        document.getElementById('seed-selector-panel').style.display = 'none';
-    };
-    
-    // Обработчик кнопки скрещивания
-    document.getElementById('hybrid-create-btn').addEventListener('click', () => {
-        const resultDiv = document.getElementById('hybrid-result');
-        const hybridCost = 50;
-        
-        if (!selectedSeed1 || !selectedSeed2) {
-            resultDiv.innerHTML = '<span style="color: red;">❌ Выберите оба семени!</span>';
-            return;
-        }
-        
-        if (selectedSeed1 === selectedSeed2) {
-            resultDiv.innerHTML = '<span style="color: red;">❌ Нельзя скрестить одинаковые!</span>';
-            return;
-        }
-        
-        if (gameState.balance < hybridCost) {
-            resultDiv.innerHTML = '<span style="color: red;">❌ Нужно 50 🪙!</span>';
-            return;
-        }
-        
-        if (!gameState.seedInventory[selectedSeed1] || !gameState.seedInventory[selectedSeed2]) {
-            resultDiv.innerHTML = '<span style="color: red;">❌ Недостаточно семян!</span>';
-            return;
-        }
-        
-        const recipe = getHybridRecipe(selectedSeed1, selectedSeed2);
-        
-        if (!recipe) {
-            resultDiv.innerHTML = '<span style="color: orange;">⚠️ Комбинация невозможна!</span>';
-            return;
-        }
-        
-        // Проводим скрещивание
-        gameState.balance -= hybridCost;
-        gameState.seedInventory[selectedSeed1]--;
-        gameState.seedInventory[selectedSeed2]--;
-        gameState.seedInventory[recipe.result] = (gameState.seedInventory[recipe.result] || 0) + 1;
-        
-        updateBalanceDisplay();
-        saveGameData();
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        resultDiv.innerHTML = `
-            <div style="
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; 
-                padding: 15px; 
-                border-radius: 12px;
-                animation: pulse 0.5s;
-            ">
-                ✨ <strong>Получен гибрид!</strong><br>
-                ${recipe.result} <strong>${recipe.name}</strong>
+                <!-- Сообщение о результате -->
+                <div id="msg" style="margin-top: 15px; text-align: center; min-height: 20px;"></div>
             </div>
         `;
-        
-        // Перезагружаем интерфейс через 1.5 секунды
-        setTimeout(() => showHybridLab(), 1500);
-    });
-}
-
-
-// ТАКЖЕ ОБНОВИТЕ ФУНКЦИЮ plantSeed, ДОБАВИВ ПРОВЕРКУ ГИБРИДОВ:
-function plantSeed(bed, seed) {
-    // Ищем данные в обычных растениях или гибридах
-    const plantInfo = PLANT_DATA[seed] || getHybridData(seed);
-    if (!plantInfo) return;
     
-    // Остальной код функции plantSeed остается без изменений...
-}
+        const slot1El = document.getElementById('slot1');
+        const slot2El = document.getElementById('slot2');
+        const cropsListEl = document.getElementById('cropsList');
+        const mixBtn = document.getElementById('mixBtn');
+        const msgEl = document.getElementById('msg');
+    
+    // Добавляем эффект наведения на кнопку
+        mixBtn.onmouseover = () => {
+            mixBtn.style.transform = 'translateY(-2px)';
+            mixBtn.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+        };
+        mixBtn.onmouseout = () => {
+            mixBtn.style.transform = 'translateY(0)';
+            mixBtn.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+        };
+    
+    // Получаем овощи со склада
+        const crops = [];
+        for (let key in gameState.warehouse) {
+            if (gameState.warehouse[key] > 0) {
+                crops.push(key);
+            }
+        }
+    
+        if (crops.length === 0) {
+            cropsListEl.innerHTML = `
+                <div style="
+                 grid-column: 1/-1; 
+                 text-align: center; 
+                 color: #adb5bd; 
+                 padding: 40px 20px;
+                 font-size: 14px;
+                ">
+                    <div style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;">📦</div>
+                    <div style="font-weight: bold; margin-bottom: 5px;">Склад пуст</div>
+                    <div style="font-size: 12px;">Вырастите овощи на грядках</div>
+                </div>
+            `;
+            return;
+        }
+    
+    // Создаем красивые карточки овощей
+        crops.forEach(crop => {
+            const plant = PLANT_DATA[crop];
+            const hybrid = getHybridData ? getHybridData(crop) : null;
+        
+            if (!plant && !hybrid) return;
+        
+            const isHybrid = !!hybrid;
+            const name = plant ? plant.name : (hybrid ? 'Гибрид' : 'Овощ');
+        
+            const card = document.createElement('div');
+            card.style.cssText = `
+             background: ${isHybrid ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'};
+             border: 2px solid ${isHybrid ? '#5a67d8' : '#e9ecef'};
+             border-radius: 12px;
+             padding: 10px;
+             text-align: center;
+             cursor: pointer;
+             transition: all 0.3s;
+             box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+             position: relative;
+             overflow: hidden;
+            `;
+        
+            card.innerHTML = `
+                <div style="font-size: 36px; margin-bottom: 5px;">${crop}</div>
+                <div style="
+                    font-size: 9px; 
+                    color: ${isHybrid ? 'rgba(255,255,255,0.9)' : '#6c757d'}; 
+                    font-weight: ${isHybrid ? 'bold' : 'normal'};
+                    margin-bottom: 3px;
+                ">${name}</div>
+                <div style="
+                    font-size: 8px; 
+                    color: ${isHybrid ? 'rgba(255,255,255,0.8)' : '#adb5bd'};
+                    background: ${isHybrid ? 'rgba(255,255,255,0.2)' : '#f8f9fa'};
+                    padding: 2px 6px;
+                    border-radius: 8px;
+                    display: inline-block;
+                ">${gameState.warehouse[crop]} шт</div>
+            `;
+        
+        // Эффекты наведения
+            card.onmouseover = function() {
+                card.style.transform = 'translateY(-5px) scale(1.05)';
+                card.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
+                card.style.borderColor = isHybrid ? '#4c51bf' : '#667eea';
+            };
+        
+            card.onmouseout = function() {
+             card.style.transform = 'translateY(0) scale(1)';
+             card.style.boxShadow = '0 2px 4px rgba(0,0,0,0.08)';
+             card.style.borderColor = isHybrid ? '#5a67d8' : '#e9ecef';
+            };
+        
+        // Обработчик выбора
+            card.onclick = function() {
+                if (!crop1) {
+                 crop1 = crop;
+                 slot1El.innerHTML = `<div style="font-size: 50px;">${crop}</div>`;
+                 slot1El.style.borderColor = '#667eea';
+                 slot1El.style.borderStyle = 'solid';
+                 slot1El.style.background = 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)';
+                 slot1El.style.transform = 'scale(1.05)';
+                } else if (!crop2) {
+                 crop2 = crop;
+                 slot2El.innerHTML = `<div style="font-size: 50px;">${crop}</div>`;
+                 slot2El.style.borderColor = '#667eea';
+                 slot2El.style.borderStyle = 'solid';
+                 slot2El.style.background = 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)';
+                 slot2El.style.transform = 'scale(1.05)';
+                }
+            };
+        
+            cropsListEl.appendChild(card);
+        });
+    
+    // Сброс слотов при клике
+        slot1El.onclick = function() {
+         crop1 = null;
+         slot1El.innerHTML = '?';
+         slot1El.style.borderColor = '#dee2e6';
+         slot1El.style.borderStyle = 'dashed';
+         slot1El.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
+         slot1El.style.transform = 'scale(1)';
+        };
+    
+        slot2El.onclick = function() {
+         crop2 = null;
+         slot2El.innerHTML = '?';
+         slot2El.style.borderColor = '#dee2e6';
+         slot2El.style.borderStyle = 'dashed';
+         slot2El.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
+         slot2El.style.transform = 'scale(1)';
+        };
+    
+    // Обработчик скрещивания
+        mixBtn.onclick = function() {
+            if (!crop1 || !crop2) {
+                msgEl.innerHTML = '<div style="color: #dc3545; font-weight: bold; animation: shake 0.5s;">❌ Выберите два овоща!</div>';
+                return;
+            }
+            if (crop1 === crop2) {
+                msgEl.innerHTML = '<div style="color: #fd7e14; font-weight: bold;">⚠️ Нельзя скрестить одинаковые овощи!</div>';
+                return;
+            }
+            if (gameState.balance < 50) {
+                msgEl.innerHTML = '<div style="color: #dc3545; font-weight: bold;">💰 Недостаточно монет! Нужно 50 🪙</div>';
+                return;
+            }
+        
+            if (typeof getHybridRecipe !== 'function') {
+                msgEl.innerHTML = '<div style="color: #dc3545;">❌ Файл hybrids.js не подключен!</div>';
+                return;
+            }
+        
+            const recipe = getHybridRecipe(crop1, crop2);
+        
+            if (!recipe) {
+                msgEl.innerHTML = '<div style="color: #fd7e14; font-weight: bold;">🔬 Эта комбинация не дает гибрида. Попробуйте другую!</div>';
+                return;
+            }
+        
+        // ИСПРАВЛЕНИЕ: Гибрид теперь идет на склад, а не в семена
+            gameState.balance -= 50;
+            gameState.warehouse[crop1]--;
+            gameState.warehouse[crop2]--;
+            gameState.warehouse[recipe.result] = (gameState.warehouse[recipe.result] || 0) + 1;
+        
+            updateBalanceDisplay();
+            saveGameData();
+            tg.HapticFeedback.notificationOccurred('success');
+        
+            msgEl.innerHTML = `
+                <div style="
+                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                 color: white; 
+                 padding: 15px; 
+                 border-radius: 12px;
+                 animation: fadeIn 0.5s;
+                 box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                ">
+                    <div style="font-size: 36px; margin-bottom: 5px;">✨</div>
+                    <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px;">Получен гибрид!</div>
+                    <div style="font-size: 20px; margin: 8px 0;">${recipe.result}</div>
+                    <div style="font-size: 14px; opacity: 0.95;">${recipe.name}</div>
+                    <div style="font-size: 11px; opacity: 0.85; margin-top: 8px;">Проверьте склад урожая!</div>
+                </div>
+            `;
+        
+            setTimeout(() => showHybridLab(), 2500);
+        };
+    }
+
+    function updateWarehouseDisplay() {
+        warehouseList.innerHTML = '';
+    
+        const regularCrops = {}; // Обычные овощи
+        const hybridCrops = {};  // Гибридные овощи
+    
+    // Разделяем овощи на обычные и гибридные
+        Object.keys(gameState.warehouse).forEach(crop => {
+            if (gameState.warehouse[crop] > 0) {
+            // Проверяем, является ли овощ гибридом
+                if (getHybridData && getHybridData(crop)) {
+                    hybridCrops[crop] = gameState.warehouse[crop];
+                } else {
+                    regularCrops[crop] = gameState.warehouse[crop];
+                }
+            }
+        });
+    
+        const hasRegular = Object.keys(regularCrops).length > 0;
+        const hasHybrid = Object.keys(hybridCrops).length > 0;
+    
+        if (!hasRegular && !hasHybrid) {
+            warehouseList.innerHTML = '<li style="text-align: center; color: #999; padding: 20px;">Склад урожая пуст</li>';
+            sellAllButton.style.display = 'none';
+            return;
+        }
+    
+        sellAllButton.style.display = 'block';
+    
+    // Показываем обычные овощи
+        if (hasRegular) {
+            const regularHeader = document.createElement('li');
+            regularHeader.style.cssText = 'font-weight: bold; color: #4CAF50; margin-top: 10px; padding: 5px 0; border-bottom: 2px solid #4CAF50;';
+            regularHeader.textContent = '🌱 Обычные овощи';
+            warehouseList.appendChild(regularHeader);
+        
+            Object.keys(regularCrops).forEach(crop => {
+                const plant = PLANT_DATA[crop];
+                const li = document.createElement('li');
+                li.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0;';
+                li.innerHTML = `
+                    <span>${crop} ${plant.name}</span>
+                    <span>${regularCrops[crop]} шт (${(plant.sellPrice * regularCrops[crop]).toFixed(2)} 🪙)</span>
+                `;
+                warehouseList.appendChild(li);
+            });
+        }
+    
+    // Показываем гибридные овощи
+        if (hasHybrid) {
+            const hybridHeader = document.createElement('li');
+            hybridHeader.style.cssText = 'font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 15px; padding: 8px; border-radius: 8px;';
+            hybridHeader.textContent = '✨ Гибридные овощи';
+            warehouseList.appendChild(hybridHeader);
+        
+            Object.keys(hybridCrops).forEach(crop => {
+                const hybridInfo = getHybridData(crop);
+                const li = document.createElement('li');
+                li.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0; background: rgba(102, 126, 234, 0.1); margin: 4px 0; border-radius: 5px; padding-left: 10px;';
+                li.innerHTML = `
+                    <span>${crop} <strong>${hybridInfo ? HYBRID_RECIPES_FULL[Object.keys(HYBRID_RECIPES_FULL).find(k => HYBRID_RECIPES_FULL[k].result === crop)]?.name || 'Гибрид' : 'Гибрид'}</strong></span>
+                    <span style="color: #667eea; font-weight: bold;">${hybridCrops[crop]} шт (${(hybridInfo.sellPrice * hybridCrops[crop]).toFixed(2)} 🪙)</span>
+                `;
+                warehouseList.appendChild(li);
+            });
+        }
+    }
+
+setTimeout(() => updateGardenBeds(), 100);    
+});
+
+
