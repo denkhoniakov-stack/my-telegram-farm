@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         warehouse: {},
         seedInventory: { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 }, // Добавил семян для тестов
         items: {},
-        unlockedBeds: 3
+        unlockedBeds: 3,
+        garden: []
     };
 
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
@@ -262,6 +263,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function plantSeed(bed, seed) {
         const plantInfo = PLANT_DATA[seed];
+        const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
+    
+    // ДОБАВЬТЕ: Сохраняем время посадки
+        gameState.garden[bedIndex] = {
+            seed: seed,
+            plantedAt: Date.now(),
+            growTime: plantInfo.growTime
+        };
+        saveGameData();
+    
+    // Рендерим растение
         const growTimeInSeconds = plantInfo.growTime / 1000;
         let remainingTime = growTimeInSeconds;
 
@@ -295,6 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.stopPropagation();
                     animateHarvest(plantElement, seed);
                     gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
+                    // ДОБАВЬТЕ: Удаляем из garden
+                    gameState.garden[bedIndex] = null;
                     saveGameData();
                     bed.innerHTML = '';
                     hapticFeedback('success');
@@ -302,6 +316,65 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 1000);
     }
+
+
+    function renderPlant(bed, bedIndex) {
+        const plantData = gameState.garden[bedIndex];
+        if (!plantData) return;
+    
+        const plantInfo = PLANT_DATA[plantData.seed];
+        const elapsed = Date.now() - plantData.plantedAt;
+        const remaining = Math.max(0, Math.floor((plantData.growTime - elapsed) / 1000));
+    
+        bed.innerHTML = '';
+        const plantElement = document.createElement('div');
+        plantElement.classList.add('plant');
+        plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
+    
+        if (remaining > 0) {
+            const timerElement = document.createElement('div');
+            timerElement.classList.add('plant-timer');
+            bed.appendChild(plantElement);
+            bed.appendChild(timerElement);
+        
+            let remainingTime = remaining;
+            timerElement.innerText = formatTime(remainingTime);
+        
+            const timerInterval = setInterval(() => {
+                remainingTime--;
+                timerElement.innerText = formatTime(remainingTime);
+            
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    bed.removeChild(timerElement);
+                    plantElement.innerText = plantData.seed;
+                    setupHarvest(plantElement, bed, bedIndex, plantData.seed);
+                }
+            }, 1000);
+        } else {
+            bed.appendChild(plantElement);
+            setupHarvest(plantElement, bed, bedIndex, plantData.seed);
+        }
+    }
+
+    function setupHarvest(plantElement, bed, bedIndex, seed) {
+         plantElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            animateHarvest(plantElement, seed);
+            gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
+            gameState.garden[bedIndex] = null;
+            saveGameData();
+            bed.innerHTML = '';
+            hapticFeedback('success');
+        }, { once: true });
+    }
+
+    function formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = seconds % 60;
+        return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+
     
     function animateHarvest(startElement, seed) {
         const endElement = document.getElementById('nav-warehouse');
