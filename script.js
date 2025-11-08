@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.expand();
 
     function showAlert(message) {
-        if (showAlert && typeof showAlert === 'function') {
-            showAlert(message);
+        if (tg.showAlert && typeof tg.showAlert === 'function') {
+            tg.showAlert(message);
         } else {
             alert(message);
         }
@@ -76,8 +76,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ ---
     function loadGameData() {
-        tg.CloudStorage.getItem('farmGame', (err, data) => {
-            if (!err && data) {
+    // Проверяем, доступен ли CloudStorage
+        if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
+        // Используем Telegram Cloud Storage
+            tg.CloudStorage.getItem('farmGame', (err, data) => {
+                if (!err && data) {
+                    try {
+                        const loaded = JSON.parse(data);
+                        gameState.balance = loaded.balance || 100;
+                        gameState.seedInventory = loaded.seedInventory || { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 };
+                        gameState.warehouse = loaded.warehouse || {};
+                        gameState.items = loaded.items || {};
+                        gameState.garden = loaded.garden || [];
+                        gameState.unlockedBeds = loaded.unlockedBeds || 3;
+                    } catch (e) {
+                        console.error('Ошибка загрузки:', e);
+                    }
+                }
+                updateBalanceDisplay();
+                updateGardenDisplay();
+                updateWarehouseDisplay();
+            });
+        } else {
+        // Fallback: используем localStorage для браузера
+            const data = localStorage.getItem('farmGame');
+            if (data) {
                 try {
                     const loaded = JSON.parse(data);
                     gameState.balance = loaded.balance || 100;
@@ -86,26 +109,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.items = loaded.items || {};
                     gameState.garden = loaded.garden || [];
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
-                
-                    updateBalanceDisplay();
-                    updateGardenDisplay();
-                    updateWarehouseDisplay();
                 } catch (e) {
-                    console.error('Ошибка загрузки:', e);
+                    console.error('Ошибка:', e);
                 }
-            } else {
-                updateBalanceDisplay();
-                updateGardenDisplay();
-                updateWarehouseDisplay();
             }
-        });
+            updateBalanceDisplay();
+            updateGardenDisplay();
+            updateWarehouseDisplay();
+        }
     }
+
 
     function updateBalanceDisplay() { balanceAmountElement.innerText = gameState.balance.toFixed(2); }
 
-    function updateBalanceDisplay() { 
-         balanceAmountElement.innerText = gameState.balance.toFixed(2); 
-    }
+    
 
     // ДОБАВЬТЕ ЭТУ ФУНКЦИЮ ЗДЕСЬ
     function saveGameData() {
