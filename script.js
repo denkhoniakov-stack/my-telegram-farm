@@ -339,6 +339,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.classList.add('active');
                 const tabId = e.target.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'inventory') {
+                    showHybridLab();
+                }
             }
         });
     }
@@ -422,3 +425,254 @@ document.addEventListener('DOMContentLoaded', () => {
 }); // <-- КОНЕЦ КОДА
 
 // ЗАКОНЧИТЕ КОПИРОВАТЬ ЗДЕСЬ
+
+// ДОБАВЬТЕ ЭТУ ФУНКЦИЮ В script.js:
+
+// ЗАМЕНИТЕ ВСЮ ФУНКЦИЮ showHybridLab() НА ЭТУ ВЕРСИЮ:
+function showHybridLab() {
+    const labContainer = document.getElementById('inventory-tab');
+    if (!labContainer) return;
+    
+    let selectedSeed1 = null;
+    let selectedSeed2 = null;
+    
+    labContainer.innerHTML = `
+        <div style="padding: 15px; text-align: center;">
+            <h3 style="margin: 10px 0; font-family: 'Nunito', Arial, sans-serif;">🧪 Лаборатория Гибридов</h3>
+            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                Выберите два семени для скрещивания
+            </p>
+            
+            <!-- Выбранные семена -->
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin: 20px 0;">
+                <div id="selected-seed-1" style="
+                    width: 80px; 
+                    height: 80px; 
+                    border: 3px dashed #ccc; 
+                    border-radius: 12px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    font-size: 40px;
+                    background: #f9f9f9;
+                    cursor: pointer;
+                " onclick="openSeedSelector(1)">
+                    ?
+                </div>
+                <span style="font-size: 24px; color: #999;">+</span>
+                <div id="selected-seed-2" style="
+                    width: 80px; 
+                    height: 80px; 
+                    border: 3px dashed #ccc; 
+                    border-radius: 12px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    font-size: 40px;
+                    background: #f9f9f9;
+                    cursor: pointer;
+                " onclick="openSeedSelector(2)">
+                    ?
+                </div>
+            </div>
+            
+            <!-- Список доступных семян -->
+            <div id="seed-selector-panel" style="display: none; margin: 20px 0;">
+                <p style="font-size: 13px; color: #555; margin-bottom: 10px;">
+                    <strong>Выберите семя:</strong>
+                </p>
+                <div id="seed-grid" style="
+                    display: grid; 
+                    grid-template-columns: repeat(4, 1fr); 
+                    gap: 8px; 
+                    max-height: 250px; 
+                    overflow-y: auto;
+                    padding: 10px;
+                    background: #f5f5f5;
+                    border-radius: 10px;
+                "></div>
+            </div>
+            
+            <button id="hybrid-create-btn" style="
+                background-color: #4CAF50; 
+                color: white; 
+                padding: 12px 30px; 
+                border: none; 
+                border-radius: 8px; 
+                font-size: 16px; 
+                cursor: pointer;
+                font-weight: bold;
+                font-family: 'Nunito', Arial, sans-serif;
+                margin-top: 10px;
+            ">Скрестить (50 🪙)</button>
+            
+            <div id="hybrid-result" style="margin-top: 20px; font-size: 14px;"></div>
+        </div>
+    `;
+    
+    // Функция открытия селектора семян
+    window.openSeedSelector = function(slotNumber) {
+        const selectorPanel = document.getElementById('seed-selector-panel');
+        const seedGrid = document.getElementById('seed-grid');
+        
+        // Переключаем видимость панели
+        if (selectorPanel.style.display === 'none') {
+            selectorPanel.style.display = 'block';
+            selectorPanel.dataset.currentSlot = slotNumber;
+            
+            // Заполняем сетку семенами
+            seedGrid.innerHTML = '';
+            
+            // Добавляем обычные семена
+            Object.keys(PLANT_DATA).forEach(seed => {
+                if (gameState.seedInventory[seed] > 0) {
+                    const plant = PLANT_DATA[seed];
+                    const seedCard = document.createElement('div');
+                    seedCard.style.cssText = `
+                        background: white;
+                        border: 2px solid #ddd;
+                        border-radius: 10px;
+                        padding: 8px;
+                        cursor: pointer;
+                        text-align: center;
+                        transition: transform 0.2s, border-color 0.2s;
+                    `;
+                    seedCard.innerHTML = `
+                        <div style="font-size: 32px;">${seed}</div>
+                        <div style="font-size: 10px; color: #666; margin-top: 2px;">${plant.name}</div>
+                        <div style="font-size: 9px; color: #999;">${gameState.seedInventory[seed]} шт</div>
+                    `;
+                    seedCard.onmouseover = () => {
+                        seedCard.style.transform = 'scale(1.05)';
+                        seedCard.style.borderColor = '#4CAF50';
+                    };
+                    seedCard.onmouseout = () => {
+                        seedCard.style.transform = 'scale(1)';
+                        seedCard.style.borderColor = '#ddd';
+                    };
+                    seedCard.onclick = () => selectSeed(seed, slotNumber);
+                    seedGrid.appendChild(seedCard);
+                }
+            });
+            
+            // Добавляем гибриды, если они есть
+            Object.keys(HYBRID_DATA).forEach(hybrid => {
+                if (gameState.seedInventory[hybrid] > 0) {
+                    const seedCard = document.createElement('div');
+                    seedCard.style.cssText = `
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border: 2px solid #5568d3;
+                        border-radius: 10px;
+                        padding: 8px;
+                        cursor: pointer;
+                        text-align: center;
+                        transition: transform 0.2s;
+                        color: white;
+                    `;
+                    seedCard.innerHTML = `
+                        <div style="font-size: 32px;">${hybrid}</div>
+                        <div style="font-size: 10px; margin-top: 2px;">Гибрид</div>
+                        <div style="font-size: 9px; opacity: 0.9;">${gameState.seedInventory[hybrid]} шт</div>
+                    `;
+                    seedCard.onmouseover = () => seedCard.style.transform = 'scale(1.05)';
+                    seedCard.onmouseout = () => seedCard.style.transform = 'scale(1)';
+                    seedCard.onclick = () => selectSeed(hybrid, slotNumber);
+                    seedGrid.appendChild(seedCard);
+                }
+            });
+        } else {
+            selectorPanel.style.display = 'none';
+        }
+    };
+    
+    // Функция выбора семени
+    window.selectSeed = function(seed, slotNumber) {
+        if (slotNumber === 1) {
+            selectedSeed1 = seed;
+            document.getElementById('selected-seed-1').innerHTML = `
+                <div style="font-size: 50px;">${seed}</div>
+            `;
+            document.getElementById('selected-seed-1').style.borderColor = '#4CAF50';
+            document.getElementById('selected-seed-1').style.borderStyle = 'solid';
+        } else {
+            selectedSeed2 = seed;
+            document.getElementById('selected-seed-2').innerHTML = `
+                <div style="font-size: 50px;">${seed}</div>
+            `;
+            document.getElementById('selected-seed-2').style.borderColor = '#4CAF50';
+            document.getElementById('selected-seed-2').style.borderStyle = 'solid';
+        }
+        
+        // Скрываем панель выбора
+        document.getElementById('seed-selector-panel').style.display = 'none';
+    };
+    
+    // Обработчик кнопки скрещивания
+    document.getElementById('hybrid-create-btn').addEventListener('click', () => {
+        const resultDiv = document.getElementById('hybrid-result');
+        const hybridCost = 50;
+        
+        if (!selectedSeed1 || !selectedSeed2) {
+            resultDiv.innerHTML = '<span style="color: red;">❌ Выберите оба семени!</span>';
+            return;
+        }
+        
+        if (selectedSeed1 === selectedSeed2) {
+            resultDiv.innerHTML = '<span style="color: red;">❌ Нельзя скрестить одинаковые!</span>';
+            return;
+        }
+        
+        if (gameState.balance < hybridCost) {
+            resultDiv.innerHTML = '<span style="color: red;">❌ Нужно 50 🪙!</span>';
+            return;
+        }
+        
+        if (!gameState.seedInventory[selectedSeed1] || !gameState.seedInventory[selectedSeed2]) {
+            resultDiv.innerHTML = '<span style="color: red;">❌ Недостаточно семян!</span>';
+            return;
+        }
+        
+        const recipe = getHybridRecipe(selectedSeed1, selectedSeed2);
+        
+        if (!recipe) {
+            resultDiv.innerHTML = '<span style="color: orange;">⚠️ Комбинация невозможна!</span>';
+            return;
+        }
+        
+        // Проводим скрещивание
+        gameState.balance -= hybridCost;
+        gameState.seedInventory[selectedSeed1]--;
+        gameState.seedInventory[selectedSeed2]--;
+        gameState.seedInventory[recipe.result] = (gameState.seedInventory[recipe.result] || 0) + 1;
+        
+        updateBalanceDisplay();
+        saveGameData();
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        resultDiv.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; 
+                padding: 15px; 
+                border-radius: 12px;
+                animation: pulse 0.5s;
+            ">
+                ✨ <strong>Получен гибрид!</strong><br>
+                ${recipe.result} <strong>${recipe.name}</strong>
+            </div>
+        `;
+        
+        // Перезагружаем интерфейс через 1.5 секунды
+        setTimeout(() => showHybridLab(), 1500);
+    });
+}
+
+
+// ТАКЖЕ ОБНОВИТЕ ФУНКЦИЮ plantSeed, ДОБАВИВ ПРОВЕРКУ ГИБРИДОВ:
+function plantSeed(bed, seed) {
+    // Ищем данные в обычных растениях или гибридах
+    const plantInfo = PLANT_DATA[seed] || getHybridData(seed);
+    if (!plantInfo) return;
+    
+    // Остальной код функции plantSeed остается без изменений...
+}
