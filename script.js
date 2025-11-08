@@ -5,35 +5,36 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.ready();
     tg.expand();
 
-    // --- БАЗА ДАННЫХ ПРЕДМЕТОВ ---
-    const INVENTORY_DATA = {
-        'super-rake': { name: 'Супер-Лейка', price: 150, bonus: 'Увеличивает урожай на 5% (пассивно)' },
-        'golden-spade': { name: 'Золотая Лопата', price: 250, bonus: 'Ускоряет посадку на 15% (пассивно)' },
-        'smart-scarecrow': { name: 'Умное Пугало', price: 200, bonus: 'Снижает шанс неудачного урожая на 10% (пассивно)' },
-        'turbo-fertilizer': { name: 'Удобрение "Турбо-Рост"', price: 50, bonus: 'Ускоряет рост 1 растения на 25% (разовое использование)' },
-        'farmer-gloves': { name: 'Фермерские Перчатки', price: 300, bonus: 'Шанс 2% на двойной урожай (пассивно)' }
-    };
-    const BOOSTERS_DATA = {
-        'sun-rain': { name: 'Солнечный Дождь', price: 100, bonus: 'Мгновенно ускоряет все растения на 30%' },
-        'fertility-elixir': { name: 'Эликсир Плодородия', price: 75, bonus: 'Ускоряет рост всех семян на 50% в течение 10 минут' },
-        'golden-hour': { name: 'Золотой Час', price: 120, bonus: 'Увеличивает цену продажи всего урожая на 20% в течение 1 часа' }
-    };
-    const DECOR_DATA = {
-        'weather-vane': { name: 'Веселый Флюгер', price: 500, bonus: 'Шанс найти редкие семена +1% (пассивно)' },
-        'beehive': { name: 'Пчелиный Улей', price: 750, bonus: 'Увеличивает весь урожай на 2% (пассивно)' }
-    };
+
     const PLANT_DATA = {
+    // --- БАЗОВЫЕ КУЛЬТУРЫ (быстрые и дешевые) ---
         '🥕': { name: 'Морковь', growTime: 1000, seedCost: 1.00, sellPrice: 1.54 },
         '🍅': { name: 'Помидор', growTime: 3000, seedCost: 3.00, sellPrice: 4.62 },
         '🍆': { name: 'Баклажан', growTime: 5000, seedCost: 5.00, sellPrice: 7.70 },
         '🌽': { name: 'Кукуруза', growTime: 7000, seedCost: 7.00, sellPrice: 10.78 },
-        '🍓': { name: 'Клубника', growTime: 10000, seedCost: 10.00, sellPrice: 15.40 }
+        '🥒': { name: 'Огурец', growTime: 8500, seedCost: 8.00, sellPrice: 12.32 },
+        '🍓': { name: 'Клубника', growTime: 10000, seedCost: 10.00, sellPrice: 15.40 },
+    
+    // --- СРЕДНИЕ КУЛЬТУРЫ (хороший баланс) ---
+        '🥔': { name: 'Картофель', growTime: 12000, seedCost: 12.00, sellPrice: 18.48 },
+        '🌶️': { name: 'Перец', growTime: 14000, seedCost: 14.00, sellPrice: 21.56 },
+        '🥬': { name: 'Салат', growTime: 16000, seedCost: 16.00, sellPrice: 24.64 },
+        '🧅': { name: 'Лук', growTime: 18000, seedCost: 18.00, sellPrice: 27.72 },
+        '🥦': { name: 'Брокколи', growTime: 20000, seedCost: 20.00, sellPrice: 30.80 },
+    
+    // --- ПРОДВИНУТЫЕ КУЛЬТУРЫ (медленные, но прибыльные) ---
+        '🍉': { name: 'Арбуз', growTime: 24000, seedCost: 24.00, sellPrice: 36.96 },
+        '🍇': { name: 'Виноград', growTime: 28000, seedCost: 28.00, sellPrice: 43.12 },
+        '🍑': { name: 'Персик', growTime: 32000, seedCost: 32.00, sellPrice: 49.28 },
+        '🍊': { name: 'Апельсин', growTime: 36000, seedCost: 36.00, sellPrice: 55.44 },
+        '🥭': { name: 'Манго', growTime: 40000, seedCost: 40.00, sellPrice: 61.60 }
     };
     let gameState = {
         balance: 100,
         warehouse: {},
         seedInventory: { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 }, // Добавил семян для тестов
-        items: {}
+        items: {},
+        unlockedBeds: 3
     };
 
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
@@ -59,10 +60,48 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!gameState.seedInventory) gameState.seedInventory = {};
             if (!gameState.warehouse) gameState.warehouse = {};
             if (!gameState.items) gameState.items = {};
+            if (!gameState.unlockedBeds) gameState.unlockedBeds = 3; // По умолчанию 3 грядки
         }
         updateBalanceDisplay();
+        updateGardenBeds(); // <-- ДОБАВЬТЕ ЭТУ СТРОКУ
     }
     function updateBalanceDisplay() { balanceAmountElement.innerText = gameState.balance.toFixed(2); }
+
+    function getBedPrice(bedIndex) {
+    // Первые 3 грядки бесплатны, дальше цена растет
+        if (bedIndex < 3) return 0;
+    
+    // Формула: базовая цена 100 + 50 за каждую следующую грядку
+        const basePrice = 100;
+        const increment = 50;
+        return basePrice + (bedIndex - 3) * increment;
+    // Грядка 4 = 100, грядка 5 = 150, грядка 6 = 200, и т.д.
+    }
+
+    // ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ:
+    function updateGardenBeds() {
+        const beds = document.querySelectorAll('.garden-bed');
+    
+        beds.forEach((bed, index) => {
+            if (index < gameState.unlockedBeds) {
+                // Грядка разблокирована
+                bed.classList.remove('locked');
+                bed.classList.add('available');
+                bed.innerHTML = ''; // Очищаем содержимое
+            } else {
+            // Грядка заблокирована
+                bed.classList.remove('available');
+                bed.classList.add('locked');
+            
+                const price = getBedPrice(index);
+                bed.innerHTML = `<div class="bed-lock-overlay">
+                    <div class="bed-lock-icon">🔒</div>
+                    <div class="bed-price">${price} 🪙</div>
+                </div>`;
+            }
+        });
+    }
+
     
     // --- ФИНАЛЬНАЯ ВЕРСИЯ ФУНКЦИИ ВЫБОРА СЕМЯН ---
     function showPlantingMenu(bed) {
@@ -214,8 +253,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     gardenContainer.addEventListener('click', (event) => {
-        const bed = event.target.closest('.garden-bed.available');
-        if (bed && bed.innerHTML === '') {
+        const bed = event.target.closest('.garden-bed');
+        if (!bed) return;
+    
+        const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
+    
+    // Если грядка заблокирована - пытаемся купить
+        if (bed.classList.contains('locked')) {
+            const price = getBedPrice(bedIndex);
+        
+            if (gameState.balance < price) {
+                tg.showAlert(`Недостаточно монет! Нужно: ${price} 🪙`);
+                return;
+            }
+        
+        // Покупаем грядку
+            gameState.balance -= price;
+            gameState.unlockedBeds = bedIndex + 1;
+            updateBalanceDisplay();
+            updateGardenBeds();
+            saveGameData();
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showPopup({ 
+                title: 'Грядка куплена!', 
+                message: `Вы открыли новую грядку за ${price} монет.` 
+            });
+            return;
+        }
+    
+    // Если грядка доступна и пустая - показываем меню посадки
+        if (bed.classList.contains('available') && bed.innerHTML === '') {
             activeBed = bed;
             showPlantingMenu(bed);
         }
@@ -242,23 +309,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 warehouseModal.classList.remove('hidden'); 
                 break;
             case 'nav-shop':
+    // Сбрасываем все вкладки
                 if (shopTabsContainer) {
                     shopTabsContainer.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
                 }
                 tabContents.forEach(content => content.classList.remove('active'));
+    
+    // Делаем активной вкладку "Семена"
                 const seedsTabButton = shopTabsContainer.querySelector('.tab-button[data-tab="seeds"]');
                 if (seedsTabButton) seedsTabButton.classList.add('active');
                 const seedsTabContent = document.getElementById('seeds-tab');
                 if (seedsTabContent) seedsTabContent.classList.add('active');
+    
+    // Загружаем только семена
                 populateShopSeeds();
-                populateShopTabs();
+    // УДАЛИЛИ ВЫЗОВ populateShopTabs();
+    
                 shopModal.classList.remove('hidden');
-                break;
-            case 'nav-tasks': 
-            case 'nav-leaders': 
-            case 'nav-settings':
-                tg.showAlert(`Раздел в разработке!`);
-                navFarmBtn.click();
                 break;
         }
     }));
@@ -279,35 +346,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Универсальный обработчик покупок
     shopModal.addEventListener('click', (e) => {
         if (!e.target.classList.contains('buy-button') || e.target.disabled) return;
+    
         const button = e.target;
-        const itemType = button.dataset.itemType, itemId = button.dataset.itemId, seedId = button.dataset.seed;
-        let price = 0, itemData = null;
-        if (seedId) { itemData = PLANT_DATA[seedId]; price = itemData.seedCost; } 
-        else if (itemId && itemType) {
-            switch (itemType) {
-                case 'inventory': itemData = INVENTORY_DATA[itemId]; break;
-                case 'booster':   itemData = BOOSTERS_DATA[itemId]; break;
-                case 'decor':     itemData = DECOR_DATA[itemId]; break;
-            }
-            if (itemData) price = itemData.price;
+        const seedId = button.dataset.seed;
+    
+        if (!seedId) return; // Если это не семена, ничего не делаем
+    
+        const plant = PLANT_DATA[seedId];
+        const price = plant.seedCost;
+    
+        if (gameState.balance < price) {
+            tg.showAlert('Недостаточно монет!');
+            return;
         }
-        if (!itemData || gameState.balance < price) { if (itemData) tg.showAlert('Недостаточно монет!'); return; }
-        if ((itemType === 'inventory' || itemType === 'decor') && gameState.items[itemId]) { tg.showAlert('Этот предмет у вас уже есть!'); return; }
+    
+    // Покупка
         gameState.balance -= price;
-        if (seedId) {
-            gameState.seedInventory[seedId] = (gameState.seedInventory[seedId] || 0) + 1;
-            document.getElementById(`inv-count-${seedId}`).innerText = `В наличии: ${gameState.seedInventory[seedId]}`;
-        } else if (itemId) {
-            gameState.items[itemId] = true;
-            button.disabled = true; button.innerText = 'Куплено';
-        }
-        updateBalanceDisplay(); saveGameData(); tg.HapticFeedback.notificationOccurred('success');
+        gameState.seedInventory[seedId] = (gameState.seedInventory[seedId] || 0) + 1;
+    
+    // Обновление интерфейса
+        document.getElementById(`inv-count-${seedId}`).innerText = `В наличии: ${gameState.seedInventory[seedId]}`;
+        updateBalanceDisplay();
+        saveGameData();
+        tg.HapticFeedback.notificationOccurred('success');
     });
 
     // Функции заполнения магазина
     function populateShopSeeds() {
         const shopListContainer = document.querySelector('#seeds-tab ul');
         if (!shopListContainer) return;
+    
         shopListContainer.innerHTML = '';
         Object.keys(PLANT_DATA).forEach(seed => {
             const plant = PLANT_DATA[seed];
@@ -318,23 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             shopListContainer.appendChild(li);
         });
     }
-    function populateShopTabs() {
-        const lists = { inventory: { container: document.querySelector('#inventory-tab'), data: INVENTORY_DATA, icon: '🛠️' }, boosters: { container: document.querySelector('#boosters-tab'), data: BOOSTERS_DATA, icon: '⚡️' }, decor: { container: document.querySelector('#decor-tab'), data: DECOR_DATA, icon: '🎨' } };
-        for (const type in lists) {
-            const { container, data, icon } = lists[type];
-            if (!container) continue;
-            container.innerHTML = '';
-            const ul = document.createElement('ul'); ul.style.padding = '0';
-            for (const key in data) {
-                const item = data[key]; const li = document.createElement('li'); li.className = 'shop-item';
-                const isItemOwned = gameState.items[key];
-                const buttonHTML = isItemOwned ? `<button class="buy-button" disabled>Куплено</button>` : `<button class="buy-button" data-item-id="${key}" data-item-type="${type}">${item.price} 🪙</button>`;
-                li.innerHTML = `<div class="shop-item-icon">${icon}</div><div class="shop-item-details"><div class="shop-item-title">${item.name}</div><div class="shop-item-info">${item.bonus}</div></div><div class="shop-item-buy">${buttonHTML}</div>`;
-                ul.appendChild(li);
-            }
-            container.appendChild(ul);
-        }
-    }
+
     
     // Обработчик продажи и закрытия модалок
     sellAllButton.addEventListener('click', () => {
