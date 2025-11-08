@@ -5,6 +5,28 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.ready();
     tg.expand();
 
+    function showAlert(message) {
+        if (showAlert && typeof showAlert === 'function') {
+            showAlert(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    function showPopup(options) {
+        if (tg.showPopup && typeof tg.showPopup === 'function') {
+            tg.showPopup(options);
+        } else {
+            alert(options.message);
+        }
+    }
+
+    function hapticFeedback(type) {
+        if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
+            tg.HapticFeedback.notificationOccurred(type);
+        }
+    }
+
 
     const PLANT_DATA = {
     // --- БАЗОВЫЕ КУЛЬТУРЫ (быстрые и дешевые) ---
@@ -88,9 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ДОБАВЬТЕ ЭТУ ФУНКЦИЮ ЗДЕСЬ
     function saveGameData() {
         const data = JSON.stringify(gameState);
-        tg.CloudStorage.setItem('farmGame', data, (err) => {
-            if (err) console.error('Ошибка сохранения:', err);
-        });
+    
+    // Пробуем CloudStorage, если не работает — используем localStorage
+        if (tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
+            tg.CloudStorage.setItem('farmGame', data);
+        } else {
+            localStorage.setItem('farmGame', data);
+        }
     }
 
 
@@ -133,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showPlantingMenu(bed) {
         const availableSeeds = Object.keys(gameState.seedInventory).filter(seed => gameState.seedInventory[seed] > 0);
         if (availableSeeds.length === 0) {
-            tg.showAlert('У вас нет семян для посадки. Зайдите в магазин!');
+            showAlert('У вас нет семян для посадки. Зайдите в магазин!');
             return;
         }
 
@@ -213,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             plantSeed(activeBed, seedType);
             activeBed = null;
         } else {
-            tg.showAlert(`У вас закончились семена ${PLANT_DATA[seedType].name}!`);
+            showAlert(`У вас закончились семена ${PLANT_DATA[seedType].name}!`);
         }
     }
     
@@ -254,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
                     saveGameData();
                     bed.innerHTML = '';
-                    tg.HapticFeedback.notificationOccurred('success');
+                    hapticFeedback('success');
                 }, { once: true });
             }
         }, 1000);
@@ -291,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = getBedPrice(bedIndex);
         
             if (gameState.balance < price) {
-                tg.showAlert(`Недостаточно монет! Нужно: ${price} 🪙`);
+                showAlert(`Недостаточно монет! Нужно: ${price} 🪙`);
                 return;
             }
         
@@ -301,8 +327,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBalanceDisplay();
             updateGardenBeds();
             saveGameData();
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`Грядка куплена! Вы открыли новую грядку за ${price} монет.`);
+            hapticFeedback('success');
+            showAlert(`Грядка куплена! Вы открыли новую грядку за ${price} монет.`);
             return;
         }
     
@@ -384,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const price = plant.seedCost;
     
         if (gameState.balance < price) {
-            tg.showAlert('Недостаточно монет!');
+            showAlert('Недостаточно монет!');
             return;
         }
     
@@ -396,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`inv-count-${seedId}`).innerText = `В наличии: ${gameState.seedInventory[seedId]}`;
         updateBalanceDisplay();
         saveGameData();
-        tg.HapticFeedback.notificationOccurred('success');
+        hapticFeedback('success');
     });
 
     // Функции заполнения магазина
@@ -443,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBalanceDisplay();
         updateWarehouseDisplay();
     
-        tg.showAlert(`Урожай продан! Вы заработали ${totalProfit.toFixed(2)} монет ${totalProfit > 100 ? '🎉' : ''}`);
+        showAlert(`Урожай продан! Вы заработали ${totalProfit.toFixed(2)} монет ${totalProfit > 100 ? '🎉' : ''}`);
     });   
     document.querySelectorAll('.modal').forEach(modal => {
         modal.querySelector('.close-button').addEventListener('click', () => {
@@ -581,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateBalanceDisplay();
                 updateWarehouseDisplay();
                 saveGameData();
-                tg.HapticFeedback.notificationOccurred('success');
+                hapticFeedback('success');
             });
         });
     }

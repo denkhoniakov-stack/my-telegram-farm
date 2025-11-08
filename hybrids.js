@@ -249,6 +249,10 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     const labContainer = document.getElementById('inventory-tab');
     if (!labContainer) return;
 
+    if (!gameState.hybridMixing) {
+        gameState.hybridMixing = null;
+    }
+
     labContainer.innerHTML = `
         <div class="lab-container">
             <div class="lab-header-new">
@@ -297,7 +301,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         const crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
 
         if (crops.length === 0) {
-            tg.showAlert('На складе нет овощей!');
+            showAlert('На складе нет овощей!');
             return;
         }
 
@@ -385,6 +389,12 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         
         gameState.warehouse[crop1]--;
         gameState.warehouse[crop2]--;
+        gameState.hybridMixing = {
+            startTime: Date.now(),
+            duration: hybridTime * 1000,
+            resultEmoji: recipe.result,
+            resultName: recipe.name
+        };
         updateBalanceDisplay();
         saveGameData();
 
@@ -393,7 +403,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         slot1El.style.pointerEvents = 'none';
         slot2El.style.pointerEvents = 'none';
 
-        let remainingTime = hybridTime;
+        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
 
     // Только таймер
         msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}с</div>`;
@@ -406,7 +416,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 
             if (remainingTime <= 0) {
                 clearInterval(timerInterval);
-                tg.HapticFeedback.notificationOccurred('success');
+                hapticFeedback('success')
 
             // Кнопка "Получить"
                 msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${recipe.result} Получить ${recipe.name}</button>`;
@@ -426,5 +436,59 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 };
             }
         }, 1000);
+    };
+    if (gameState.hybridMixing) {
+        mixBtn.disabled = true;
+        mixBtn.style.opacity = '0.5';
+        slot1El.style.pointerEvents = 'none';
+        slot2El.style.pointerEvents = 'none';
+        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+    }
+}
+
+function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
+    const mixing = gameState.hybridMixing;
+    if (!mixing) return;
+
+    const elapsed = Date.now() - mixing.startTime;
+    let remainingTime = Math.max(0, Math.floor((mixing.duration - elapsed) / 1000));
+
+    if (remainingTime === 0) {
+        showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        return;
+    }
+
+    msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}с</div>`;
+    const timerEl = document.getElementById('hybridTimer');
+
+    const timerInterval = setInterval(() => {
+        remainingTime--;
+        timerEl.textContent = `${remainingTime}с`;
+
+        if (remainingTime <= 0) {
+            clearInterval(timerInterval);
+            hapticFeedback('success')
+            showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        }
+    }, 1000);
+}
+
+function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
+    const mixing = gameState.hybridMixing;
+    
+    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} Получить ${mixing.resultName}</button>`;
+
+    const claimBtn = document.getElementById('claimBtn');
+    claimBtn.onclick = () => {
+        gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
+        gameState.hybridMixing = null;
+        saveGameData();
+
+        mixBtn.disabled = false;
+        mixBtn.style.opacity = '1';
+        slot1El.style.pointerEvents = 'all';
+        slot2El.style.pointerEvents = 'all';
+        
+        initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
     };
 }
