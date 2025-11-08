@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
+    const ADMIN_ID = 123456789; // ЗАМЕНИТЕ НА ВАШ TELEGRAM USER ID
+    const isAdmin = tg.initDataUnsafe?.user?.id === ADMIN_ID;
 
     function showAlert(message) {
         if (tg.showAlert && typeof tg.showAlert === 'function') {
@@ -171,6 +173,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    
+
+// ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ
+    function updateGardenDisplay() {
+        const beds = document.querySelectorAll('.garden-bed');
+        beds.forEach((bed, index) => {
+            if (index < gameState.unlockedBeds && gameState.garden[index]) {
+                renderPlant(bed, index);
+            }
+        });
+    }
+
 
     
     // --- ФИНАЛЬНАЯ ВЕРСИЯ ФУНКЦИИ ВЫБОРА СЕМЯН ---
@@ -705,6 +720,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 setTimeout(() => updateGardenBeds(), 100);    
 loadGameData();
+if (isAdmin) {
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton) {
+        resetButton.style.display = 'block';
+        resetButton.addEventListener('click', () => {
+            if (confirm('Админ-сброс: удалить весь прогресс?')) {
+                localStorage.removeItem('farmGame');
+                if (tg.CloudStorage && typeof tg.CloudStorage.removeItem === 'function') {
+                    tg.CloudStorage.removeItem('farmGame');
+                }
+                location.reload();
+            }
+        });
+    }
+}
 });
 
 
