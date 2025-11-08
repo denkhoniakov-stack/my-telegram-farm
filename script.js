@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-    const ADMIN_ID = 123456789; // ЗАМЕНИТЕ НА ВАШ TELEGRAM USER ID
+    const ADMIN_ID = 522564845; // ЗАМЕНИТЕ НА ВАШ TELEGRAM USER ID
     const isAdmin = tg.initDataUnsafe?.user?.id === ADMIN_ID;
 
     function showAlert(message) {
