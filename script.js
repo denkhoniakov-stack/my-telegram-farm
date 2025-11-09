@@ -73,27 +73,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const PLANT_DATA = {
     // --- БАЗОВЫЕ КУЛЬТУРЫ (быстрые и дешевые) ---
-        '🥕': { name: 'Морковь', growTime: 1000, seedCost: 1.00, sellPrice: 1.54 },
-        '🍅': { name: 'Помидор', growTime: 3000, seedCost: 3.00, sellPrice: 4.62 },
-        '🍆': { name: 'Баклажан', growTime: 5000, seedCost: 5.00, sellPrice: 7.70 },
-        '🌽': { name: 'Кукуруза', growTime: 7000, seedCost: 7.00, sellPrice: 10.78 },
-        '🥒': { name: 'Огурец', growTime: 8500, seedCost: 8.00, sellPrice: 12.32 },
-        '🍓': { name: 'Клубника', growTime: 10000, seedCost: 10.00, sellPrice: 15.40 },
-    
-    // --- СРЕДНИЕ КУЛЬТУРЫ (хороший баланс) ---
-        '🥔': { name: 'Картофель', growTime: 12000, seedCost: 12.00, sellPrice: 18.48 },
-        '🌶️': { name: 'Перец', growTime: 14000, seedCost: 14.00, sellPrice: 21.56 },
-        '🥬': { name: 'Салат', growTime: 16000, seedCost: 16.00, sellPrice: 24.64 },
-        '🧅': { name: 'Лук', growTime: 18000, seedCost: 18.00, sellPrice: 27.72 },
-        '🥦': { name: 'Брокколи', growTime: 20000, seedCost: 20.00, sellPrice: 30.80 },
-    
-    // --- ПРОДВИНУТЫЕ КУЛЬТУРЫ (медленные, но прибыльные) ---
-        '🍉': { name: 'Арбуз', growTime: 24000, seedCost: 24.00, sellPrice: 36.96 },
-        '🍇': { name: 'Виноград', growTime: 28000, seedCost: 28.00, sellPrice: 43.12 },
-        '🍑': { name: 'Персик', growTime: 32000, seedCost: 32.00, sellPrice: 49.28 },
-        '🍊': { name: 'Апельсин', growTime: 36000, seedCost: 36.00, sellPrice: 55.44 },
-        '🥭': { name: 'Манго', growTime: 40000, seedCost: 40.00, sellPrice: 61.60 }
+        '🥕': { name: 'Морковь', growTime: 1, seedCost: 1.00, sellPrice: 1.54 },
+        '🍅': { name: 'Помидор', growTime: 3, seedCost: 3.00, sellPrice: 4.62 },
+        '🍆': { name: 'Баклажан', growTime: 5, seedCost: 5.00, sellPrice: 7.70 },
+        '🌽': { name: 'Кукуруза', growTime: 7, seedCost: 7.00, sellPrice: 10.78 },
+        '🥒': { name: 'Огурец', growTime: 9, seedCost: 8.00, sellPrice: 12.32 },
+        '🍓': { name: 'Клубника', growTime: 10, seedCost: 10.00, sellPrice: 15.40 },
+
+        // --- СРЕДНИЕ КУЛЬТУРЫ (хороший баланс) ---
+        '🥔': { name: 'Картофель', growTime: 12, seedCost: 12.00, sellPrice: 18.48 },
+        '🌶️': { name: 'Перец', growTime: 14, seedCost: 14.00, sellPrice: 21.56 },
+        '🥬': { name: 'Салат', growTime: 16, seedCost: 16.00, sellPrice: 24.64 },
+        '🧅': { name: 'Лук', growTime: 18, seedCost: 18.00, sellPrice: 27.72 },
+        '🥦': { name: 'Брокколи', growTime: 20, seedCost: 20.00, sellPrice: 30.80 },
+
+        // --- ПРОДВИНУТЫЕ КУЛЬТУРЫ (медленные, но прибыльные) ---
+        '🍉': { name: 'Арбуз', growTime: 24, seedCost: 24.00, sellPrice: 36.96 },
+        '🍇': { name: 'Виноград', growTime: 28, seedCost: 28.00, sellPrice: 43.12 },
+        '🍑': { name: 'Персик', growTime: 32, seedCost: 32.00, sellPrice: 49.28 },
+        '🍊': { name: 'Апельсин', growTime: 36, seedCost: 36.00, sellPrice: 55.44 },
+        '🥭': { name: 'Манго', growTime: 40, seedCost: 40.00, sellPrice: 61.60 }
     };
+
     let gameState = {
         balance: 100,
         warehouse: {},
