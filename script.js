@@ -243,6 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ
     function updateGardenDisplay() {
+        clearAllTimers(); // ✅ ДОБАВЛЕНО: Очищаем все таймеры перед обновлением
+        
         const beds = document.querySelectorAll('.garden-bed');
         beds.forEach((bed, index) => {
             if (index < gameState.unlockedBeds && gameState.garden[index]) {
@@ -250,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
 
 
 
@@ -366,46 +369,71 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPlant(bed, bedIndex); // ✅ Просто вызываем renderPlant
     }
 
+    // ✅ НОВАЯ ФУНКЦИЯ: Очищает все активные таймеры
+    function clearAllTimers() {
+        const beds = document.querySelectorAll('.garden-bed');
+        beds.forEach(bed => {
+            const timerId = bed.getAttribute('data-timer-id');
+            if (timerId) {
+                clearInterval(parseInt(timerId));
+                bed.removeAttribute('data-timer-id');
+            }
+        });
+    }
 
+    
 
     function renderPlant(bed, bedIndex) {
         const plantData = gameState.garden[bedIndex];
         if (!plantData) return;
-    
+
         const plantInfo = PLANT_DATA[plantData.seed];
         const elapsed = Date.now() - plantData.plantedAt;
         const remaining = Math.max(0, Math.floor((plantData.growTime - elapsed) / 1000));
-    
+
         bed.innerHTML = '';
+
         const plantElement = document.createElement('div');
         plantElement.classList.add('plant');
         plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
-    
+
         if (remaining > 0) {
             const timerElement = document.createElement('div');
             timerElement.classList.add('plant-timer');
             bed.appendChild(plantElement);
             bed.appendChild(timerElement);
-        
+
             let remainingTime = remaining;
             timerElement.innerText = formatTime(remainingTime);
-        
+
+            // ✅ ИСПРАВЛЕНИЕ: Сохраняем ID интервала в атрибуте грядки
             const timerInterval = setInterval(() => {
                 remainingTime--;
-                timerElement.innerText = formatTime(remainingTime);
-            
+                if (remainingTime >= 0) {
+                    timerElement.innerText = formatTime(remainingTime);
+                }
+                
                 if (remainingTime <= 0) {
                     clearInterval(timerInterval);
-                    bed.removeChild(timerElement);
+                    bed.removeAttribute('data-timer-id'); // ✅ Очищаем атрибут
+                    
+                    // ✅ ИСПРАВЛЕНИЕ: Удаляем таймер и обновляем растение
+                    if (timerElement.parentNode) {
+                        bed.removeChild(timerElement);
+                    }
                     plantElement.innerText = plantData.seed;
                     setupHarvest(plantElement, bed, bedIndex, plantData.seed);
                 }
             }, 1000);
+            
+            // ✅ Сохраняем ID таймера в атрибуте грядки
+            bed.setAttribute('data-timer-id', timerInterval);
         } else {
             bed.appendChild(plantElement);
             setupHarvest(plantElement, bed, bedIndex, plantData.seed);
         }
     }
+
 
 
     function setupHarvest(plantElement, bed, bedIndex, seed) {
