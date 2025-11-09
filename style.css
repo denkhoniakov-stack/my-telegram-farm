@@ -1122,3 +1122,117 @@ body {
 .claim-hybrid-btn:active {
     transform: scale(0.98);
 }
+
+/* Вкладки редкости */
+.hybrid-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 15px 0;
+    justify-content: center;
+}
+
+.hybrid-tab {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.hybrid-tab.active[data-rarity="epic"] {
+    background: rgba(156, 39, 176, 0.2);
+    border-color: #9C27B0;
+}
+
+.hybrid-tab.active[data-rarity="legendary"] {
+    background: rgba(255, 193, 7, 0.2);
+    border-color: #FFC107;
+}
+
+.hybrid-tab.active[data-rarity="mythic"] {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: #F44336;
+}
+
+.tab-icon {
+    font-size: 20px;
+}
+
+.tab-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Список открытых гибридов */
+.discovered-hybrids-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+}
+
+.discovered-hybrid-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.discovered-hybrid-item.epic {
+    background: rgba(156, 39, 176, 0.15);
+    border-left-color: #9C27B0;
+}
+
+.discovered-hybrid-item.legendary {
+    background: rgba(255, 193, 7, 0.15);
+    border-left-color: #FFC107;
+}
+
+.discovered-hybrid-item.mythic {
+    background: rgba(244, 67, 54, 0.15);
+    border-left-color: #F44336;
+}
+
+.hybrid-emoji {
+    font-size: 32px;
+}
+
+.hybrid-info {
+    flex: 1;
+}
+
+.hybrid-name {
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+}
+
+.hybrid-stats {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
+}
+
+.no-hybrids {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    font-style: italic;
+}
+
+.lab-divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    margin: 20px 0;
+}
