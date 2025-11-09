@@ -407,18 +407,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function plantSeed(bed, seed) {
         const plantInfo = PLANT_DATA[seed];
         const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
-    
-    // ДОБАВЬТЕ: Сохраняем время посадки
+
+        // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
         gameState.garden[bedIndex] = {
             seed: seed,
-            plantedAt: Date.now(),
-            growTime: plantInfo.growTime
+            plantedAt: Date.now()
+            // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
         };
         saveGameData();
-    
-    // Рендерим растение
-        renderPlant(bed, bedIndex); // ✅ Просто вызываем renderPlant
+
+        // Рендерим растение
+        renderPlant(bed, bedIndex);
     }
+
 
     // ✅ НОВАЯ ФУНКЦИЯ: Очищает все активные таймеры
     function clearAllTimers() {
@@ -440,7 +441,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const plantInfo = PLANT_DATA[plantData.seed];
         const elapsed = Date.now() - plantData.plantedAt;
-        const remaining = Math.max(0, Math.floor((plantData.growTime - elapsed) / 1000));
+        
+        // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
+        const growTimeSeconds = plantInfo.growTime;
+        const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
 
         bed.innerHTML = '';
 
@@ -457,7 +461,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let remainingTime = remaining;
             timerElement.innerText = formatTime(remainingTime);
 
-            // ✅ ИСПРАВЛЕНИЕ: Сохраняем ID интервала в атрибуте грядки
             const timerInterval = setInterval(() => {
                 remainingTime--;
                 if (remainingTime >= 0) {
@@ -466,9 +469,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (remainingTime <= 0) {
                     clearInterval(timerInterval);
-                    bed.removeAttribute('data-timer-id'); // ✅ Очищаем атрибут
+                    bed.removeAttribute('data-timer-id');
                     
-                    // ✅ ИСПРАВЛЕНИЕ: Удаляем таймер и обновляем растение
                     if (timerElement.parentNode) {
                         bed.removeChild(timerElement);
                     }
@@ -477,13 +479,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 1000);
             
-            // ✅ Сохраняем ID таймера в атрибуте грядки
             bed.setAttribute('data-timer-id', timerInterval);
         } else {
             bed.appendChild(plantElement);
             setupHarvest(plantElement, bed, bedIndex, plantData.seed);
         }
     }
+
 
 
 
