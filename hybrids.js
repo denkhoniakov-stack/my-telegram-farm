@@ -226,7 +226,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     if (!labContainer) return;
 
     // ✅ ИСПРАВЛЕНИЕ: Гарантируем, что объекты в gameState существуют
-    if (!gameState.hybridMixing) {
+    if (gameState.hybridMixing === undefined) {
         gameState.hybridMixing = null;
     }
     if (!gameState.hybridData) {
