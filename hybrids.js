@@ -220,32 +220,18 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         
         labContainer.innerHTML = `
             <div class="lab-container">
+                <!-- ✅ Вкладки сверху -->
+                <div class="hybrid-tabs">
+                    <button class="hybrid-tab active" data-rarity="epic">Эпические</button>
+                    <button class="hybrid-tab" data-rarity="legendary">Легендарные</button>
+                    <button class="hybrid-tab" data-rarity="mythic">Мифические</button>
+                </div>
+                
                 <div class="lab-header-new">
                     <div class="lab-icon">🧪</div>
                     <h3>Лаборатория Гибридов</h3>
                     <p>Выберите два овоща для создания уникального гибрида</p>
                 </div>
-                
-                <!-- ✅ НОВОЕ: Вкладки для отображения открытых гибридов -->
-                <div class="hybrid-tabs">
-                    <button class="hybrid-tab active" data-rarity="epic">
-                        <span class="tab-icon">💜</span>
-                        <span class="tab-label">Эпические</span>
-                    </button>
-                    <button class="hybrid-tab" data-rarity="legendary">
-                        <span class="tab-icon">✨</span>
-                        <span class="tab-label">Легендарные</span>
-                    </button>
-                    <button class="hybrid-tab" data-rarity="mythic">
-                        <span class="tab-icon">🔥</span>
-                        <span class="tab-label">Мифические</span>
-                    </button>
-                </div>
-                
-                <!-- ✅ НОВОЕ: Список открытых гибридов -->
-                <div class="discovered-hybrids-list" id="discoveredHybridsList"></div>
-                
-                <div class="lab-divider"></div>
                 
                 <div class="lab-selection">
                     <div id="slot1" class="lab-slot-new"><span class="slot-placeholder">?</span></div>
@@ -358,7 +344,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             }
             const stats = calculateHybridStats(crop1Global, crop2Global, PLANT_DATA, gameState);
             
-            // ✅ ДОБАВЛЕНО: Сохраняем редкость вместе с данными гибрида
             gameState.hybridData[recipe.result] = { 
                 growTime: stats.growTime * 1000, 
                 sellPrice: stats.sellPrice, 
@@ -369,7 +354,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             gameState.warehouse[crop1Global]--;
             gameState.warehouse[crop2Global]--;
             
-            // ✅ ДОБАВЛЕНО: Удаляем записи с нулевым количеством
             if (gameState.warehouse[crop1Global] <= 0) {
                 delete gameState.warehouse[crop1Global];
             }
@@ -397,21 +381,17 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
         };
 
-        // ✅ НОВОЕ: Обработчики для вкладок
+        // ✅ Обработчики для вкладок (просто переключение активной)
         const hybridTabs = document.querySelectorAll('.hybrid-tab');
         hybridTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 hybridTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                updateDiscoveredHybridsList(tab.dataset.rarity, gameState);
             });
         });
-        
-        // ✅ НОВОЕ: Инициализируем список открытых гибридов
-        updateDiscoveredHybridsList('epic', gameState);
     }
 
-    // ✅ ИСПРАВЛЕНИЕ: Восстанавливаем UI при каждом заходе в лабораторию
+    // ✅ Восстанавливаем UI при каждом заходе в лабораторию
     const slot1El = document.getElementById('slot1');
     const slot2El = document.getElementById('slot2');
     const mixBtn = document.getElementById('mixBtn');
@@ -442,13 +422,8 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         slot2El.style.pointerEvents = 'all';
         msgEl.innerHTML = '';
     }
-    
-    // ✅ НОВОЕ: Обновляем список открытых гибридов при каждом заходе
-    const activeTab = document.querySelector('.hybrid-tab.active');
-    if (activeTab) {
-        updateDiscoveredHybridsList(activeTab.dataset.rarity, gameState);
-    }
 }
+
 
 
 function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
