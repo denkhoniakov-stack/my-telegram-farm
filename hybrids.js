@@ -164,7 +164,7 @@ for (const [key, value] of Object.entries(HYBRID_RECIPES)) {
     HYBRID_RECIPES_FULL[reverseKey] = value;
 }
 
-// База данных характеристик гибридов (рассчитывается динамически)
+// База данных характеристик гибридов
 const HYBRID_DATA = {
     '🍕': { growTime: 0, sellPrice: 0 },
     '🫑': { growTime: 0, sellPrice: 0 },
@@ -214,7 +214,6 @@ function getHybridData(hybridEmoji) {
     return HYBRID_DATA[hybridEmoji] || null;
 }
 
-// Функция расчёта характеристик гибрида
 function calculateHybridStats(crop1, crop2, PLANT_DATA) {
     const parent1 = PLANT_DATA[crop1] || getHybridData(crop1);
     const parent2 = PLANT_DATA[crop2] || getHybridData(crop2);
@@ -223,15 +222,9 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA) {
         return { growTime: 30, sellPrice: 50, mixCost: 50 };
     }
 
-    // Время скрещивания = среднее время роста родителей (в секундах)
     const avgGrowTime = parent1.growTime + parent2.growTime;
-
     const hybridTime = Math.floor(avgGrowTime / 1000);
-
-    // Цена продажи = сумма цен родителей × 1.5
     const hybridPrice = (parent1.sellPrice + parent2.sellPrice) * 1.5;
-
-    // Стоимость скрещивания = 10% от будущей цены (минимум 10 монет)
     const mixCost = Math.max(10, Math.floor(hybridPrice * 0.1));
 
     return {
@@ -249,6 +242,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     const labContainer = document.getElementById('inventory-tab');
     if (!labContainer) return;
 
+    // Инициализация hybridMixing
     if (!gameState.hybridMixing) {
         gameState.hybridMixing = null;
     }
@@ -301,7 +295,11 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         const crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
 
         if (crops.length === 0) {
-            showAlert('На складе нет овощей!');
+            if (tg.showAlert && typeof tg.showAlert === 'function') {
+                tg.showAlert('На складе нет овощей!');
+            } else {
+                alert('На складе нет овощей!');
+            }
             return;
         }
 
@@ -317,7 +315,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 <div class="crop-modal-icon">${crop}</div>
                 <div class="crop-modal-details">
                     <div class="crop-modal-name">${plant ? plant.name : getHybridName(crop)}</div>
-
                     <div class="crop-modal-count">${gameState.warehouse[crop]} шт</div>
                 </div>
             `;
@@ -376,17 +373,13 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         }
 
         const stats = calculateHybridStats(crop1, crop2, PLANT_DATA);
-        const mixCost = stats.mixCost;
         const hybridTime = stats.growTime;
-
-        
 
         HYBRID_DATA[recipe.result] = {
             growTime: stats.growTime * 1000,
             sellPrice: stats.sellPrice
         };
 
-        
         gameState.warehouse[crop1]--;
         gameState.warehouse[crop2]--;
         gameState.hybridMixing = {
@@ -404,39 +397,9 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         slot2El.style.pointerEvents = 'none';
 
         startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
-
-    // Только таймер
-        msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}с</div>`;
-
-        const timerEl = document.getElementById('hybridTimer');
-    
-        const timerInterval = setInterval(() => {
-            remainingTime--;
-            timerEl.textContent = `${remainingTime}с`;
-
-            if (remainingTime <= 0) {
-                clearInterval(timerInterval);
-                hapticFeedback('success')
-
-            // Кнопка "Получить"
-                msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${recipe.result} Получить ${recipe.name}</button>`;
-
-
-                const claimBtn = document.getElementById('claimBtn');
-                claimBtn.onclick = () => {
-                    gameState.warehouse[recipe.result] = (gameState.warehouse[recipe.result] || 0) + 1;
-                    saveGameData();
-
-                    mixBtn.disabled = false;
-                    mixBtn.style.opacity = '1';
-                    slot1El.style.pointerEvents = 'all';
-                    slot2El.style.pointerEvents = 'all';
-                
-                    initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
-                };
-            }
-        }, 1000);
     };
+
+    // Проверка активного скрещивания при загрузке
     if (gameState.hybridMixing) {
         mixBtn.disabled = true;
         mixBtn.style.opacity = '0.5';
@@ -446,7 +409,9 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     }
 }
 
-// ДОБАВЬТЕ ЭТИ ФУНКЦИИ ПОСЛЕ initHybridLab
+// ========================================
+// ФУНКЦИИ ВОССТАНОВЛЕНИЯ ТАЙМЕРА
+// ========================================
 
 function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;
@@ -472,54 +437,6 @@ function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, s
             if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
                 tg.HapticFeedback.notificationOccurred('success');
             }
-            showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
-        }
-    }, 1000);
-}
-
-function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
-    const mixing = gameState.hybridMixing;
-    
-    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} Получить ${mixing.resultName}</button>`;
-
-    const claimBtn = document.getElementById('claimBtn');
-    claimBtn.onclick = () => {
-        gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
-        gameState.hybridMixing = null;
-        saveGameData();
-
-        mixBtn.disabled = false;
-        mixBtn.style.opacity = '1';
-        slot1El.style.pointerEvents = 'all';
-        slot2El.style.pointerEvents = 'all';
-        
-        initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
-    };
-}
-
-
-function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
-    const mixing = gameState.hybridMixing;
-    if (!mixing) return;
-
-    const elapsed = Date.now() - mixing.startTime;
-    let remainingTime = Math.max(0, Math.floor((mixing.duration - elapsed) / 1000));
-
-    if (remainingTime === 0) {
-        showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
-        return;
-    }
-
-    msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}с</div>`;
-    const timerEl = document.getElementById('hybridTimer');
-
-    const timerInterval = setInterval(() => {
-        remainingTime--;
-        timerEl.textContent = `${remainingTime}с`;
-
-        if (remainingTime <= 0) {
-            clearInterval(timerInterval);
-            hapticFeedback('success')
             showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
         }
     }, 1000);
