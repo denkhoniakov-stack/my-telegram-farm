@@ -173,7 +173,7 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
     
     // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
-    const growTime = (hybrid1Data.growTime / 1000) + (hybrid2Data.growTime / 1000);
+    const growTime = hybrid1Data.growTime + hybrid2Data.growTime;
     const sellPrice = (hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.5;
     
     return {
@@ -206,7 +206,7 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
     
     // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
-    const growTime = (hybrid1Data.growTime / 1000) + (hybrid2Data.growTime / 1000);
+    const growTime = hybrid1Data.growTime + hybrid2Data.growTime;
     const sellPrice = (hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.7;
     
     return {
@@ -534,7 +534,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             }
             
             gameState.hybridData[stats.resultEmoji] = { 
-                growTime: stats.growTime * 1000, 
+                growTime: stats.growTime, 
                 sellPrice: stats.sellPrice, 
                 name: stats.name,
                 rarity: stats.rarity
@@ -548,7 +548,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             
             gameState.hybridMixings[activeRarity] = { 
                 startTime: Date.now(), 
-                duration: stats.growTime * 1000, 
+                duration: stats.growTime, 
                 resultEmoji: stats.resultEmoji, 
                 resultName: stats.name, 
                 crop1: crop1, 
@@ -592,8 +592,9 @@ function startMixingTimer(rarity, gameState, tg, saveGameData, msgEl, mixBtn, sl
         mixingTimerIntervals[rarity] = null;
     }
     
-    const elapsed = Date.now() - mixing.startTime;
-    let remainingTime = Math.max(0, Math.floor((mixing.duration - elapsed) / 1000));
+    const elapsed = (Date.now() - mixing.startTime) / 1000;  // Переводим в секунды
+    let remainingTime = Math.max(0, Math.floor(mixing.duration - elapsed));  // Всё в секундах
+
     
     if (remainingTime === 0) {
         showClaimButton(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
