@@ -1,3 +1,4 @@
+
 // ========================================
 // СИСТЕМА ГИБРИДИЗАЦИИ РАСТЕНИЙ
 // ========================================
@@ -20,7 +21,6 @@ const HYBRID_RECIPES = {
     '🥕-🍑': { result: '🥧', name: 'Персико-Пай' },
     '🥕-🍊': { result: '🧃', name: 'Цитрокорка' },
     '🥕-🥭': { result: '🍨', name: 'Манго-Морозко' },
-
     // === ПОМИДОР (🍅) === 13 комбинаций
     '🍅-🍆': { result: '🍝', name: 'Паста-Маркет' },
     '🍅-🌽': { result: '🌯', name: 'Томато-Буррито' },
@@ -36,7 +36,6 @@ const HYBRID_RECIPES = {
     '🍅-🍑': { result: '🧁', name: 'Персико-Маффин' },
     '🍅-🍊': { result: '🍹', name: 'Цитрусовый Микс' },
     '🍅-🥭': { result: '🍨', name: 'Тропический Десерт' },
-
     // === БАКЛАЖАН (🍆) === 12 комбинаций
     '🍆-🌽': { result: '🥙', name: 'Баклажанная Шаурма' },
     '🍆-🥒': { result: '🍱', name: 'Овощной Бокс' },
@@ -51,7 +50,6 @@ const HYBRID_RECIPES = {
     '🍆-🍑': { result: '🥧', name: 'Баклажанный Пирог' },
     '🍆-🍊': { result: '🧁', name: 'Цитроклажан' },
     '🍆-🥭': { result: '🍨', name: 'Манго-Баклажан' },
-
     // === КУКУРУЗА (🌽) === 11 комбинаций
     '🌽-🥒': { result: '🌮', name: 'Огурузная Тако' },
     '🌽-🍓': { result: '🍿', name: 'Ягодный Попкорн' },
@@ -65,7 +63,6 @@ const HYBRID_RECIPES = {
     '🌽-🍑': { result: '🥧', name: 'Персико-Кукуруза' },
     '🌽-🍊': { result: '🧁', name: 'Цитроруза' },
     '🌽-🥭': { result: '🍨', name: 'Манго-Кукуруза' },
-
     // === ОГУРЕЦ (🥒) === 10 комбинаций
     '🥒-🍓': { result: '🍹', name: 'Освежающий Смузи' },
     '🥒-🥔': { result: '🥗', name: 'Картофельный Салат' },
@@ -78,7 +75,6 @@ const HYBRID_RECIPES = {
     '🥒-🍑': { result: '🥧', name: 'Персогурец' },
     '🥒-🍊': { result: '🧁', name: 'Цитрогурец' },
     '🥒-🥭': { result: '🍨', name: 'Манго-Огурец' },
-
     // === КЛУБНИКА (🍓) === 9 комбинаций
     '🍓-🥔': { result: '🍰', name: 'Клубничный Десерт' },
     '🍓-🌶️': { result: '🍹', name: 'Острая Ягода' },
@@ -90,7 +86,6 @@ const HYBRID_RECIPES = {
     '🍓-🍑': { result: '🥧', name: 'Персико-Ягода' },
     '🍓-🍊': { result: '🧁', name: 'Цитро-Ягода' },
     '🍓-🥭': { result: '🍨', name: 'Манго-Клубника' },
-
     // === КАРТОФЕЛЬ (🥔) === 8 комбинаций
     '🥔-🌶️': { result: '🍟', name: 'Острая Картошка' },
     '🥔-🥬': { result: '🥗', name: 'Картофельный Микс' },
@@ -101,7 +96,6 @@ const HYBRID_RECIPES = {
     '🥔-🍑': { result: '🥧', name: 'Персико-Картошка' },
     '🥔-🍊': { result: '🧁', name: 'Цитро-Картофель' },
     '🥔-🥭': { result: '🍨', name: 'Манго-Картофель' },
-
     // === ПЕРЕЦ (🌶️) === 7 комбинаций
     '🌶️-🥬': { result: '🥗', name: 'Острый Салат' },
     '🌶️-🧅': { result: '🍲', name: 'Перцовый Суп' },
@@ -111,7 +105,6 @@ const HYBRID_RECIPES = {
     '🌶️-🍑': { result: '🥧', name: 'Острый Персик' },
     '🌶️-🍊': { result: '🧁', name: 'Острый Цитрус' },
     '🌶️-🥭': { result: '🍨', name: 'Острое Манго' },
-
     // === САЛАТ (🥬) === 6 комбинаций
     '🥬-🧅': { result: '🍲', name: 'Луковый Салат' },
     '🥬-🥦': { result: '🥘', name: 'Супер-Салат' },
@@ -120,7 +113,6 @@ const HYBRID_RECIPES = {
     '🥬-🍑': { result: '🥧', name: 'Персиковый Салат' },
     '🥬-🍊': { result: '🧁', name: 'Цитрусовый Салат' },
     '🥬-🥭': { result: '🍨', name: 'Манго-Салат' },
-
     // === ЛУК (🧅) === 5 комбинаций
     '🧅-🥦': { result: '🥘', name: 'Луковая Брокколи' },
     '🧅-🍉': { result: '🧃', name: 'Луковый Арбуз' },
@@ -128,29 +120,24 @@ const HYBRID_RECIPES = {
     '🧅-🍑': { result: '🥧', name: 'Луковый Персик' },
     '🧅-🍊': { result: '🧁', name: 'Луковый Цитрус' },
     '🧅-🥭': { result: '🍨', name: 'Луковое Манго' },
-
     // === БРОККОЛИ (🥦) === 4 комбинации
     '🥦-🍉': { result: '🧃', name: 'Брокколи-Арбуз' },
     '🥦-🍇': { result: '🍸', name: 'Виноколи' },
     '🥦-🍑': { result: '🥧', name: 'Персиколи' },
     '🥦-🍊': { result: '🧁', name: 'Цитроколи' },
     '🥦-🥭': { result: '🍨', name: 'Манго-Брокколи' },
-
     // === АРБУЗ (🍉) === 3 комбинации
     '🍉-🍇': { result: '🍸', name: 'Виноарбуз' },
     '🍉-🍑': { result: '🥧', name: 'Персиарбуз' },
     '🍉-🍊': { result: '🧁', name: 'Цитроарбуз' },
     '🍉-🥭': { result: '🍨', name: 'Манго-Арбуз' },
-
     // === ВИНОГРАД (🍇) === 2 комбинации
     '🍇-🍑': { result: '🥧', name: 'Персиноград' },
     '🍇-🍊': { result: '🧁', name: 'Цитроград' },
     '🍇-🥭': { result: '🍨', name: 'Манго-Виноград' },
-
     // === ПЕРСИК (🍑) === 1 комбинация
     '🍑-🍊': { result: '🧁', name: 'Цитроперсик' },
     '🍑-🥭': { result: '🍨', name: 'Манго-Персик' },
-
     // === АПЕЛЬСИН (🍊) === последняя
     '🍊-🥭': { result: '🍨', name: 'Апельсиново-Манго' }
 };
@@ -164,45 +151,39 @@ for (const [key, value] of Object.entries(HYBRID_RECIPES)) {
     HYBRID_RECIPES_FULL[reverseKey] = value;
 }
 
-// База данных характеристик гибридов
+// База данных характеристик гибридов ПО УМОЛЧАНИЮ
 const HYBRID_DATA = {
-    '🍕': { growTime: 0, sellPrice: 0 },
-    '🫑': { growTime: 0, sellPrice: 0 },
-    '🌮': { growTime: 0, sellPrice: 0 },
-    '🥗': { growTime: 0, sellPrice: 0 },
-    '🍰': { growTime: 0, sellPrice: 0 },
-    '🍟': { growTime: 0, sellPrice: 0 },
-    '🫚': { growTime: 0, sellPrice: 0 },
-    '🥙': { growTime: 0, sellPrice: 0 },
-    '🍲': { growTime: 0, sellPrice: 0 },
-    '🥘': { growTime: 0, sellPrice: 0 },
-    '🍹': { growTime: 0, sellPrice: 0 },
-    '🍸': { growTime: 0, sellPrice: 0 },
-    '🥧': { growTime: 0, sellPrice: 0 },
-    '🧃': { growTime: 0, sellPrice: 0 },
-    '🍨': { growTime: 0, sellPrice: 0 },
-    '🍝': { growTime: 0, sellPrice: 0 },
-    '🌯': { growTime: 0, sellPrice: 0 },
-    '🥪': { growTime: 0, sellPrice: 0 },
-    '🍔': { growTime: 0, sellPrice: 0 },
-    '🌭': { growTime: 0, sellPrice: 0 },
-    '🍛': { growTime: 0, sellPrice: 0 },
-    '🍷': { growTime: 0, sellPrice: 0 },
-    '🧁': { growTime: 0, sellPrice: 0 },
-    '🍱': { growTime: 0, sellPrice: 0 },
-    '🌶️': { growTime: 0, sellPrice: 0 },
-    '🍿': { growTime: 0, sellPrice: 0 },
+    '🍕': { growTime: 0, sellPrice: 0 }, '🫑': { growTime: 0, sellPrice: 0 },
+    '🌮': { growTime: 0, sellPrice: 0 }, '🥗': { growTime: 0, sellPrice: 0 },
+    '🍰': { growTime: 0, sellPrice: 0 }, '🍟': { growTime: 0, sellPrice: 0 },
+    '🫚': { growTime: 0, sellPrice: 0 }, '🥙': { growTime: 0, sellPrice: 0 },
+    '🍲': { growTime: 0, sellPrice: 0 }, '🥘': { growTime: 0, sellPrice: 0 },
+    '🍹': { growTime: 0, sellPrice: 0 }, '🍸': { growTime: 0, sellPrice: 0 },
+    '🥧': { growTime: 0, sellPrice: 0 }, '🧃': { growTime: 0, sellPrice: 0 },
+    '🍨': { growTime: 0, sellPrice: 0 }, '🍝': { growTime: 0, sellPrice: 0 },
+    '🌯': { growTime: 0, sellPrice: 0 }, '🥪': { growTime: 0, sellPrice: 0 },
+    '🍔': { growTime: 0, sellPrice: 0 }, '🌭': { growTime: 0, sellPrice: 0 },
+    '🍛': { growTime: 0, sellPrice: 0 }, '🍷': { growTime: 0, sellPrice: 0 },
+    '🧁': { growTime: 0, sellPrice: 0 }, '🍱': { growTime: 0, sellPrice: 0 },
+    '🌶️': { growTime: 0, sellPrice: 0 }, '🍿': { growTime: 0, sellPrice: 0 },
     '🍓': { growTime: 0, sellPrice: 0 }
 };
 
-function getHybridRecipe(seed1, seed2) {
-    if (seed1 === seed2) return null;
-    const key = `${seed1}-${seed2}`;
-    return HYBRID_RECIPES_FULL[key] || null;
+// ✅ ИСПРАВЛЕННАЯ ФУНКЦИЯ: Получает данные гибрида из gameState
+function getHybridData(hybridEmoji, gameState) {
+    if (gameState && gameState.hybridData && gameState.hybridData[hybridEmoji]) {
+        return gameState.hybridData[hybridEmoji];
+    }
+    return HYBRID_DATA[hybridEmoji] || null;
 }
 
-function getHybridName(hybridEmoji) {
-    for (const [key, value] of Object.entries(HYBRID_RECIPES)) {
+// ✅ ИСПРАВЛЕННАЯ ФУНКЦИЯ: Получает имя гибрида из gameState
+function getHybridName(hybridEmoji, gameState) {
+    if (gameState && gameState.hybridData && gameState.hybridData[hybridEmoji]) {
+        return gameState.hybridData[hybridEmoji].name;
+    }
+    // Если в сохранении нет, ищем в рецептах
+    for (const value of Object.values(HYBRID_RECIPES_FULL)) {
         if (value.result === hybridEmoji) {
             return value.name;
         }
@@ -210,24 +191,22 @@ function getHybridName(hybridEmoji) {
     return 'Гибрид';
 }
 
-function getHybridData(hybridEmoji) {
-    return HYBRID_DATA[hybridEmoji] || null;
+function getHybridRecipe(seed1, seed2) {
+    if (seed1 === seed2) return null;
+    const key = `${seed1}-${seed2}`;
+    return HYBRID_RECIPES_FULL[key] || null;
 }
 
+// ✅ ИСПРАВЛЕННАЯ ФУНКЦИЯ: Рассчитывает статистику, используя данные из gameState
 function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
-    // Ищем данные о родителях в трех местах:
-    // 1. В базовых растениях (PLANT_DATA)
-    // 2. В созданных игроком гибридах (gameState.hybridData)
-    // 3. В данных по умолчанию (HYBRID_DATA)
-    const parent1 = PLANT_DATA[crop1] || (gameState.hybridData && gameState.hybridData[crop1]) || HYBRID_DATA[crop1];
-    const parent2 = PLANT_DATA[crop2] || (gameState.hybridData && gameState.hybridData[crop2]) || HYBRID_DATA[crop2];
+    const parent1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
+    const parent2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
 
     if (!parent1 || !parent2) {
-        // Если данные не найдены, возвращаем значения по умолчанию
         return { growTime: 30, sellPrice: 50, mixCost: 50 };
     }
 
-    const avgGrowTime = (parent1.growTime + parent2.growTime);
+    const avgGrowTime = parent1.growTime + parent2.growTime;
     const hybridTime = Math.floor(avgGrowTime / 1000);
     const hybridPrice = (parent1.sellPrice + parent2.sellPrice) * 1.5;
     const mixCost = Math.max(10, Math.floor(hybridPrice * 0.1));
@@ -239,18 +218,19 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
     };
 }
 
-
 // ========================================
 // UI ЛАБОРАТОРИИ
 // ========================================
-
 function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA) {
     const labContainer = document.getElementById('inventory-tab');
     if (!labContainer) return;
 
-    // Инициализация hybridMixing
+    // ✅ ИСПРАВЛЕНИЕ: Гарантируем, что объекты в gameState существуют
     if (!gameState.hybridMixing) {
         gameState.hybridMixing = null;
+    }
+    if (!gameState.hybridData) {
+        gameState.hybridData = {};
     }
 
     labContainer.innerHTML = `
@@ -260,7 +240,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 <h3>Лаборатория Гибридов</h3>
                 <p>Выберите два овоща для создания уникального гибрида</p>
             </div>
-
             <div class="lab-selection">
                 <div id="slot1" class="lab-slot-new">
                     <span class="slot-placeholder">?</span>
@@ -270,11 +249,9 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                     <span class="slot-placeholder">?</span>
                 </div>
             </div>
-
             <button id="mixBtn" class="lab-mix-btn">✨ Скрестить</button>
             <div id="msg" class="lab-result-message"></div>
         </div>
-
         <div id="cropModal" class="crop-modal hidden">
             <div class="crop-modal-content">
                 <div class="crop-modal-header">
@@ -301,18 +278,15 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         const crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
 
         if (crops.length === 0) {
-            if (tg.showAlert && typeof tg.showAlert === 'function') {
-                tg.showAlert('На складе нет овощей!');
-            } else {
-                alert('На складе нет овощей!');
-            }
+            tg.showAlert('На складе нет овощей!');
             return;
         }
 
         cropModalList.innerHTML = '';
         crops.forEach(crop => {
             const plant = PLANT_DATA[crop];
-            const hybrid = getHybridData(crop);
+            // ✅ ИСПРАВЛЕНИЕ: Передаем gameState для получения данных гибрида
+            const hybrid = getHybridData(crop, gameState);
             if (!plant && !hybrid) return;
 
             const li = document.createElement('li');
@@ -320,7 +294,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             li.innerHTML = `
                 <div class="crop-modal-icon">${crop}</div>
                 <div class="crop-modal-details">
-                    <div class="crop-modal-name">${plant ? plant.name : getHybridName(crop)}</div>
+                    <div class="crop-modal-name">${plant ? plant.name : getHybridName(crop, gameState)}</div>
                     <div class="crop-modal-count">${gameState.warehouse[crop]} шт</div>
                 </div>
             `;
@@ -361,7 +335,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         } else openCropModal(2);
     };
 
-    // Обработчик скрещивания
+    // ✅ ИСПРАВЛЕННЫЙ обработчик скрещивания
     mixBtn.onclick = () => {
         if (!crop1 || !crop2) {
             msgEl.innerHTML = '<div class="result-error">❌ Выберите два овоща!</div>';
@@ -378,20 +352,19 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             return;
         }
 
-        const stats = calculateHybridStats(crop1, crop2, PLANT_DATA, gameState); // Добавляем gameState
+        const stats = calculateHybridStats(crop1, crop2, PLANT_DATA, gameState);
         const hybridTime = stats.growTime;
 
-// Сохраняем данные в gameState, А НЕ в HYBRID_DATA
-       gameState.hybridData[recipe.result] = {
+        // 🔥 ГЛАВНОЕ: Сохраняем данные в gameState
+        gameState.hybridData[recipe.result] = {
             growTime: stats.growTime * 1000,
             sellPrice: stats.sellPrice,
-            name: recipe.name // Также сохраним имя гибрида
+            name: recipe.name
         };
 
         gameState.warehouse[crop1]--;
         gameState.warehouse[crop2]--;
         
-        // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: сохраняем crop1 и crop2
         gameState.hybridMixing = {
             startTime: Date.now(),
             duration: hybridTime * 1000,
@@ -402,19 +375,18 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         };
         
         updateBalanceDisplay();
-        saveGameData();
+        saveGameData(); // Сохраняем все изменения
 
         mixBtn.disabled = true;
         mixBtn.style.opacity = '0.5';
         slot1El.style.pointerEvents = 'none';
         slot2El.style.pointerEvents = 'none';
 
-        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El, slot1El, slot2El);
+        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
     };
 
     // Проверка активного скрещивания при загрузке
     if (gameState.hybridMixing) {
-        // Восстанавливаем выбранные овощи
         crop1 = gameState.hybridMixing.crop1;
         crop2 = gameState.hybridMixing.crop2;
         
@@ -438,7 +410,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 // ========================================
 // ФУНКЦИИ ВОССТАНОВЛЕНИЯ ТАЙМЕРА
 // ========================================
-
 function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;
     if (!mixing) return;
@@ -456,7 +427,9 @@ function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, s
 
     const timerInterval = setInterval(() => {
         remainingTime--;
-        timerEl.textContent = `${remainingTime}с`;
+        if (timerEl) {
+            timerEl.textContent = `${remainingTime}с`;
+        }
 
         if (remainingTime <= 0) {
             clearInterval(timerInterval);
@@ -470,8 +443,12 @@ function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, s
 
 function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;
+    if (!mixing) return;
+
+    // ✅ ИСПРАВЛЕНИЕ: Получаем актуальное имя гибрида
+    const resultName = getHybridName(mixing.resultEmoji, gameState);
     
-    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} Получить ${mixing.resultName}</button>`;
+    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} Получить ${resultName}</button>`;
 
     const claimBtn = document.getElementById('claimBtn');
     claimBtn.onclick = () => {
@@ -479,12 +456,8 @@ function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, sl
         gameState.hybridMixing = null;
         saveGameData();
 
-        mixBtn.disabled = false;
-        mixBtn.style.opacity = '1';
-        slot1El.style.pointerEvents = 'all';
-        slot2El.style.pointerEvents = 'all';
-        
-        // ИСПРАВЛЕНИЕ: передаём все параметры
+        // Обновляем весь UI лаборатории, чтобы сбросить состояние
         initHybridLab(gameState, tg, window.updateBalanceDisplay, saveGameData, window.PLANT_DATA);
     };
 }
+

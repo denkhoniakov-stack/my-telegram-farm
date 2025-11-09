@@ -562,14 +562,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (quantity > 0) {
             // Проверяем, гибрид это или обычный овощ
                 const plant = PLANT_DATA[crop];
-                const hybrid = getHybridData ? getHybridData(crop) : null;
-            
+                const hybrid = getHybridData(crop, gameState); // <--- передаем gameState
                 if (plant) {
-                     totalProfit += quantity * plant.sellPrice;
+                  totalProfit += quantity * plant.sellPrice;
                 } else if (hybrid) {
-                    totalProfit += quantity * hybrid.sellPrice;
+                   totalProfit += quantity * hybrid.sellPrice;
                 }
-            }
+            }    
         });
     
         if (totalProfit === 0) return;
@@ -609,9 +608,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
         items.forEach(crop => {
             const plant = PLANT_DATA[crop];
-            const hybrid = getHybridData ? getHybridData(crop) : null;
+            const hybrid = getHybridData(crop, gameState); // <--- передаем gameState
             const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
-            const name = plant ? plant.name : (hybrid ? getHybridName(crop) : crop);
+            const name = plant ? plant.name : getHybridName(crop, gameState);
 
             const maxCount = gameState.warehouse[crop];
         
