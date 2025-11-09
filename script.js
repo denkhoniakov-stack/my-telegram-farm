@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         seedInventory: { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 }, // Добавил семян для тестов
         items: {},
         unlockedBeds: 3,
-        garden: []
+        garden: [],
+        discoveredHybrids: []
     };
 
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.items = loaded.items || {};
                         gameState.garden = loaded.garden || [];
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
+                        gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                     } catch (e) {
                         console.error('Ошибка загрузки:', e);
                     }
@@ -112,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.items = loaded.items || {};
                     gameState.garden = loaded.garden || [];
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
+                    gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
                 } catch (e) {
                     console.error('Ошибка:', e);
                 }
