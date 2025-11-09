@@ -665,11 +665,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateWarehouseDisplay() {
         warehouseList.innerHTML = '';
 
-        // ✅ ДОБАВЛЕНО: Создаем секцию для семян
+        // ✅ СЕКЦИЯ 1: Семена
         const seedsInInventory = Object.keys(gameState.seedInventory).filter(seed => gameState.seedInventory[seed] > 0);
         
         if (seedsInInventory.length > 0) {
-            // Заголовок секции семян
             const seedsHeader = document.createElement('li');
             seedsHeader.style.cssText = `
                 padding: 15px 10px 5px 10px;
@@ -683,7 +682,6 @@ document.addEventListener('DOMContentLoaded', () => {
             seedsHeader.innerHTML = '🌱 Семена';
             warehouseList.appendChild(seedsHeader);
 
-            // Список семян
             seedsInInventory.forEach(seedEmoji => {
                 const plant = PLANT_DATA[seedEmoji];
                 if (!plant) return;
@@ -718,11 +716,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // ✅ Оригинальный код для урожая
-        const harvestedItems = Object.keys(gameState.warehouse).filter(key => gameState.warehouse[key] > 0);
+        // ✅ СЕКЦИЯ 2: Обычный урожай (не гибриды)
+        const harvestedItems = Object.keys(gameState.warehouse).filter(key => {
+            return gameState.warehouse[key] > 0 && PLANT_DATA[key]; // Только обычные растения
+        });
         
         if (harvestedItems.length > 0) {
-            // Заголовок секции урожая
             const harvestHeader = document.createElement('li');
             harvestHeader.style.cssText = `
                 padding: 15px 10px 5px 10px;
@@ -736,54 +735,110 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             harvestHeader.innerHTML = '🌾 Урожай';
             warehouseList.appendChild(harvestHeader);
+
+            harvestedItems.forEach(crop => {
+                const plant = PLANT_DATA[crop];
+                const maxCount = gameState.warehouse[crop];
+
+                const li = document.createElement('li');
+                li.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #ddd;
+                `;
+
+                li.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 28px;">${crop}</span>
+                        <div>
+                            <div style="font-weight: bold;">${plant.name}</div>
+                            <div style="font-size: 12px; color: #666;">
+                                ${maxCount} шт. • ${plant.sellPrice.toFixed(2)} за шт.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="minus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">−</button>
+                        <span class="sell-count" data-crop="${crop}" style="min-width: 30px; text-align: center; font-weight: bold; font-size: 16px;">1</span>
+                        <button class="plus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">+</button>
+                        <button class="sell-btn" data-crop="${crop}" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-left: 8px;">Продать</button>
+                    </div>
+                `;
+
+                warehouseList.appendChild(li);
+            });
         }
 
-        if (seedsInInventory.length === 0 && harvestedItems.length === 0) {
+        // ✅ СЕКЦИЯ 3: Гибриды (внизу списка)
+        const hybridItems = Object.keys(gameState.warehouse).filter(key => {
+            return gameState.warehouse[key] > 0 && !PLANT_DATA[key]; // Только гибриды
+        });
+        
+        if (hybridItems.length > 0) {
+            const hybridsHeader = document.createElement('li');
+            hybridsHeader.style.cssText = `
+                padding: 15px 10px 5px 10px;
+                font-weight: bold;
+                font-size: 16px;
+                color: #9C27B0;
+                background: rgba(156, 39, 176, 0.1);
+                border-radius: 8px;
+                margin-bottom: 5px;
+                margin-top: 15px;
+            `;
+            hybridsHeader.innerHTML = '🧬 Гибриды';
+            warehouseList.appendChild(hybridsHeader);
+
+            hybridItems.forEach(crop => {
+                const hybrid = getHybridData(crop, gameState);
+                const sellPrice = hybrid ? hybrid.sellPrice : 0;
+                const name = getHybridName(crop, gameState);
+                const maxCount = gameState.warehouse[crop];
+
+                const li = document.createElement('li');
+                li.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #ddd;
+                `;
+
+                li.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 28px;">${crop}</span>
+                        <div>
+                            <div style="font-weight: bold;">${name}</div>
+                            <div style="font-size: 12px; color: #666;">
+                                ${maxCount} шт. • ${sellPrice.toFixed(2)} за шт.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="minus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">−</button>
+                        <span class="sell-count" data-crop="${crop}" style="min-width: 30px; text-align: center; font-weight: bold; font-size: 16px;">1</span>
+                        <button class="plus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">+</button>
+                        <button class="sell-btn" data-crop="${crop}" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-left: 8px;">Продать</button>
+                    </div>
+                `;
+
+                warehouseList.appendChild(li);
+            });
+        }
+
+        // Проверка на пустой склад
+        if (seedsInInventory.length === 0 && harvestedItems.length === 0 && hybridItems.length === 0) {
             warehouseList.innerHTML = '<li style="text-align: center; color: #999;">Склад пуст</li>';
             sellAllButton.style.display = 'none';
             return;
         }
 
-        sellAllButton.style.display = harvestedItems.length > 0 ? 'block' : 'none';
+        // Кнопка "Продать всё" показывается только если есть урожай или гибриды
+        sellAllButton.style.display = (harvestedItems.length > 0 || hybridItems.length > 0) ? 'block' : 'none';
 
-        harvestedItems.forEach(crop => {
-            const plant = PLANT_DATA[crop];
-            const hybrid = getHybridData(crop, gameState);
-            const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
-            const name = plant ? plant.name : getHybridName(crop, gameState);
-            const maxCount = gameState.warehouse[crop];
-
-            const li = document.createElement('li');
-            li.style.cssText = `
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid #ddd;
-            `;
-
-            li.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 28px;">${crop}</span>
-                    <div>
-                        <div style="font-weight: bold;">${name}</div>
-                        <div style="font-size: 12px; color: #666;">
-                            ${maxCount} шт. • ${sellPrice.toFixed(2)} за шт.
-                        </div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="minus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">−</button>
-                    <span class="sell-count" data-crop="${crop}" style="min-width: 30px; text-align: center; font-weight: bold; font-size: 16px;">1</span>
-                    <button class="plus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">+</button>
-                    <button class="sell-btn" data-crop="${crop}" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-left: 8px;">Продать</button>
-                </div>
-            `;
-
-            warehouseList.appendChild(li);
-        });
-
-        // Обработчики для кнопок продажи (оригинальный код)
+        // Обработчики для кнопок продажи
         document.querySelectorAll('.minus-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const crop = btn.dataset.crop;
@@ -826,6 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
 
 
 
