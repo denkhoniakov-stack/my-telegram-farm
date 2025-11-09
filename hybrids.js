@@ -5,155 +5,230 @@
 // База данных всех возможных гибридов (105 комбинаций)
 const HYBRID_RECIPES = {
     // Морковь (15 комбинаций)
-    '🥕-🍅': { result: '🍕', name: 'Пицца-Морковь', rarity: 'epic' },
-    '🥕-🍆': { result: '🫑', name: 'Баклажкорка', rarity: 'epic' },
-    '🥕-🌽': { result: '🌮', name: 'Тако-Корнет', rarity: 'epic' },
-    '🥕-🥒': { result: '🥗', name: 'Хрустяшка', rarity: 'epic' },
-    '🥕-🍓': { result: '🍰', name: 'Морковный Торт', rarity: 'epic' },
-    '🥕-🥔': { result: '🍟', name: 'Золотая Картошка', rarity: 'epic' },
-    '🥕-🌶️': { result: '🫚', name: 'Огненный Корень', rarity: 'epic' },
-    '🥕-🥬': { result: '🥙', name: 'Зеленый Рулет', rarity: 'epic' },
-    '🥕-🧅': { result: '🍲', name: 'Суповар', rarity: 'epic' },
-    '🥕-🥦': { result: '🥘', name: 'Бро-Морковь', rarity: 'epic' },
-    '🥕-🍉': { result: '🍹', name: 'Арбузный Фреш', rarity: 'epic' },
-    '🥕-🍇': { result: '🍸', name: 'Виноморковь', rarity: 'epic' },
-    '🥕-🍑': { result: '🥧', name: 'Персико-Пай', rarity: 'epic' },
-    '🥕-🍊': { result: '🧃', name: 'Цитрокорка', rarity: 'epic' },
-    '🥕-🥭': { result: '🍨', name: 'Манго-Морозко', rarity: 'epic' },
+    '🥕-🍅': { result: '🍕', name: 'Морковицца', rarity: 'epic' },
+    '🥕-🍆': { result: '🫑', name: 'Каклажор', rarity: 'epic' },
+    '🥕-🌽': { result: '🌮', name: 'Моркуруза', rarity: 'epic' },
+    '🥕-🥒': { result: '🥗', name: 'Огуровка', rarity: 'epic' },
+    '🥕-🍓': { result: '🍰', name: 'Морковника', rarity: 'epic' },
+    '🥕-🥔': { result: '🍟', name: 'Каркошка', rarity: 'epic' },
+    '🥕-🌶️': { result: '🫚', name: 'Перковь', rarity: 'epic' },
+    '🥕-🥬': { result: '🥙', name: 'Салаковка', rarity: 'epic' },
+    '🥕-🧅': { result: '🍲', name: 'Луковка', rarity: 'epic' },
+    '🥕-🥦': { result: '🥘', name: 'Брокковь', rarity: 'epic' },
+    '🥕-🍉': { result: '🍹', name: 'Морбузка', rarity: 'epic' },
+    '🥕-🍇': { result: '🍸', name: 'Винковь', rarity: 'epic' },
+    '🥕-🍑': { result: '🥧', name: 'Персковь', rarity: 'epic' },
+    '🥕-🍊': { result: '🧃', name: 'Апелковь', rarity: 'epic' },
+    '🥕-🥭': { result: '🍨', name: 'Манковка', rarity: 'epic' },
     
     // Томат (14 комбинаций)
-    '🍅-🍆': { result: '🍝', name: 'Паста-Маркет', rarity: 'epic' },
-    '🍅-🌽': { result: '🌯', name: 'Томато-Буррито', rarity: 'epic' },
-    '🍅-🥒': { result: '🥪', name: 'Клаб-Сэндвич', rarity: 'epic' },
-    '🍅-🍓': { result: '🍓', name: 'Красный Коктейль', rarity: 'epic' },
-    '🍅-🥔': { result: '🍔', name: 'Томато-Бургер', rarity: 'epic' },
-    '🍅-🌶️': { result: '🌭', name: 'Острый Дог', rarity: 'epic' },
-    '🍅-🥬': { result: '🥗', name: 'Салат Цезарь', rarity: 'epic' },
-    '🍅-🧅': { result: '🍛', name: 'Томатное Карри', rarity: 'epic' },
-    '🍅-🥦': { result: '🥘', name: 'Овощное Рагу', rarity: 'epic' },
-    '🍅-🍉': { result: '🧃', name: 'Томатный Сок', rarity: 'epic' },
-    '🍅-🍇': { result: '🍷', name: 'Томатное Вино', rarity: 'epic' },
-    '🍅-🍑': { result: '🧁', name: 'Персико-Маффин', rarity: 'epic' },
-    '🍅-🍊': { result: '🍹', name: 'Цитрусовый Микс', rarity: 'epic' },
-    '🍅-🥭': { result: '🍨', name: 'Тропический Десерт', rarity: 'epic' },
+    '🍅-🍆': { result: '🍝', name: 'Томклажан', rarity: 'epic' },
+    '🍅-🌽': { result: '🌯', name: 'Кукумат', rarity: 'epic' },
+    '🍅-🥒': { result: '🥪', name: 'Огурмат', rarity: 'epic' },
+    '🍅-🍓': { result: '🍓', name: 'Клубмат', rarity: 'epic' },
+    '🍅-🥔': { result: '🍔', name: 'Картомат', rarity: 'epic' },
+    '🍅-🌶️': { result: '🌭', name: 'Перцомат', rarity: 'epic' },
+    '🍅-🥬': { result: '🥗', name: 'Салатомат', rarity: 'epic' },
+    '🍅-🧅': { result: '🍛', name: 'Лукомат', rarity: 'epic' },
+    '🍅-🥦': { result: '🥘', name: 'Броккомат', rarity: 'epic' },
+    '🍅-🍉': { result: '🧃', name: 'Арбумат', rarity: 'epic' },
+    '🍅-🍇': { result: '🍷', name: 'Виномат', rarity: 'epic' },
+    '🍅-🍑': { result: '🧁', name: 'Персомат', rarity: 'epic' },
+    '🍅-🍊': { result: '🍹', name: 'Апельсомат', rarity: 'epic' },
+    '🍅-🥭': { result: '🍨', name: 'Мангомат', rarity: 'epic' },
     
     // Баклажан (13 комбинаций)
-    '🍆-🌽': { result: '🥙', name: 'Баклажанная Шаурма', rarity: 'epic' },
-    '🍆-🥒': { result: '🍱', name: 'Овощной Бокс', rarity: 'epic' },
-    '🍆-🍓': { result: '🍰', name: 'Фиолетовый Торт', rarity: 'epic' },
-    '🍆-🥔': { result: '🍟', name: 'Баклажанные Чипсы', rarity: 'epic' },
-    '🍆-🌶️': { result: '🌶️', name: 'Острый Баклажан', rarity: 'epic' },
-    '🍆-🥬': { result: '🥗', name: 'Зеленый Баклажан', rarity: 'epic' },
-    '🍆-🧅': { result: '🍲', name: 'Луковое Соте', rarity: 'epic' },
-    '🍆-🥦': { result: '🥘', name: 'Брокколажан', rarity: 'epic' },
-    '🍆-🍉': { result: '🧃', name: 'Фиолетовый Сок', rarity: 'epic' },
+    '🍆-🌽': { result: '🥙', name: 'Баккуруза', rarity: 'epic' },
+    '🍆-🥒': { result: '🍱', name: 'Огурклажан', rarity: 'epic' },
+    '🍆-🍓': { result: '🍰', name: 'Клубклажан', rarity: 'epic' },
+    '🍆-🥔': { result: '🍟', name: 'Картоклажан', rarity: 'epic' },
+    '🍆-🌶️': { result: '🌶️', name: 'Перклажан', rarity: 'epic' },
+    '🍆-🥬': { result: '🥗', name: 'Салаклажан', rarity: 'epic' },
+    '🍆-🧅': { result: '🍲', name: 'Луклажан', rarity: 'epic' },
+    '🍆-🥦': { result: '🥘', name: 'Брокклажан', rarity: 'epic' },
+    '🍆-🍉': { result: '🧃', name: 'Арбуклажан', rarity: 'epic' },
     '🍆-🍇': { result: '🍸', name: 'Виноклажан', rarity: 'epic' },
-    '🍆-🍑': { result: '🥧', name: 'Баклажанный Пирог', rarity: 'epic' },
-    '🍆-🍊': { result: '🧁', name: 'Цитроклажан', rarity: 'epic' },
-    '🍆-🥭': { result: '🍨', name: 'Манго-Баклажан', rarity: 'epic' },
+    '🍆-🍑': { result: '🥧', name: 'Персклажан', rarity: 'epic' },
+    '🍆-🍊': { result: '🧁', name: 'Апельклажан', rarity: 'epic' },
+    '🍆-🥭': { result: '🍨', name: 'Мангоклажан', rarity: 'epic' },
     
     // Кукуруза (12 комбинаций)
-    '🌽-🥒': { result: '🌮', name: 'Огурузная Тако', rarity: 'epic' },
-    '🌽-🍓': { result: '🍿', name: 'Ягодный Попкорн', rarity: 'epic' },
-    '🌽-🥔': { result: '🍟', name: 'Кукурузные Палочки', rarity: 'epic' },
-    '🌽-🌶️': { result: '🌭', name: 'Острая Кукуруза', rarity: 'epic' },
-    '🌽-🥬': { result: '🥗', name: 'Салат с Кукурузой', rarity: 'epic' },
-    '🌽-🧅': { result: '🍲', name: 'Кукурузный Суп', rarity: 'epic' },
-    '🌽-🥦': { result: '🥘', name: 'Зеленая Кукуруза', rarity: 'epic' },
-    '🌽-🍉': { result: '🧃', name: 'Кукурузный Нектар', rarity: 'epic' },
-    '🌽-🍇': { result: '🍸', name: 'Виноруза', rarity: 'epic' },
-    '🌽-🍑': { result: '🥧', name: 'Персико-Кукуруза', rarity: 'epic' },
-    '🌽-🍊': { result: '🧁', name: 'Цитроруза', rarity: 'epic' },
-    '🌽-🥭': { result: '🍨', name: 'Манго-Кукуруза', rarity: 'epic' },
+    '🌽-🥒': { result: '🌮', name: 'Огурукуруза', rarity: 'epic' },
+    '🌽-🍓': { result: '🍿', name: 'Клубкуруза', rarity: 'epic' },
+    '🌽-🥔': { result: '🍟', name: 'Картокуруза', rarity: 'epic' },
+    '🌽-🌶️': { result: '🌭', name: 'Перкуруза', rarity: 'epic' },
+    '🌽-🥬': { result: '🥗', name: 'Салакуруза', rarity: 'epic' },
+    '🌽-🧅': { result: '🍲', name: 'Лукуруза', rarity: 'epic' },
+    '🌽-🥦': { result: '🥘', name: 'Броккуруза', rarity: 'epic' },
+    '🌽-🍉': { result: '🧃', name: 'Арбукуруза', rarity: 'epic' },
+    '🌽-🍇': { result: '🍸', name: 'Винокуруза', rarity: 'epic' },
+    '🌽-🍑': { result: '🥧', name: 'Перскуруза', rarity: 'epic' },
+    '🌽-🍊': { result: '🧁', name: 'Апелькуруза', rarity: 'epic' },
+    '🌽-🥭': { result: '🍨', name: 'Мангокуруза', rarity: 'epic' },
     
     // Огурец (11 комбинаций)
-    '🥒-🍓': { result: '🍹', name: 'Освежающий Смузи', rarity: 'epic' },
-    '🥒-🥔': { result: '🥗', name: 'Картофельный Салат', rarity: 'epic' },
-    '🥒-🌶️': { result: '🥙', name: 'Острый Огурец', rarity: 'epic' },
-    '🥒-🥬': { result: '🥗', name: 'Зеленый Хруст', rarity: 'epic' },
-    '🥒-🧅': { result: '🍲', name: 'Огуречный Суп', rarity: 'epic' },
-    '🥒-🥦': { result: '🥘', name: 'Брокколец', rarity: 'epic' },
-    '🥒-🍉': { result: '🧃', name: 'Арбузец', rarity: 'epic' },
+    '🥒-🍓': { result: '🍹', name: 'Клубгурец', rarity: 'epic' },
+    '🥒-🥔': { result: '🥗', name: 'Картогурец', rarity: 'epic' },
+    '🥒-🌶️': { result: '🥙', name: 'Перогурец', rarity: 'epic' },
+    '🥒-🥬': { result: '🥗', name: 'Салагурец', rarity: 'epic' },
+    '🥒-🧅': { result: '🍲', name: 'Лукогурец', rarity: 'epic' },
+    '🥒-🥦': { result: '🥘', name: 'Броккогурец', rarity: 'epic' },
+    '🥒-🍉': { result: '🧃', name: 'Арбугурец', rarity: 'epic' },
     '🥒-🍇': { result: '🍸', name: 'Виногурец', rarity: 'epic' },
     '🥒-🍑': { result: '🥧', name: 'Персогурец', rarity: 'epic' },
-    '🥒-🍊': { result: '🧁', name: 'Цитрогурец', rarity: 'epic' },
-    '🥒-🥭': { result: '🍨', name: 'Манго-Огурец', rarity: 'epic' },
+    '🥒-🍊': { result: '🧁', name: 'Апельгурец', rarity: 'epic' },
+    '🥒-🥭': { result: '🍨', name: 'Мангогурец', rarity: 'epic' },
     
     // Клубника (10 комбинаций)
-    '🍓-🥔': { result: '🍰', name: 'Клубничный Десерт', rarity: 'epic' },
-    '🍓-🌶️': { result: '🍹', name: 'Острая Ягода', rarity: 'epic' },
-    '🍓-🥬': { result: '🥗', name: 'Ягодный Салат', rarity: 'epic' },
-    '🍓-🧅': { result: '🍲', name: 'Ягодное Ассорти', rarity: 'epic' },
-    '🍓-🥦': { result: '🥘', name: 'Зеленая Клубника', rarity: 'epic' },
-    '🍓-🍉': { result: '🧃', name: 'Арбузная Ягода', rarity: 'epic' },
-    '🍓-🍇': { result: '🍸', name: 'Виноклубника', rarity: 'epic' },
-    '🍓-🍑': { result: '🥧', name: 'Персико-Ягода', rarity: 'epic' },
-    '🍓-🍊': { result: '🧁', name: 'Цитро-Ягода', rarity: 'epic' },
-    '🍓-🥭': { result: '🍨', name: 'Манго-Клубника', rarity: 'epic' },
+    '🍓-🥔': { result: '🍰', name: 'Картовника', rarity: 'epic' },
+    '🍓-🌶️': { result: '🍹', name: 'Перовника', rarity: 'epic' },
+    '🍓-🥬': { result: '🥗', name: 'Салавника', rarity: 'epic' },
+    '🍓-🧅': { result: '🍲', name: 'Луковника', rarity: 'epic' },
+    '🍓-🥦': { result: '🥘', name: 'Брокковника', rarity: 'epic' },
+    '🍓-🍉': { result: '🧃', name: 'Арбувника', rarity: 'epic' },
+    '🍓-🍇': { result: '🍸', name: 'Виновника', rarity: 'epic' },
+    '🍓-🍑': { result: '🥧', name: 'Персовника', rarity: 'epic' },
+    '🍓-🍊': { result: '🧁', name: 'Апельвника', rarity: 'epic' },
+    '🍓-🥭': { result: '🍨', name: 'Мангобника', rarity: 'epic' },
     
     // Картофель (9 комбинаций)
-    '🥔-🌶️': { result: '🍟', name: 'Острая Картошка', rarity: 'epic' },
-    '🥔-🥬': { result: '🥗', name: 'Картофельный Микс', rarity: 'epic' },
-    '🥔-🧅': { result: '🍲', name: 'Луковая Картошка', rarity: 'epic' },
-    '🥔-🥦': { result: '🥘', name: 'Бро-Картошка', rarity: 'epic' },
-    '🥔-🍉': { result: '🧃', name: 'Арбузный Картофель', rarity: 'epic' },
-    '🥔-🍇': { result: '🍸', name: 'Виноградель', rarity: 'epic' },
-    '🥔-🍑': { result: '🥧', name: 'Персико-Картошка', rarity: 'epic' },
-    '🥔-🍊': { result: '🧁', name: 'Цитро-Картофель', rarity: 'epic' },
-    '🥔-🥭': { result: '🍨', name: 'Манго-Картофель', rarity: 'epic' },
+    '🥔-🌶️': { result: '🍟', name: 'Перкошка', rarity: 'epic' },
+    '🥔-🥬': { result: '🥗', name: 'Салакошка', rarity: 'epic' },
+    '🥔-🧅': { result: '🍲', name: 'Лукошка', rarity: 'epic' },
+    '🥔-🥦': { result: '🥘', name: 'Броккошка', rarity: 'epic' },
+    '🥔-🍉': { result: '🧃', name: 'Арбукошка', rarity: 'epic' },
+    '🥔-🍇': { result: '🍸', name: 'Винокошка', rarity: 'epic' },
+    '🥔-🍑': { result: '🥧', name: 'Перскошка', rarity: 'epic' },
+    '🥔-🍊': { result: '🧁', name: 'Апелькошка', rarity: 'epic' },
+    '🥔-🥭': { result: '🍨', name: 'Мангокошка', rarity: 'epic' },
     
     // Перец (8 комбинаций)
-    '🌶️-🥬': { result: '🥗', name: 'Острый Салат', rarity: 'epic' },
-    '🌶️-🧅': { result: '🍲', name: 'Перцовый Суп', rarity: 'epic' },
-    '🌶️-🥦': { result: '🥘', name: 'Острая Брокколи', rarity: 'epic' },
-    '🌶️-🍉': { result: '🧃', name: 'Острый Арбуз', rarity: 'epic' },
-    '🌶️-🍇': { result: '🍸', name: 'Винный Перец', rarity: 'epic' },
-    '🌶️-🍑': { result: '🥧', name: 'Острый Персик', rarity: 'epic' },
-    '🌶️-🍊': { result: '🧁', name: 'Острый Цитрус', rarity: 'epic' },
-    '🌶️-🥭': { result: '🍨', name: 'Острое Манго', rarity: 'epic' },
+    '🌶️-🥬': { result: '🥗', name: 'Салаперец', rarity: 'epic' },
+    '🌶️-🧅': { result: '🍲', name: 'Лукоперец', rarity: 'epic' },
+    '🌶️-🥦': { result: '🥘', name: 'Броккоперец', rarity: 'epic' },
+    '🌶️-🍉': { result: '🧃', name: 'Арбуперец', rarity: 'epic' },
+    '🌶️-🍇': { result: '🍸', name: 'Виноперец', rarity: 'epic' },
+    '🌶️-🍑': { result: '🥧', name: 'Персоперец', rarity: 'epic' },
+    '🌶️-🍊': { result: '🧁', name: 'Апельперец', rarity: 'epic' },
+    '🌶️-🥭': { result: '🍨', name: 'Мангоперец', rarity: 'epic' },
     
     // Салат (7 комбинаций)
-    '🥬-🧅': { result: '🍲', name: 'Луковый Салат', rarity: 'epic' },
-    '🥬-🥦': { result: '🥘', name: 'Супер-Салат', rarity: 'epic' },
-    '🥬-🍉': { result: '🧃', name: 'Арбузный Салат', rarity: 'epic' },
-    '🥬-🍇': { result: '🍸', name: 'Винный Салат', rarity: 'epic' },
-    '🥬-🍑': { result: '🥧', name: 'Персиковый Салат', rarity: 'epic' },
-    '🥬-🍊': { result: '🧁', name: 'Цитрусовый Салат', rarity: 'epic' },
-    '🥬-🥭': { result: '🍨', name: 'Манго-Салат', rarity: 'epic' },
+    '🥬-🧅': { result: '🍲', name: 'Лукалат', rarity: 'epic' },
+    '🥬-🥦': { result: '🥘', name: 'Броккалат', rarity: 'epic' },
+    '🥬-🍉': { result: '🧃', name: 'Арбулат', rarity: 'epic' },
+    '🥬-🍇': { result: '🍸', name: 'Винолат', rarity: 'epic' },
+    '🥬-🍑': { result: '🥧', name: 'Персалат', rarity: 'epic' },
+    '🥬-🍊': { result: '🧁', name: 'Апельсалат', rarity: 'epic' },
+    '🥬-🥭': { result: '🍨', name: 'Мангалат', rarity: 'epic' },
     
     // Лук (6 комбинаций)
-    '🧅-🥦': { result: '🥘', name: 'Луковая Брокколи', rarity: 'epic' },
-    '🧅-🍉': { result: '🧃', name: 'Луковый Арбуз', rarity: 'epic' },
-    '🧅-🍇': { result: '🍸', name: 'Виноградный Лук', rarity: 'epic' },
-    '🧅-🍑': { result: '🥧', name: 'Луковый Персик', rarity: 'epic' },
-    '🧅-🍊': { result: '🧁', name: 'Луковый Цитрус', rarity: 'epic' },
-    '🧅-🥭': { result: '🍨', name: 'Луковое Манго', rarity: 'epic' },
+    '🧅-🥦': { result: '🥘', name: 'Брокколук', rarity: 'epic' },
+    '🧅-🍉': { result: '🧃', name: 'Арбулук', rarity: 'epic' },
+    '🧅-🍇': { result: '🍸', name: 'Винолук', rarity: 'epic' },
+    '🧅-🍑': { result: '🥧', name: 'Персолук', rarity: 'epic' },
+    '🧅-🍊': { result: '🧁', name: 'Апельсолук', rarity: 'epic' },
+    '🧅-🥭': { result: '🍨', name: 'Манголук', rarity: 'epic' },
     
     // Брокколи (5 комбинаций)
-    '🥦-🍉': { result: '🧃', name: 'Брокколи-Арбуз', rarity: 'epic' },
+    '🥦-🍉': { result: '🧃', name: 'Арбуколи', rarity: 'epic' },
     '🥦-🍇': { result: '🍸', name: 'Виноколи', rarity: 'epic' },
-    '🥦-🍑': { result: '🥧', name: 'Персиколи', rarity: 'epic' },
-    '🥦-🍊': { result: '🧁', name: 'Цитроколи', rarity: 'epic' },
-    '🥦-🥭': { result: '🍨', name: 'Манго-Брокколи', rarity: 'epic' },
+    '🥦-🍑': { result: '🥧', name: 'Персоколи', rarity: 'epic' },
+    '🥦-🍊': { result: '🧁', name: 'Апельколи', rarity: 'epic' },
+    '🥦-🥭': { result: '🍨', name: 'Мангоколи', rarity: 'epic' },
     
     // Арбуз (4 комбинации)
-    '🍉-🍇': { result: '🍸', name: 'Виноарбуз', rarity: 'epic' },
-    '🍉-🍑': { result: '🥧', name: 'Персиарбуз', rarity: 'epic' },
-    '🍉-🍊': { result: '🧁', name: 'Цитроарбуз', rarity: 'epic' },
-    '🍉-🥭': { result: '🍨', name: 'Манго-Арбуз', rarity: 'epic' },
+    '🍉-🍇': { result: '🍸', name: 'Винобуз', rarity: 'epic' },
+    '🍉-🍑': { result: '🥧', name: 'Персобуз', rarity: 'epic' },
+    '🍉-🍊': { result: '🧁', name: 'Апельбуз', rarity: 'epic' },
+    '🍉-🥭': { result: '🍨', name: 'Мангобуз', rarity: 'epic' },
     
     // Виноград (3 комбинации)
-    '🍇-🍑': { result: '🥧', name: 'Персиноград', rarity: 'epic' },
-    '🍇-🍊': { result: '🧁', name: 'Цитроград', rarity: 'epic' },
-    '🍇-🥭': { result: '🍨', name: 'Манго-Виноград', rarity: 'epic' },
+    '🍇-🍑': { result: '🥧', name: 'Персоград', rarity: 'epic' },
+    '🍇-🍊': { result: '🧁', name: 'Апельград', rarity: 'epic' },
+    '🍇-🥭': { result: '🍨', name: 'Мангоград', rarity: 'epic' },
     
     // Персик (2 комбинации)
-    '🍑-🍊': { result: '🧁', name: 'Цитроперсик', rarity: 'epic' },
-    '🍑-🥭': { result: '🍨', name: 'Манго-Персик', rarity: 'epic' },
+    '🍑-🍊': { result: '🧁', name: 'Апельсик', rarity: 'epic' },
+    '🍑-🥭': { result: '🍨', name: 'Мангосик', rarity: 'epic' },
     
     // Апельсин (1 комбинация)
-    '🍊-🥭': { result: '🍨', name: 'Апельсиново-Манго', rarity: 'epic' }
+    '🍊-🥭': { result: '🍨', name: 'Мангосин', rarity: 'epic' }
 };
+
+// ✅ НОВАЯ ФУНКЦИЯ: Создание легендарного гибрида из двух эпических
+function createLegendaryHybrid(epic1, epic2, gameState) {
+    // Получаем данные эпических гибридов
+    const hybrid1Data = gameState.hybridData[epic1];
+    const hybrid2Data = gameState.hybridData[epic2];
+    
+    if (!hybrid1Data || !hybrid2Data) return null;
+    if (hybrid1Data.rarity !== 'epic' || hybrid2Data.rarity !== 'epic') return null;
+    
+    // Создаем уникальный ключ для этой комбинации
+    const key = [epic1, epic2].sort().join('-');
+    
+    // Генерируем название (смешиваем названия двух эпиков)
+    const name1 = hybrid1Data.name;
+    const name2 = hybrid2Data.name;
+    
+    // Берем первую половину от первого названия и вторую от второго
+    const halfIndex1 = Math.ceil(name1.length / 2);
+    const halfIndex2 = Math.floor(name2.length / 2);
+    const legendaryName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
+    
+    // Генерируем новый эмодзи (берем случайный из списка легендарных символов)
+    const legendaryEmojis = ['⭐', '💎', '👑', '🏆', '🔱', '🎖️', '🌟', '✨', '💫', '🎯', '🏅', '🔰'];
+    const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
+    
+    // Вычисляем характеристики (среднее + бонус)
+    const growTime = Math.floor((hybrid1Data.growTime + hybrid2Data.growTime) / 2 * 1.5);
+    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) / 2 * 2);
+    
+    return {
+        result: randomEmoji,
+        name: legendaryName,
+        rarity: 'legendary',
+        growTime: growTime,
+        sellPrice: sellPrice
+    };
+}
+
+// ✅ НОВАЯ ФУНКЦИЯ: Создание мифического гибрида из двух легендарных
+function createMythicHybrid(legendary1, legendary2, gameState) {
+    // Получаем данные легендарных гибридов
+    const hybrid1Data = gameState.hybridData[legendary1];
+    const hybrid2Data = gameState.hybridData[legendary2];
+    
+    if (!hybrid1Data || !hybrid2Data) return null;
+    if (hybrid1Data.rarity !== 'legendary' || hybrid2Data.rarity !== 'legendary') return null;
+    
+    // Создаем уникальный ключ для этой комбинации
+    const key = [legendary1, legendary2].sort().join('-');
+    
+    // Генерируем название
+    const name1 = hybrid1Data.name;
+    const name2 = hybrid2Data.name;
+    
+    const halfIndex1 = Math.ceil(name1.length / 2);
+    const halfIndex2 = Math.floor(name2.length / 2);
+    const mythicName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
+    
+    // Генерируем новый эмодзи (берем случайный из списка мифических символов)
+    const mythicEmojis = ['🔥', '⚡', '🌈', '💀', '🦄', '🐉', '👹', '🎃', '🔮', '🗡️', '🛡️', '⚔️'];
+    const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
+    
+    // Вычисляем характеристики (среднее + большой бонус)
+    const growTime = Math.floor((hybrid1Data.growTime + hybrid2Data.growTime) / 2 * 2);
+    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) / 2 * 3);
+    
+    return {
+        result: randomEmoji,
+        name: mythicName,
+        rarity: 'mythic',
+        growTime: growTime,
+        sellPrice: sellPrice
+    };
+}
 
 
 const HYBRID_RECIPES_FULL = {};
@@ -263,16 +338,44 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 
         function openCropModal(slotNumber) {
             activeSlot = slotNumber;
-            const crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
+            
+            // ✅ Получаем активную вкладку
+            const activeTab = document.querySelector('.hybrid-tab.active');
+            const activeRarity = activeTab ? activeTab.dataset.rarity : 'epic';
+            
+            // ✅ Фильтруем овощи в зависимости от вкладки
+            let crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
+            
+            if (activeRarity === 'epic') {
+                // Эпические: показываем ТОЛЬКО обычные овощи с грядки
+                crops = crops.filter(crop => PLANT_DATA[crop]);
+            } 
+            else if (activeRarity === 'legendary') {
+                // Легендарные: показываем ТОЛЬКО эпические гибриды
+                crops = crops.filter(crop => {
+                    const hybridData = getHybridData(crop, gameState);
+                    return hybridData && hybridData.rarity === 'epic';
+                });
+            } 
+            else if (activeRarity === 'mythic') {
+                // Мифические: показываем ТОЛЬКО легендарные гибриды
+                crops = crops.filter(crop => {
+                    const hybridData = getHybridData(crop, gameState);
+                    return hybridData && hybridData.rarity === 'legendary';
+                });
+            }
+            
             if (crops.length === 0) { 
-                tg.showAlert('На складе нет овощей!'); 
+                tg.showAlert('На складе нет подходящих овощей для этой категории!'); 
                 return; 
             }
+            
             cropModalList.innerHTML = '';
             crops.forEach(crop => {
                 const plant = PLANT_DATA[crop];
                 const hybrid = getHybridData(crop, gameState);
                 if (!plant && !hybrid) return;
+                
                 const li = document.createElement('li');
                 li.className = 'crop-modal-item';
                 li.innerHTML = `
@@ -298,6 +401,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             });
             cropModal.classList.remove('hidden');
         }
+
 
         cropModalClose.onclick = () => cropModal.classList.add('hidden');
         cropModal.onclick = (e) => { 
@@ -337,18 +441,62 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 msgEl.innerHTML = '<div class="result-warning">⚠️ Одинаковые овощи!</div>'; 
                 return; 
             }
-            const recipe = getHybridRecipe(crop1Global, crop2Global);
-            if (!recipe) { 
-                msgEl.innerHTML = '<div class="result-warning">🔬 Комбинация не работает!</div>'; 
-                return; 
-            }
-            const stats = calculateHybridStats(crop1Global, crop2Global, PLANT_DATA, gameState);
             
-            gameState.hybridData[recipe.result] = { 
+            // ✅ Определяем активную вкладку
+            const activeTab = document.querySelector('.hybrid-tab.active');
+            const activeRarity = activeTab ? activeTab.dataset.rarity : 'epic';
+            
+            let recipe = null;
+            let stats = null;
+            
+            if (activeRarity === 'epic') {
+                // Эпические: используем стандартные рецепты
+                recipe = getHybridRecipe(crop1Global, crop2Global);
+                if (!recipe) { 
+                    msgEl.innerHTML = '<div class="result-warning">🔬 Комбинация не работает!</div>'; 
+                    return; 
+                }
+                stats = calculateHybridStats(crop1Global, crop2Global, PLANT_DATA, gameState);
+                stats.name = recipe.name;
+                stats.resultEmoji = recipe.result;
+                stats.rarity = 'epic';
+            } 
+            else if (activeRarity === 'legendary') {
+                // Легендарные: создаем из двух эпиков
+                recipe = createLegendaryHybrid(crop1Global, crop2Global, gameState);
+                if (!recipe) { 
+                    msgEl.innerHTML = '<div class="result-warning">⚠️ Нужны два эпических гибрида!</div>'; 
+                    return; 
+                }
+                stats = {
+                    growTime: recipe.growTime / 1000,
+                    sellPrice: recipe.sellPrice,
+                    name: recipe.name,
+                    resultEmoji: recipe.result,
+                    rarity: 'legendary'
+                };
+            } 
+            else if (activeRarity === 'mythic') {
+                // Мифические: создаем из двух легендарных
+                recipe = createMythicHybrid(crop1Global, crop2Global, gameState);
+                if (!recipe) { 
+                    msgEl.innerHTML = '<div class="result-warning">⚠️ Нужны два легендарных гибрида!</div>'; 
+                    return; 
+                }
+                stats = {
+                    growTime: recipe.growTime / 1000,
+                    sellPrice: recipe.sellPrice,
+                    name: recipe.name,
+                    resultEmoji: recipe.result,
+                    rarity: 'mythic'
+                };
+            }
+            
+            gameState.hybridData[stats.resultEmoji] = { 
                 growTime: stats.growTime * 1000, 
                 sellPrice: stats.sellPrice, 
-                name: recipe.name,
-                rarity: recipe.rarity
+                name: stats.name,
+                rarity: stats.rarity
             };
             
             gameState.warehouse[crop1Global]--;
@@ -364,8 +512,8 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             gameState.hybridMixing = { 
                 startTime: Date.now(), 
                 duration: stats.growTime * 1000, 
-                resultEmoji: recipe.result, 
-                resultName: recipe.name, 
+                resultEmoji: stats.resultEmoji, 
+                resultName: stats.name, 
                 crop1: crop1Global, 
                 crop2: crop2Global 
             };
@@ -380,6 +528,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             
             startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
         };
+
 
         // ✅ Обработчики для вкладок (просто переключение активной)
         const hybridTabs = document.querySelectorAll('.hybrid-tab');

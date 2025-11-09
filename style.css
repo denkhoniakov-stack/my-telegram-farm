@@ -1236,3 +1236,50 @@ body {
     background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
     margin: 20px 0;
 }
+/* Вкладки редкости гибридов */
+.hybrid-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #D2B48C;
+    padding-bottom: 10px;
+}
+
+.hybrid-tab {
+    background-color: #eaddc0;
+    border: 2px solid #c8b89a;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #6a4c2f;
+    font-family: 'Nunito', Arial, sans-serif; /* ✅ Такой же шрифт как у магазина */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.hybrid-tab:hover {
+    background-color: #f5e8d0;
+}
+
+/* Активная эпическая вкладка - фиолетовая */
+.hybrid-tab.active[data-rarity="epic"] {
+    background-color: #9C27B0;
+    border-color: #7B1FA2;
+    color: white;
+}
+
+/* Активная легендарная вкладка - золотая */
+.hybrid-tab.active[data-rarity="legendary"] {
+    background-color: #FFC107;
+    border-color: #FFA000;
+    color: white;
+}
+
+/* Активная мифическая вкладка - красноватая */
+.hybrid-tab.active[data-rarity="mythic"] {
+    background-color: #F44336;
+    border-color: #D32F2F;
+    color: white;
+}
