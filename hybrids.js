@@ -382,12 +382,17 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 
         gameState.warehouse[crop1]--;
         gameState.warehouse[crop2]--;
+        
+        // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: сохраняем crop1 и crop2
         gameState.hybridMixing = {
             startTime: Date.now(),
             duration: hybridTime * 1000,
             resultEmoji: recipe.result,
-            resultName: recipe.name
+            resultName: recipe.name,
+            crop1: crop1,
+            crop2: crop2
         };
+        
         updateBalanceDisplay();
         saveGameData();
 
@@ -396,11 +401,24 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         slot1El.style.pointerEvents = 'none';
         slot2El.style.pointerEvents = 'none';
 
-        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El, slot1El, slot2El);
     };
 
     // Проверка активного скрещивания при загрузке
     if (gameState.hybridMixing) {
+        // Восстанавливаем выбранные овощи
+        crop1 = gameState.hybridMixing.crop1;
+        crop2 = gameState.hybridMixing.crop2;
+        
+        if (crop1) {
+            slot1El.innerHTML = `<span class="slot-emoji">${crop1}</span>`;
+            slot1El.classList.add('filled');
+        }
+        if (crop2) {
+            slot2El.innerHTML = `<span class="slot-emoji">${crop2}</span>`;
+            slot2El.classList.add('filled');
+        }
+        
         mixBtn.disabled = true;
         mixBtn.style.opacity = '0.5';
         slot1El.style.pointerEvents = 'none';
@@ -458,6 +476,7 @@ function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, sl
         slot1El.style.pointerEvents = 'all';
         slot2El.style.pointerEvents = 'all';
         
-        initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
+        // ИСПРАВЛЕНИЕ: передаём все параметры
+        initHybridLab(gameState, tg, window.updateBalanceDisplay, saveGameData, window.PLANT_DATA);
     };
 }
