@@ -214,15 +214,20 @@ function getHybridData(hybridEmoji) {
     return HYBRID_DATA[hybridEmoji] || null;
 }
 
-function calculateHybridStats(crop1, crop2, PLANT_DATA) {
-    const parent1 = PLANT_DATA[crop1] || getHybridData(crop1);
-    const parent2 = PLANT_DATA[crop2] || getHybridData(crop2);
+function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
+    // Ищем данные о родителях в трех местах:
+    // 1. В базовых растениях (PLANT_DATA)
+    // 2. В созданных игроком гибридах (gameState.hybridData)
+    // 3. В данных по умолчанию (HYBRID_DATA)
+    const parent1 = PLANT_DATA[crop1] || (gameState.hybridData && gameState.hybridData[crop1]) || HYBRID_DATA[crop1];
+    const parent2 = PLANT_DATA[crop2] || (gameState.hybridData && gameState.hybridData[crop2]) || HYBRID_DATA[crop2];
 
     if (!parent1 || !parent2) {
+        // Если данные не найдены, возвращаем значения по умолчанию
         return { growTime: 30, sellPrice: 50, mixCost: 50 };
     }
 
-    const avgGrowTime = parent1.growTime + parent2.growTime;
+    const avgGrowTime = (parent1.growTime + parent2.growTime);
     const hybridTime = Math.floor(avgGrowTime / 1000);
     const hybridPrice = (parent1.sellPrice + parent2.sellPrice) * 1.5;
     const mixCost = Math.max(10, Math.floor(hybridPrice * 0.1));
@@ -233,6 +238,7 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA) {
         mixCost: mixCost
     };
 }
+
 
 // ========================================
 // UI ЛАБОРАТОРИИ
@@ -372,12 +378,14 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             return;
         }
 
-        const stats = calculateHybridStats(crop1, crop2, PLANT_DATA);
+        const stats = calculateHybridStats(crop1, crop2, PLANT_DATA, gameState); // Добавляем gameState
         const hybridTime = stats.growTime;
 
-        HYBRID_DATA[recipe.result] = {
+// Сохраняем данные в gameState, А НЕ в HYBRID_DATA
+       gameState.hybridData[recipe.result] = {
             growTime: stats.growTime * 1000,
-            sellPrice: stats.sellPrice
+            sellPrice: stats.sellPrice,
+            name: recipe.name // Также сохраним имя гибрида
         };
 
         gameState.warehouse[crop1]--;

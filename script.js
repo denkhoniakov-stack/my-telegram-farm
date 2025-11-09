@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
         items: {},
         unlockedBeds: 3,
         garden: [],
-        discoveredHybrids: []
+        discoveredHybrids: [],
+        hybridData: {} 
     };
 
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
@@ -94,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.garden = loaded.garden || [];
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
+                        gameState.hybridData = loaded.hybridData || {};
                     } catch (e) {
                         console.error('Ошибка загрузки:', e);
                     }
@@ -115,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.garden = loaded.garden || [];
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
                     gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
+                    gameState.hybridData = loaded.hybridData || {};
                 } catch (e) {
                     console.error('Ошибка:', e);
                 }
