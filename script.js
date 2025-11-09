@@ -636,126 +636,161 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateWarehouseDisplay() {
         warehouseList.innerHTML = '';
-    
-        const items = Object.keys(gameState.warehouse).filter(key => gameState.warehouse[key] > 0);
-    
-        if (items.length === 0) {
+
+        // ✅ ДОБАВЛЕНО: Создаем секцию для семян
+        const seedsInInventory = Object.keys(gameState.seedInventory).filter(seed => gameState.seedInventory[seed] > 0);
+        
+        if (seedsInInventory.length > 0) {
+            // Заголовок секции семян
+            const seedsHeader = document.createElement('li');
+            seedsHeader.style.cssText = `
+                padding: 15px 10px 5px 10px;
+                font-weight: bold;
+                font-size: 16px;
+                color: #4CAF50;
+                background: rgba(76, 175, 80, 0.1);
+                border-radius: 8px;
+                margin-bottom: 5px;
+            `;
+            seedsHeader.innerHTML = '🌱 Семена';
+            warehouseList.appendChild(seedsHeader);
+
+            // Список семян
+            seedsInInventory.forEach(seedEmoji => {
+                const plant = PLANT_DATA[seedEmoji];
+                if (!plant) return;
+                
+                const count = gameState.seedInventory[seedEmoji];
+                
+                const li = document.createElement('li');
+                li.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #ddd;
+                `;
+                
+                li.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 28px;">${seedEmoji}</span>
+                        <div>
+                            <div style="font-weight: bold;">${plant.name}</div>
+                            <div style="font-size: 12px; color: #666;">
+                                ${count} шт. • Стоимость: ${plant.seedCost.toFixed(2)}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="color: #999; font-size: 14px;">
+                        Семена
+                    </div>
+                `;
+                
+                warehouseList.appendChild(li);
+            });
+        }
+
+        // ✅ Оригинальный код для урожая
+        const harvestedItems = Object.keys(gameState.warehouse).filter(key => gameState.warehouse[key] > 0);
+        
+        if (harvestedItems.length > 0) {
+            // Заголовок секции урожая
+            const harvestHeader = document.createElement('li');
+            harvestHeader.style.cssText = `
+                padding: 15px 10px 5px 10px;
+                font-weight: bold;
+                font-size: 16px;
+                color: #FF9800;
+                background: rgba(255, 152, 0, 0.1);
+                border-radius: 8px;
+                margin-bottom: 5px;
+                margin-top: 15px;
+            `;
+            harvestHeader.innerHTML = '🌾 Урожай';
+            warehouseList.appendChild(harvestHeader);
+        }
+
+        if (seedsInInventory.length === 0 && harvestedItems.length === 0) {
             warehouseList.innerHTML = '<li style="text-align: center; color: #999;">Склад пуст</li>';
             sellAllButton.style.display = 'none';
             return;
         }
-    
-        sellAllButton.style.display = 'block';
-    
-        items.forEach(crop => {
+
+        sellAllButton.style.display = harvestedItems.length > 0 ? 'block' : 'none';
+
+        harvestedItems.forEach(crop => {
             const plant = PLANT_DATA[crop];
-            const hybrid = getHybridData(crop, gameState); // ✅ передаем gameState
+            const hybrid = getHybridData(crop, gameState);
             const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
-            const name = plant ? plant.name : getHybridName(crop, gameState); // ✅ передаем gameState
-
-
+            const name = plant ? plant.name : getHybridName(crop, gameState);
             const maxCount = gameState.warehouse[crop];
-        
+
             const li = document.createElement('li');
-            li.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd;';
-        
+            li.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #ddd;
+            `;
+
             li.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 28px;">${crop}</span>
                     <div>
                         <div style="font-weight: bold;">${name}</div>
-                        <div style="font-size: 12px; color: #666;">${maxCount} шт × ${sellPrice.toFixed(2)} 🪙</div>
+                        <div style="font-size: 12px; color: #666;">
+                            ${maxCount} шт. • ${sellPrice.toFixed(2)} за шт.
+                        </div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="minus-btn" data-crop="${crop}" style="
-                        width: 32px;
-                        height: 32px;
-                        background: #ff6b6b;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 20px;
-                        font-weight: bold;
-                        line-height: 1;
-                    ">−</button>
-                    <span class="sell-count" data-crop="${crop}" style="
-                        min-width: 30px;
-                        text-align: center;
-                        font-weight: bold;
-                        font-size: 16px;
-                    ">1</span>
-                    <button class="plus-btn" data-crop="${crop}" style="
-                        width: 32px;
-                        height: 32px;
-                        background: #4CAF50;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 20px;
-                        font-weight: bold;
-                        line-height: 1;
-                    ">+</button>
-                    <button class="sell-btn" data-crop="${crop}" style="
-                        background: #4CAF50;
-                        color: white;
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        font-size: 14px;
-                        margin-left: 8px;
-                    ">Продать</button>
+                    <button class="minus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #ff6b6b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">−</button>
+                    <span class="sell-count" data-crop="${crop}" style="min-width: 30px; text-align: center; font-weight: bold; font-size: 16px;">1</span>
+                    <button class="plus-btn" data-crop="${crop}" style="width: 32px; height: 32px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1;">+</button>
+                    <button class="sell-btn" data-crop="${crop}" style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-left: 8px;">Продать</button>
                 </div>
             `;
-        
+
             warehouseList.appendChild(li);
         });
-    
-    // Обработчики кнопок
+
+        // Обработчики для кнопок продажи (оригинальный код)
         document.querySelectorAll('.minus-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const crop = btn.dataset.crop;
                 const countEl = document.querySelector(`.sell-count[data-crop="${crop}"]`);
                 let count = parseInt(countEl.textContent);
-                if (count > 1) {
-                    countEl.textContent = count - 1;
-                }
+                if (count > 1) countEl.textContent = count - 1;
             });
         });
-    
+
         document.querySelectorAll('.plus-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const crop = btn.dataset.crop;
                 const maxCount = gameState.warehouse[crop];
                 const countEl = document.querySelector(`.sell-count[data-crop="${crop}"]`);
                 let count = parseInt(countEl.textContent);
-                if (count < maxCount) {
-                    countEl.textContent = count + 1;
-                }
+                if (count < maxCount) countEl.textContent = count + 1;
             });
         });
-    
+
         document.querySelectorAll('.sell-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const crop = btn.dataset.crop;
                 const countEl = document.querySelector(`.sell-count[data-crop="${crop}"]`);
                 const sellCount = parseInt(countEl.textContent);
-            
                 const plant = PLANT_DATA[crop];
-                const hybrid = getHybridData(crop, gameState); // ✅ передаем gameState
+                const hybrid = getHybridData(crop, gameState);
                 const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
-            
+                
                 gameState.balance += sellPrice * sellCount;
                 gameState.warehouse[crop] -= sellCount;
-            
-                if (gameState.warehouse[crop] === 0) {
+                
+                if (gameState.warehouse[crop] <= 0) {
                     delete gameState.warehouse[crop];
                 }
-            
+                
                 updateBalanceDisplay();
                 updateWarehouseDisplay();
                 saveGameData();
@@ -763,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
 
 
 
