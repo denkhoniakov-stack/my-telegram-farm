@@ -1,11 +1,49 @@
 // НАЧНИТЕ КОПИРОВАТЬ ОТСЮДА
 
 document.addEventListener('DOMContentLoaded', () => {
-    const tg = window.Telegram.WebApp;
+    // ========================================
+    // ✅ ЭМУЛЯТОР TELEGRAM API ДЛЯ ЛОКАЛЬНОЙ РАЗРАБОТКИ
+    // ========================================
+    let tg;
+    if (typeof window.Telegram === 'undefined' || typeof window.Telegram.WebApp === 'undefined') {
+        console.warn("Режим локальной разработки: API Telegram не найдено. Используется эмулятор.");
+        tg = {
+            initDataUnsafe: { user: { id: 12345, first_name: "Local", last_name: "User", username: "localuser" } },
+            ready: () => console.log("Эмулятор TG: ready()"),
+            expand: () => console.log("Эмулятор TG: expand()"),
+            showAlert: (message) => alert(message),
+            showPopup: (options) => alert(options.message),
+            showConfirm: (message, callback) => {
+                const result = confirm(message);
+                if (callback) callback(result);
+            },
+            HapticFeedback: {
+                notificationOccurred: (type) => console.log(`Эмулятор тактильной отдачи: ${type}`)
+            },
+            CloudStorage: {
+                setItem: (key, value, callback) => {
+                    localStorage.setItem(key, value);
+                    if (callback) callback(null);
+                },
+                getItem: (key, callback) => {
+                    const value = localStorage.getItem(key);
+                    if (callback) callback(null, value);
+                },
+                removeItem: (key, callback) => {
+                    localStorage.removeItem(key);
+                    if (callback) callback(null);
+                }
+            }
+        };
+    } else {
+        tg = window.Telegram.WebApp;
+    }
+    
     tg.ready();
     tg.expand();
     const ADMIN_ID = 522564845; // ЗАМЕНИТЕ НА ВАШ TELEGRAM USER ID
     const isAdmin = tg.initDataUnsafe?.user?.id === ADMIN_ID;
+
 
     function showAlert(message) {
         if (tg.showAlert && typeof tg.showAlert === 'function') {
@@ -15,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     function showPopup(options) {
         if (tg.showPopup && typeof tg.showPopup === 'function') {
             tg.showPopup(options);
@@ -23,11 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     function hapticFeedback(type) {
         if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
             tg.HapticFeedback.notificationOccurred(type);
         }
     }
+
 
 
     const PLANT_DATA = {
@@ -64,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hybridData: {} 
     };
 
+
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
     const balanceAmountElement = document.getElementById('balance-amount');
     const gardenContainer = document.getElementById('garden-container');
@@ -78,9 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabContents = document.querySelectorAll('.shop-tab-content');
     let activeBed = null;
 
+
     
     // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ ---
-    function loadGameData() {
+    // ✅ ИСПРАВЛЕНИЕ: Добавляем initializeGame
+    function initializeGame() {
+        updateBalanceDisplay();
+        updateGardenBeds();
+        updateGardenDisplay();
+        updateWarehouseDisplay();
+    }
+
+    // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
+    function loadGameData(callback) {
     // Проверяем, доступен ли CloudStorage
         if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
         // Используем Telegram Cloud Storage
@@ -100,9 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error('Ошибка загрузки:', e);
                     }
                 }
-                updateBalanceDisplay();
-                updateGardenDisplay();
-                updateWarehouseDisplay();
+                callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
             });
         } else {
         // Fallback: используем localStorage для браузера
@@ -122,16 +172,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Ошибка:', e);
                 }
             }
-            updateBalanceDisplay();
-            updateGardenDisplay();
-            updateWarehouseDisplay();
+            callback(); // ✅ ВЫЗЫВАЕМ CALLBACK СРАЗУ ДЛЯ LOCALSTORAGE
         }
     }
 
 
+
     function updateBalanceDisplay() { balanceAmountElement.innerText = gameState.balance.toFixed(2); }
 
+
     
+
 
     // ДОБАВЬТЕ ЭТУ ФУНКЦИЮ ЗДЕСЬ
     function saveGameData() {
@@ -146,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+
     function getBedPrice(bedIndex) {
     // Первые 3 грядки бесплатны, дальше цена растет
         if (bedIndex < 3) return 0;
@@ -157,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Грядка 4 = 100, грядка 5 = 150, грядка 6 = 200, и т.д.
     }
 
+
     function updateGardenBeds() {
         const beds = document.querySelectorAll('.garden-bed');
     
@@ -165,7 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Грядка разблокирована
                 bed.classList.remove('locked');
                 bed.classList.add('available');
-                bed.innerHTML = ''; // Очищаем содержимое
+                if (!bed.querySelector('.plant')) { // ✅ Проверяем, нет ли там уже растения
+                    bed.innerHTML = ''; // Очищаем содержимое
+                }
             } else {
             // Грядка заблокирована
                 bed.classList.remove('available');
@@ -180,7 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     
+
 
 // ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ
     function updateGardenDisplay() {
@@ -193,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+
     
     // --- ФИНАЛЬНАЯ ВЕРСИЯ ФУНКЦИИ ВЫБОРА СЕМЯН ---
     function showPlantingMenu(bed) {
@@ -202,11 +260,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+
         seedMenu.innerHTML = '';
         
         const numItems = availableSeeds.length;
         const itemVisualWidth = 65; 
         const screenEdgePadding = 25; 
+
 
         // Шаг 1: Расчет динамического радиуса
         const rect = bed.getBoundingClientRect();
@@ -218,17 +278,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (numItems <= 2) { idealRadius = 50; }
         const finalRadius = Math.max(55, Math.min(maxRadiusByPosition, idealRadius));
 
+
         // Шаг 2: Расчет углов с "умным поворотом"
         const angleStep = (2 * Math.PI) / numItems;
         // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Сразу поворачиваем круг на половину шага,
         // чтобы "опасные" горизонтальные точки были пустыми.
         const angleOffset = angleStep / 2;
 
+
         // Шаг 3: Генерация иконок
         availableSeeds.forEach((seed, index) => {
             const angle = angleOffset + index * angleStep;
             const x = finalRadius * Math.cos(angle);
             const y = finalRadius * Math.sin(angle);
+
 
             const option = document.createElement('div');
             option.className = 'seed-option';
@@ -249,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             seedMenu.appendChild(option);
         });
 
+
         // Центральная кнопка
         const closeButton = document.createElement('div');
         closeButton.className = 'seed-menu-close-button';
@@ -259,11 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         seedMenu.appendChild(closeButton);
 
+
         // Позиционирование меню
         seedMenu.style.left = `${centerX}px`;
         seedMenu.style.top = `${rect.top + rect.height / 2}px`;
         seedMenu.classList.remove('hidden');
     }
+
 
     // --- ОСТАЛЬНОЙ КОД (остается без изменений) ---
     
@@ -295,48 +361,9 @@ document.addEventListener('DOMContentLoaded', () => {
         saveGameData();
     
     // Рендерим растение
-        const growTimeInSeconds = plantInfo.growTime / 1000;
-        let remainingTime = growTimeInSeconds;
-
-        bed.innerHTML = '';
-        const plantElement = document.createElement('div');
-        plantElement.classList.add('plant');
-        plantElement.innerText = '🌱';
-
-        const timerElement = document.createElement('div');
-        timerElement.classList.add('plant-timer');
-
-        bed.appendChild(plantElement);
-        bed.appendChild(timerElement);
-
-        function formatTime(seconds) {
-            const min = Math.floor(seconds / 60);
-            const sec = seconds % 60;
-            return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-        }
-        timerElement.innerText = formatTime(remainingTime);
-
-        const timerInterval = setInterval(() => {
-            remainingTime--;
-            timerElement.innerText = formatTime(remainingTime);
-
-            if (remainingTime <= 0) {
-                clearInterval(timerInterval);
-                bed.removeChild(timerElement);
-                plantElement.innerText = seed;
-                plantElement.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    animateHarvest(plantElement, seed);
-                    gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
-                    // ДОБАВЬТЕ: Удаляем из garden
-                    gameState.garden[bedIndex] = null;
-                    saveGameData();
-                    bed.innerHTML = '';
-                    hapticFeedback('success');
-                }, { once: true });
-            }
-        }, 1000);
+        renderPlant(bed, bedIndex); // ✅ Просто вызываем renderPlant
     }
+
 
 
     function renderPlant(bed, bedIndex) {
@@ -378,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     function setupHarvest(plantElement, bed, bedIndex, seed) {
          plantElement.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -390,11 +418,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { once: true });
     }
 
+
     function formatTime(seconds) {
         const min = Math.floor(seconds / 60);
         const sec = seconds % 60;
         return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
     }
+
 
     
     function animateHarvest(startElement, seed) {
@@ -415,7 +445,9 @@ document.addEventListener('DOMContentLoaded', () => {
         flyingCrop.addEventListener('animationend', () => flyingCrop.remove());
     }
 
+
     
+
 
     gardenContainer.addEventListener('click', (event) => {
         const bed = event.target.closest('.garden-bed');
@@ -449,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showPlantingMenu(bed);
         }
     });
+
 
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.garden-bed') && !e.target.closest('#seed-menu')) {
@@ -508,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     // Универсальный обработчик покупок
     shopModal.addEventListener('click', (e) => {
         if (!e.target.classList.contains('buy-button') || e.target.disabled) return;
@@ -536,6 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hapticFeedback('success');
     });
 
+
     // Функции заполнения магазина
     function populateShopSeeds() {
         const shopListContainer = document.querySelector('#seeds-tab ul');
@@ -552,6 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     
     // Обработчик продажи и закрытия модалок
     sellAllButton.addEventListener('click', () => {
@@ -562,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (quantity > 0) {
             // Проверяем, гибрид это или обычный овощ
                 const plant = PLANT_DATA[crop];
-                const hybrid = getHybridData(crop, gameState); // <--- передаем gameState
+                const hybrid = getHybridData(crop, gameState); // ✅ передаем gameState
                 if (plant) {
                   totalProfit += quantity * plant.sellPrice;
                 } else if (hybrid) {
@@ -588,10 +624,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
      
      
 
+
     
+
 
     function updateWarehouseDisplay() {
         warehouseList.innerHTML = '';
@@ -608,9 +647,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
         items.forEach(crop => {
             const plant = PLANT_DATA[crop];
-            const hybrid = getHybridData(crop, gameState); // <--- передаем gameState
+            const hybrid = getHybridData(crop, gameState); // ✅ передаем gameState
             const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
-            const name = plant ? plant.name : getHybridName(crop, gameState);
+            const name = plant ? plant.name : getHybridName(crop, gameState); // ✅ передаем gameState
+
 
             const maxCount = gameState.warehouse[crop];
         
@@ -704,7 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sellCount = parseInt(countEl.textContent);
             
                 const plant = PLANT_DATA[crop];
-                const hybrid = getHybridData ? getHybridData(crop) : null;
+                const hybrid = getHybridData(crop, gameState); // ✅ передаем gameState
                 const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
             
                 gameState.balance += sellPrice * sellCount;
@@ -723,8 +763,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-setTimeout(() => updateGardenBeds(), 100);    
-loadGameData();
+
+// ✅ ИСПРАВЛЕНИЕ: Вызываем updateGardenBeds() ПОСЛЕ инициализации
+// setTimeout(() => updateGardenBeds(), 100);    
+
+// ✅ ИСПРАВЛЕНИЕ: Вызываем loadGameData с callback
+loadGameData(initializeGame);
+
 if (isAdmin) {
     const resetButton = document.getElementById('reset-button');
     if (resetButton) {
@@ -741,5 +786,3 @@ if (isAdmin) {
     }
 }
 });
-
-
