@@ -157,32 +157,27 @@ const HYBRID_RECIPES = {
 
 // ✅ НОВАЯ ФУНКЦИЯ: Создание легендарного гибрида из двух эпических
 function createLegendaryHybrid(epic1, epic2, gameState) {
-    // Получаем данные эпических гибридов
     const hybrid1Data = gameState.hybridData[epic1];
     const hybrid2Data = gameState.hybridData[epic2];
     
     if (!hybrid1Data || !hybrid2Data) return null;
     if (hybrid1Data.rarity !== 'epic' || hybrid2Data.rarity !== 'epic') return null;
     
-    // Создаем уникальный ключ для этой комбинации
-    const key = [epic1, epic2].sort().join('-');
-    
-    // Генерируем название (смешиваем названия двух эпиков)
     const name1 = hybrid1Data.name;
     const name2 = hybrid2Data.name;
     
-    // Берем первую половину от первого названия и вторую от второго
     const halfIndex1 = Math.ceil(name1.length / 2);
     const halfIndex2 = Math.floor(name2.length / 2);
     const legendaryName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
     
-    // Генерируем новый эмодзи (берем случайный из списка легендарных символов)
     const legendaryEmojis = ['⭐', '💎', '👑', '🏆', '🔱', '🎖️', '🌟', '✨', '💫', '🎯', '🏅', '🔰'];
     const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
     
-    // Вычисляем характеристики (среднее + бонус)
-    const growTime = Math.floor((hybrid1Data.growTime + hybrid2Data.growTime) / 2 * 1.5);
-    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) / 2 * 2);
+    // ✅ Время = сумма двух эпиков (не делим на 2!)
+    const growTime = Math.floor(hybrid1Data.growTime + hybrid2Data.growTime);
+    
+    // ✅ Цена = СУММА × 1.5
+    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.5);
     
     return {
         result: randomEmoji,
@@ -193,19 +188,15 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     };
 }
 
+
 // ✅ НОВАЯ ФУНКЦИЯ: Создание мифического гибрида из двух легендарных
 function createMythicHybrid(legendary1, legendary2, gameState) {
-    // Получаем данные легендарных гибридов
     const hybrid1Data = gameState.hybridData[legendary1];
     const hybrid2Data = gameState.hybridData[legendary2];
     
     if (!hybrid1Data || !hybrid2Data) return null;
     if (hybrid1Data.rarity !== 'legendary' || hybrid2Data.rarity !== 'legendary') return null;
     
-    // Создаем уникальный ключ для этой комбинации
-    const key = [legendary1, legendary2].sort().join('-');
-    
-    // Генерируем название
     const name1 = hybrid1Data.name;
     const name2 = hybrid2Data.name;
     
@@ -213,13 +204,14 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     const halfIndex2 = Math.floor(name2.length / 2);
     const mythicName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
     
-    // Генерируем новый эмодзи (берем случайный из списка мифических символов)
     const mythicEmojis = ['🔥', '⚡', '🌈', '💀', '🦄', '🐉', '👹', '🎃', '🔮', '🗡️', '🛡️', '⚔️'];
     const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
     
-    // Вычисляем характеристики (среднее + большой бонус)
-    const growTime = Math.floor((hybrid1Data.growTime + hybrid2Data.growTime) / 2 * 2);
-    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) / 2 * 3);
+    // ✅ Время = сумма двух легендарных (не делим на 2!)
+    const growTime = Math.floor(hybrid1Data.growTime + hybrid2Data.growTime);
+    
+    // ✅ Цена = СУММА × 1.7
+    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.7);
     
     return {
         result: randomEmoji,
@@ -229,6 +221,7 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
         sellPrice: sellPrice
     };
 }
+
 
 
 const HYBRID_RECIPES_FULL = {};
@@ -265,15 +258,18 @@ function getHybridRecipe(seed1, seed2) {
 }
 
 function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
-    const parent1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
-    const parent2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
-    if (!parent1 || !parent2) return { growTime: 30, sellPrice: 50, mixCost: 50 };
-    const avgGrowTime = parent1.growTime + parent2.growTime;
-    const hybridTime = Math.floor(avgGrowTime / 1000);
-    const hybridPrice = (parent1.sellPrice + parent2.sellPrice) * 1.5;
-    const mixCost = Math.max(10, Math.floor(hybridPrice * 0.1));
-    return { growTime: hybridTime, sellPrice: parseFloat(hybridPrice.toFixed(2)), mixCost: mixCost };
+    const plant1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
+    const plant2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
+    
+    // ✅ Время = просто сумма двух овощей
+    const growTime = plant1.growTime + plant2.growTime;
+    
+    // ✅ Цена = СУММА × 1.3
+    const sellPrice = (plant1.sellPrice + plant2.sellPrice) * 1.3;
+    
+    return { growTime, sellPrice };
 }
+
 
 // ✅ КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Глобальная переменная для отслеживания инициализации
 let labUIInitialized = false;
@@ -353,14 +349,20 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             else if (activeRarity === 'legendary') {
                 // Легендарные: показываем ТОЛЬКО эпические гибриды
                 crops = crops.filter(crop => {
-                    const hybridData = getHybridData(crop, gameState);
+                    // ✅ ИСПРАВЛЕНИЕ: Сначала проверяем, что это НЕ обычный овощ
+                    if (PLANT_DATA[crop]) return false;
+                    
+                    const hybridData = gameState.hybridData[crop];
                     return hybridData && hybridData.rarity === 'epic';
                 });
             } 
             else if (activeRarity === 'mythic') {
                 // Мифические: показываем ТОЛЬКО легендарные гибриды
                 crops = crops.filter(crop => {
-                    const hybridData = getHybridData(crop, gameState);
+                    // ✅ ИСПРАВЛЕНИЕ: Сначала проверяем, что это НЕ обычный овощ
+                    if (PLANT_DATA[crop]) return false;
+                    
+                    const hybridData = gameState.hybridData[crop];
                     return hybridData && hybridData.rarity === 'legendary';
                 });
             }
@@ -401,6 +403,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             });
             cropModal.classList.remove('hidden');
         }
+
 
 
         cropModalClose.onclick = () => cropModal.classList.add('hidden');
