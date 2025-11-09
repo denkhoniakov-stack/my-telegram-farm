@@ -74,16 +74,21 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     const labContainer = document.getElementById('inventory-tab');
     if (!labContainer) return;
 
+    // ✅ Инициализация данных
     if (gameState.hybridMixing === undefined) gameState.hybridMixing = null;
     if (!gameState.hybridData) gameState.hybridData = {};
 
-    // ✅ ИСПРАВЛЕНИЕ: Отрисовываем HTML только один раз
+    // ✅ Отрисовываем HTML только один раз
     if (!labUIInitialized) {
         labUIInitialized = true;
         
         labContainer.innerHTML = `
             <div class="lab-container">
-                <div class="lab-header-new"><div class="lab-icon">🧪</div><h3>Лаборатория Гибридов</h3><p>Выберите два овоща для создания уникального гибрида</p></div>
+                <div class="lab-header-new">
+                    <div class="lab-icon">🧪</div>
+                    <h3>Лаборатория Гибридов</h3>
+                    <p>Выберите два овоща для создания уникального гибрида</p>
+                </div>
                 <div class="lab-selection">
                     <div id="slot1" class="lab-slot-new"><span class="slot-placeholder">?</span></div>
                     <div class="lab-plus-new">+</div>
@@ -94,7 +99,10 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             </div>
             <div id="cropModal" class="crop-modal hidden">
                 <div class="crop-modal-content">
-                    <div class="crop-modal-header"><h3>Выберите овощ</h3><button class="crop-modal-close">&times;</button></div>
+                    <div class="crop-modal-header">
+                        <h3>Выберите овощ</h3>
+                        <button class="crop-modal-close">&times;</button>
+                    </div>
                     <ul id="cropModalList" class="crop-modal-list"></ul>
                 </div>
             </div>
@@ -112,7 +120,10 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         function openCropModal(slotNumber) {
             activeSlot = slotNumber;
             const crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
-            if (crops.length === 0) { tg.showAlert('На складе нет овощей!'); return; }
+            if (crops.length === 0) { 
+                tg.showAlert('На складе нет овощей!'); 
+                return; 
+            }
             cropModalList.innerHTML = '';
             crops.forEach(crop => {
                 const plant = PLANT_DATA[crop];
@@ -120,7 +131,13 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 if (!plant && !hybrid) return;
                 const li = document.createElement('li');
                 li.className = 'crop-modal-item';
-                li.innerHTML = `<div class="crop-modal-icon">${crop}</div><div class="crop-modal-details"><div class="crop-modal-name">${plant ? plant.name : getHybridName(crop, gameState)}</div><div class="crop-modal-count">${gameState.warehouse[crop]} шт</div></div>`;
+                li.innerHTML = `
+                    <div class="crop-modal-icon">${crop}</div>
+                    <div class="crop-modal-details">
+                        <div class="crop-modal-name">${plant ? plant.name : getHybridName(crop, gameState)}</div>
+                        <div class="crop-modal-count">${gameState.warehouse[crop]} шт</div>
+                    </div>
+                `;
                 li.onclick = () => {
                     if (activeSlot === 1) {
                         crop1Global = crop;
@@ -139,32 +156,66 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         }
 
         cropModalClose.onclick = () => cropModal.classList.add('hidden');
-        cropModal.onclick = (e) => { if (e.target === cropModal) cropModal.classList.add('hidden'); };
+        cropModal.onclick = (e) => { 
+            if (e.target === cropModal) cropModal.classList.add('hidden'); 
+        };
+        
         slot1El.onclick = () => {
+            // ✅ ИСПРАВЛЕНИЕ: Проверяем, идёт ли смешивание
+            if (gameState.hybridMixing) return;
+            
             if (crop1Global) {
                 crop1Global = null;
                 slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
                 slot1El.classList.remove('filled');
-            } else openCropModal(1);
+            } else {
+                openCropModal(1);
+            }
         };
+        
         slot2El.onclick = () => {
+            // ✅ ИСПРАВЛЕНИЕ: Проверяем, идёт ли смешивание
+            if (gameState.hybridMixing) return;
+            
             if (crop2Global) {
                 crop2Global = null;
                 slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
                 slot2El.classList.remove('filled');
-            } else openCropModal(2);
+            } else {
+                openCropModal(2);
+            }
         };
 
         mixBtn.onclick = () => {
-            if (!crop1Global || !crop2Global) { msgEl.innerHTML = '<div class="result-error">❌ Выберите два овоща!</div>'; return; }
-            if (crop1Global === crop2Global) { msgEl.innerHTML = '<div class="result-warning">⚠️ Одинаковые овощи!</div>'; return; }
+            if (!crop1Global || !crop2Global) { 
+                msgEl.innerHTML = '<div class="result-error">❌ Выберите два овоща!</div>'; 
+                return; 
+            }
+            if (crop1Global === crop2Global) { 
+                msgEl.innerHTML = '<div class="result-warning">⚠️ Одинаковые овощи!</div>'; 
+                return; 
+            }
             const recipe = getHybridRecipe(crop1Global, crop2Global);
-            if (!recipe) { msgEl.innerHTML = '<div class="result-warning">🔬 Комбинация не работает!</div>'; return; }
+            if (!recipe) { 
+                msgEl.innerHTML = '<div class="result-warning">🔬 Комбинация не работает!</div>'; 
+                return; 
+            }
             const stats = calculateHybridStats(crop1Global, crop2Global, PLANT_DATA, gameState);
-            gameState.hybridData[recipe.result] = { growTime: stats.growTime * 1000, sellPrice: stats.sellPrice, name: recipe.name };
+            gameState.hybridData[recipe.result] = { 
+                growTime: stats.growTime * 1000, 
+                sellPrice: stats.sellPrice, 
+                name: recipe.name 
+            };
             gameState.warehouse[crop1Global]--;
             gameState.warehouse[crop2Global]--;
-            gameState.hybridMixing = { startTime: Date.now(), duration: stats.growTime * 1000, resultEmoji: recipe.result, resultName: recipe.name, crop1: crop1Global, crop2: crop2Global };
+            gameState.hybridMixing = { 
+                startTime: Date.now(), 
+                duration: stats.growTime * 1000, 
+                resultEmoji: recipe.result, 
+                resultName: recipe.name, 
+                crop1: crop1Global, 
+                crop2: crop2Global 
+            };
             updateBalanceDisplay();
             saveGameData();
             mixBtn.disabled = true;
@@ -176,12 +227,14 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     }
 
     // ✅ ИСПРАВЛЕНИЕ: Восстанавливаем UI при каждом заходе в лабораторию
+    // Эта часть выполняется ВСЕГДА, даже если HTML уже создан
     const slot1El = document.getElementById('slot1');
     const slot2El = document.getElementById('slot2');
     const mixBtn = document.getElementById('mixBtn');
     const msgEl = document.getElementById('msg');
 
     if (gameState.hybridMixing) {
+        // Восстанавливаем процесс смешивания
         crop1Global = gameState.hybridMixing.crop1;
         crop2Global = gameState.hybridMixing.crop2;
         slot1El.innerHTML = `<span class="slot-emoji">${crop1Global}</span>`;
@@ -194,10 +247,13 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         slot2El.style.pointerEvents = 'none';
         startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
     } else {
+        // Сбрасываем UI, если смешивание не идёт
         crop1Global = null;
         crop2Global = null;
-        slot1El.innerHTML = '<span class="slot-placeholder">?</span>'; slot1El.classList.remove('filled');
-        slot2El.innerHTML = '<span class="slot-placeholder">?</span>'; slot2El.classList.remove('filled');
+        slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot1El.classList.remove('filled');
+        slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot2El.classList.remove('filled');
         mixBtn.disabled = false;
         mixBtn.style.opacity = '1';
         slot1El.style.pointerEvents = 'all';
@@ -205,6 +261,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         msgEl.innerHTML = '';
     }
 }
+
 
 function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;

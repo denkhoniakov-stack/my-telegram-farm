@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                         gameState.hybridData = loaded.hybridData || {};
+                        gameState.hybridMixing = loaded.hybridMixing || null;
                     } catch (e) {
                         console.error('Ошибка загрузки:', e);
                     }
@@ -168,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
                     gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
                     gameState.hybridData = loaded.hybridData || {};
+                    gameState.hybridMixing = loaded.hybridMixing || null;
                 } catch (e) {
                     console.error('Ошибка:', e);
                 }
