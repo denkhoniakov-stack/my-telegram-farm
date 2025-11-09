@@ -317,6 +317,49 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
     }
     if (!gameState.hybridData) gameState.hybridData = {};
 
+    // ✅ ВАЖНО: Объявляем вспомогательные функции ДО использования
+    function getActiveRarity() {
+        const activeTab = document.querySelector('.hybrid-tab.active');
+        return activeTab ? activeTab.dataset.rarity : 'epic';
+    }
+
+    function updateLabUI() {
+        const activeRarity = getActiveRarity();
+        const slot1El = document.getElementById('slot1');
+        const slot2El = document.getElementById('slot2');
+        const mixBtn = document.getElementById('mixBtn');
+        const msgEl = document.getElementById('msg');
+
+        if (!slot1El || !slot2El || !mixBtn || !msgEl) return;
+
+        if (gameState.hybridMixings[activeRarity]) {
+            const mixing = gameState.hybridMixings[activeRarity];
+            slot1El.innerHTML = `<span class="slot-emoji">${mixing.crop1}</span>`;
+            slot1El.classList.add('filled');
+            slot2El.innerHTML = `<span class="slot-emoji">${mixing.crop2}</span>`;
+            slot2El.classList.add('filled');
+            mixBtn.disabled = true;
+            mixBtn.style.opacity = '0.5';
+            slot1El.style.pointerEvents = 'none';
+            slot2El.style.pointerEvents = 'none';
+            startMixingTimer(activeRarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        } else {
+            const crop1 = cropSelections[activeRarity].crop1;
+            const crop2 = cropSelections[activeRarity].crop2;
+            
+            slot1El.innerHTML = crop1 ? `<span class="slot-emoji">${crop1}</span>` : '<span class="slot-placeholder">?</span>';
+            slot1El.classList.toggle('filled', !!crop1);
+            slot2El.innerHTML = crop2 ? `<span class="slot-emoji">${crop2}</span>` : '<span class="slot-placeholder">?</span>';
+            slot2El.classList.toggle('filled', !!crop2);
+            
+            mixBtn.disabled = false;
+            mixBtn.style.opacity = '1';
+            slot1El.style.pointerEvents = 'all';
+            slot2El.style.pointerEvents = 'all';
+            msgEl.innerHTML = '';
+        }
+    }
+
     // ✅ Отрисовываем HTML только один раз
     if (!labUIInitialized) {
         labUIInitialized = true;
@@ -362,12 +405,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         const cropModalList = document.getElementById('cropModalList');
         const cropModalClose = document.querySelector('.crop-modal-close');
         let activeSlot = null;
-
-        // ✅ Функция получения активной редкости
-        function getActiveRarity() {
-            const activeTab = document.querySelector('.hybrid-tab.active');
-            return activeTab ? activeTab.dataset.rarity : 'epic';
-        }
 
         function openCropModal(slotNumber) {
             activeSlot = slotNumber;
@@ -559,49 +596,10 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         });
     }
 
-    // ✅ Функция обновления UI для активной вкладки
-    function updateLabUI() {
-        const activeRarity = getActiveRarity();
-        const slot1El = document.getElementById('slot1');
-        const slot2El = document.getElementById('slot2');
-        const mixBtn = document.getElementById('mixBtn');
-        const msgEl = document.getElementById('msg');
-
-        if (gameState.hybridMixings[activeRarity]) {
-            const mixing = gameState.hybridMixings[activeRarity];
-            slot1El.innerHTML = `<span class="slot-emoji">${mixing.crop1}</span>`;
-            slot1El.classList.add('filled');
-            slot2El.innerHTML = `<span class="slot-emoji">${mixing.crop2}</span>`;
-            slot2El.classList.add('filled');
-            mixBtn.disabled = true;
-            mixBtn.style.opacity = '0.5';
-            slot1El.style.pointerEvents = 'none';
-            slot2El.style.pointerEvents = 'none';
-            startMixingTimer(activeRarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
-        } else {
-            const crop1 = cropSelections[activeRarity].crop1;
-            const crop2 = cropSelections[activeRarity].crop2;
-            
-            slot1El.innerHTML = crop1 ? `<span class="slot-emoji">${crop1}</span>` : '<span class="slot-placeholder">?</span>';
-            slot1El.classList.toggle('filled', !!crop1);
-            slot2El.innerHTML = crop2 ? `<span class="slot-emoji">${crop2}</span>` : '<span class="slot-placeholder">?</span>';
-            slot2El.classList.toggle('filled', !!crop2);
-            
-            mixBtn.disabled = false;
-            mixBtn.style.opacity = '1';
-            slot1El.style.pointerEvents = 'all';
-            slot2El.style.pointerEvents = 'all';
-            msgEl.innerHTML = '';
-        }
-    }
-
-    function getActiveRarity() {
-        const activeTab = document.querySelector('.hybrid-tab.active');
-        return activeTab ? activeTab.dataset.rarity : 'epic';
-    }
-
+    // ✅ Обновляем UI при входе в лабораторию
     updateLabUI();
 }
+
 
 // ✅ Обновленная функция таймера с поддержкой редкости
 function startMixingTimer(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
