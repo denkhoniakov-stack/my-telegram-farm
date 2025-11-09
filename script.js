@@ -100,6 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
         seedInventory: { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 }, // Добавил семян для тестов
         items: {},
         unlockedBeds: 3,
+        hybridMixings: {     // ✅ ДОБАВЬТЕ ЭТО
+           epic: null,
+           legendary: null,
+           mythic: null
+        },
         garden: [],
         discoveredHybrids: [],
         hybridData: {} 
@@ -135,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadGameData(callback) {
     // Проверяем, доступен ли CloudStorage
         if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
-        // Используем Telegram Cloud Storage
+            // Используем Telegram Cloud Storage
             tg.CloudStorage.getItem('farmGame', (err, data) => {
                 if (!err && data) {
                     try {
@@ -148,15 +153,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                         gameState.hybridData = loaded.hybridData || {};
-                        gameState.hybridMixing = loaded.hybridMixing || null;
+                        
+                        // ✅ НОВОЕ: Загружаем множественные процессы смешивания
+                        if (loaded.hybridMixings !== undefined) {
+                            gameState.hybridMixings = loaded.hybridMixings;
+                        } else {
+                            gameState.hybridMixings = {
+                                epic: null,
+                                legendary: null,
+                                mythic: null
+                            };
+                        }
+                        
+                        // ✅ МИГРАЦИЯ: Конвертируем старый формат в новый
+                        if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
+                            gameState.hybridMixings.epic = loaded.hybridMixing;
+                        }
                     } catch (e) {
                         console.error('Ошибка загрузки:', e);
                     }
+                } else {
+                    // Инициализация если данных нет
+                    gameState.hybridMixings = {
+                        epic: null,
+                        legendary: null,
+                        mythic: null
+                    };
                 }
                 callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
             });
         } else {
-        // Fallback: используем localStorage для браузера
+            // Fallback: используем localStorage для браузера
             const data = localStorage.getItem('farmGame');
             if (data) {
                 try {
@@ -169,14 +196,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
                     gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
                     gameState.hybridData = loaded.hybridData || {};
-                    gameState.hybridMixing = loaded.hybridMixing || null;
+                    
+                    // ✅ НОВОЕ: Загружаем множественные процессы смешивания
+                    if (loaded.hybridMixings !== undefined) {
+                        gameState.hybridMixings = loaded.hybridMixings;
+                    } else {
+                        gameState.hybridMixings = {
+                            epic: null,
+                            legendary: null,
+                            mythic: null
+                        };
+                    }
+                    
+                    // ✅ МИГРАЦИЯ: Конвертируем старый формат в новый
+                    if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
+                        gameState.hybridMixings.epic = loaded.hybridMixing;
+                    }
                 } catch (e) {
                     console.error('Ошибка:', e);
                 }
+            } else {
+                // Инициализация если данных нет
+                gameState.hybridMixings = {
+                    epic: null,
+                    legendary: null,
+                    mythic: null
+                };
             }
             callback(); // ✅ ВЫЗЫВАЕМ CALLBACK СРАЗУ ДЛЯ LOCALSTORAGE
         }
     }
+
 
 
 

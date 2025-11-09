@@ -165,7 +165,6 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     
     const name1 = hybrid1Data.name;
     const name2 = hybrid2Data.name;
-    
     const halfIndex1 = Math.ceil(name1.length / 2);
     const halfIndex2 = Math.floor(name2.length / 2);
     const legendaryName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
@@ -173,22 +172,19 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     const legendaryEmojis = ['⭐', '💎', '👑', '🏆', '🔱', '🎖️', '🌟', '✨', '💫', '🎯', '🏅', '🔰'];
     const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
     
-    // ✅ Время в миллисекундах, переводим в секунды, суммируем
-    const growTime1 = hybrid1Data.growTime / 1000;
-    const growTime2 = hybrid2Data.growTime / 1000;
-    const growTime = Math.floor(growTime1 + growTime2);
-    
-    // ✅ Цена = СУММА × 1.5
-    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.5);
+    // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
+    const growTime = (hybrid1Data.growTime / 1000) + (hybrid2Data.growTime / 1000);
+    const sellPrice = (hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.5;
     
     return {
         result: randomEmoji,
         name: legendaryName,
         rarity: 'legendary',
-        growTime: growTime, // В секундах
+        growTime: growTime,
         sellPrice: sellPrice
     };
 }
+
 
 
 
@@ -202,7 +198,6 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     
     const name1 = hybrid1Data.name;
     const name2 = hybrid2Data.name;
-    
     const halfIndex1 = Math.ceil(name1.length / 2);
     const halfIndex2 = Math.floor(name2.length / 2);
     const mythicName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
@@ -210,22 +205,19 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     const mythicEmojis = ['🔥', '⚡', '🌈', '💀', '🦄', '🐉', '👹', '🎃', '🔮', '🗡️', '🛡️', '⚔️'];
     const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
     
-    // ✅ Время в миллисекундах, переводим в секунды, суммируем
-    const growTime1 = hybrid1Data.growTime / 1000;
-    const growTime2 = hybrid2Data.growTime / 1000;
-    const growTime = Math.floor(growTime1 + growTime2);
-    
-    // ✅ Цена = СУММА × 1.7
-    const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.7);
+    // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
+    const growTime = (hybrid1Data.growTime / 1000) + (hybrid2Data.growTime / 1000);
+    const sellPrice = (hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.7;
     
     return {
         result: randomEmoji,
         name: mythicName,
         rarity: 'mythic',
-        growTime: growTime, // В секундах
+        growTime: growTime,
         sellPrice: sellPrice
     };
 }
+
 
 
 
@@ -264,29 +256,18 @@ function getHybridRecipe(seed1, seed2) {
 }
 
 function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
-    const plant1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
-    const plant2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
+    const plant1 = PLANT_DATA[crop1];
+    const plant2 = PLANT_DATA[crop2];
     
-    // Получаем время в секундах
-    let growTime1 = plant1.growTime;
-    let growTime2 = plant2.growTime;
+    // Просто складываем время в секундах
+    const growTime = plant1.growTime + plant2.growTime;
     
-    // Если это гибрид, время уже в миллисекундах - переводим в секунды
-    if (!PLANT_DATA[crop1] && gameState.hybridData[crop1]) {
-        growTime1 = growTime1 / 1000;
-    }
-    if (!PLANT_DATA[crop2] && gameState.hybridData[crop2]) {
-        growTime2 = growTime2 / 1000;
-    }
-    
-    // ✅ Время = сумма в секундах
-    const growTime = growTime1 + growTime2;
-    
-    // ✅ Цена = СУММА × 1.3
+    // Просто складываем цену × 1.3
     const sellPrice = (plant1.sellPrice + plant2.sellPrice) * 1.3;
     
-    return { growTime, sellPrice }; // Возвращаем в секундах
+    return { growTime, sellPrice };
 }
+
 
 
 
