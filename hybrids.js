@@ -261,14 +261,27 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
     const plant1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
     const plant2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
     
-    // ✅ Время = просто сумма двух овощей
-    const growTime = plant1.growTime + plant2.growTime;
+    // ✅ ИСПРАВЛЕНИЕ: Проверяем, в каких единицах время
+    let growTime1 = plant1.growTime;
+    let growTime2 = plant2.growTime;
+    
+    // Если это обычное растение, время в секундах - переводим в миллисекунды
+    if (PLANT_DATA[crop1]) {
+        growTime1 = growTime1 * 1000;
+    }
+    if (PLANT_DATA[crop2]) {
+        growTime2 = growTime2 * 1000;
+    }
+    
+    // ✅ Время = сумма двух овощей (в миллисекундах)
+    const growTime = growTime1 + growTime2;
     
     // ✅ Цена = СУММА × 1.3
     const sellPrice = (plant1.sellPrice + plant2.sellPrice) * 1.3;
     
-    return { growTime, sellPrice };
+    return { growTime: growTime / 1000, sellPrice }; // Возвращаем в секундах для консистентности
 }
+
 
 
 // ✅ КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Глобальная переменная для отслеживания инициализации
@@ -322,6 +335,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 </div>
             </div>
         `;
+
 
         const slot1El = document.getElementById('slot1');
         const slot2El = document.getElementById('slot2');
@@ -534,13 +548,38 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 
 
         // ✅ Обработчики для вкладок (просто переключение активной)
+        // ✅ Обработчики для вкладок с анимацией
+        // ✅ Обработчики для вкладок с анимацией
         const hybridTabs = document.querySelectorAll('.hybrid-tab');
+        
+
         hybridTabs.forEach(tab => {
             tab.addEventListener('click', () => {
+                // Убираем активный класс со всех вкладок
                 hybridTabs.forEach(t => t.classList.remove('active'));
+                
+                // Добавляем анимацию
+                labContainer.style.animation = 'none';
+                setTimeout(() => {
+                    labContainer.style.animation = 'fadeIn 0.3s ease';
+                }, 10);
+                
+                // Активируем выбранную вкладку
                 tab.classList.add('active');
+                
+                // Сбрасываем выбранные овощи при переключении
+                crop1Global = null;
+                crop2Global = null;
+                const slot1El = document.getElementById('slot1');
+                const slot2El = document.getElementById('slot2');
+                slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
+                slot1El.classList.remove('filled');
+                slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
+                slot2El.classList.remove('filled');
             });
         });
+    
+
     }
 
     // ✅ Восстанавливаем UI при каждом заходе в лабораторию

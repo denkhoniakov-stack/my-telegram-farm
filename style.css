@@ -1122,164 +1122,164 @@ body {
 .claim-hybrid-btn:active {
     transform: scale(0.98);
 }
-
-/* Вкладки редкости */
+/* Вкладки как переключение страниц */
 .hybrid-tabs {
     display: flex;
-    gap: 8px;
-    margin: 15px 0;
     justify-content: center;
+    gap: 0;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .hybrid-tab {
     flex: 1;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid transparent;
-    border-radius: 12px;
+    background: linear-gradient(180deg, #f5e8d0 0%, #e8d4b8 100%);
+    border: none;
+    border-right: 1px solid #c8b89a;
+    padding: 12px 8px;
     cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
-
-.hybrid-tab.active[data-rarity="epic"] {
-    background: rgba(156, 39, 176, 0.2);
-    border-color: #9C27B0;
-}
-
-.hybrid-tab.active[data-rarity="legendary"] {
-    background: rgba(255, 193, 7, 0.2);
-    border-color: #FFC107;
-}
-
-.hybrid-tab.active[data-rarity="mythic"] {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: #F44336;
-}
-
-.tab-icon {
-    font-size: 20px;
-}
-
-.tab-label {
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-}
-
-/* Список открытых гибридов */
-.discovered-hybrids-list {
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-}
-
-.discovered-hybrid-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    border-left: 4px solid;
-}
-
-.discovered-hybrid-item.epic {
-    background: rgba(156, 39, 176, 0.15);
-    border-left-color: #9C27B0;
-}
-
-.discovered-hybrid-item.legendary {
-    background: rgba(255, 193, 7, 0.15);
-    border-left-color: #FFC107;
-}
-
-.discovered-hybrid-item.mythic {
-    background: rgba(244, 67, 54, 0.15);
-    border-left-color: #F44336;
-}
-
-.hybrid-emoji {
-    font-size: 32px;
-}
-
-.hybrid-info {
-    flex: 1;
-}
-
-.hybrid-name {
-    font-weight: bold;
-    color: white;
-    font-size: 14px;
-}
-
-.hybrid-stats {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 4px;
-}
-
-.no-hybrids {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.5);
-    padding: 20px;
-    font-style: italic;
-}
-
-.lab-divider {
-    height: 2px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
-    margin: 20px 0;
-}
-/* Вкладки редкости гибридов */
-.hybrid-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #D2B48C;
-    padding-bottom: 10px;
-}
-
-.hybrid-tab {
-    background-color: #eaddc0;
-    border: 2px solid #c8b89a;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     color: #6a4c2f;
-    font-family: 'Nunito', Arial, sans-serif; /* ✅ Такой же шрифт как у магазина */
-    transition: background-color 0.3s, border-color 0.3s;
+    font-family: 'Nunito', Arial, sans-serif;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hybrid-tab:last-child {
+    border-right: none;
 }
 
 .hybrid-tab:hover {
-    background-color: #f5e8d0;
+    background: linear-gradient(180deg, #fff8e8 0%, #f5e8d0 100%);
+    transform: translateY(-2px);
 }
 
-/* Активная эпическая вкладка - фиолетовая */
+/* Активная вкладка - эпическая (фиолетовая) */
 .hybrid-tab.active[data-rarity="epic"] {
-    background-color: #9C27B0;
-    border-color: #7B1FA2;
+    background: linear-gradient(180deg, #B39DDB 0%, #9C27B0 100%);
     color: white;
+    box-shadow: inset 0 -3px 0 #7B1FA2;
+    transform: scale(1.05);
+    z-index: 2;
 }
 
-/* Активная легендарная вкладка - золотая */
+/* Активная вкладка - легендарная (золотая) */
 .hybrid-tab.active[data-rarity="legendary"] {
-    background-color: #FFC107;
-    border-color: #FFA000;
+    background: linear-gradient(180deg, #FFD54F 0%, #FFC107 100%);
     color: white;
+    box-shadow: inset 0 -3px 0 #FFA000;
+    transform: scale(1.05);
+    z-index: 2;
 }
 
-/* Активная мифическая вкладка - красноватая */
+/* Активная вкладка - мифическая (красная) */
 .hybrid-tab.active[data-rarity="mythic"] {
-    background-color: #F44336;
-    border-color: #D32F2F;
+    background: linear-gradient(180deg, #FF7961 0%, #F44336 100%);
     color: white;
+    box-shadow: inset 0 -3px 0 #D32F2F;
+    transform: scale(1.05);
+    z-index: 2;
 }
+
+/* Анимация переключения */
+.lab-container {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* ================================ */
+/* ВКЛАДКИ ГИБРИДОВ */
+/* ================================ */
+
+/* Контейнер вкладок */
+.hybrid-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Стиль каждой вкладки */
+.hybrid-tab {
+    flex: 1;
+    background: linear-gradient(180deg, #f5e8d0 0%, #e8d4b8 100%);
+    border: none;
+    border-right: 1px solid #c8b89a;
+    padding: 12px 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    color: #6a4c2f;
+    font-family: 'Nunito', Arial, sans-serif;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hybrid-tab:last-child {
+    border-right: none;
+}
+
+.hybrid-tab:hover {
+    background: linear-gradient(180deg, #fff8e8 0%, #f5e8d0 100%);
+    transform: translateY(-2px);
+}
+
+/* Активная эпическая вкладка (фиолетовая) */
+.hybrid-tab.active[data-rarity="epic"] {
+    background: linear-gradient(180deg, #B39DDB 0%, #9C27B0 100%);
+    color: white;
+    box-shadow: inset 0 -3px 0 #7B1FA2;
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+/* Активная легендарная вкладка (золотая) */
+.hybrid-tab.active[data-rarity="legendary"] {
+    background: linear-gradient(180deg, #FFD54F 0%, #FFC107 100%);
+    color: white;
+    box-shadow: inset 0 -3px 0 #FFA000;
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+/* Активная мифическая вкладка (красная) */
+.hybrid-tab.active[data-rarity="mythic"] {
+    background: linear-gradient(180deg, #FF7961 0%, #F44336 100%);
+    color: white;
+    box-shadow: inset 0 -3px 0 #D32F2F;
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+/* Анимация появления контейнера лаборатории */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Применяем анимацию к контейнеру */
+.lab-container {
+    animation: fadeIn 0.3s ease;
+}
+
