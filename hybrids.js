@@ -173,8 +173,10 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     const legendaryEmojis = ['⭐', '💎', '👑', '🏆', '🔱', '🎖️', '🌟', '✨', '💫', '🎯', '🏅', '🔰'];
     const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
     
-    // ✅ Время = сумма двух эпиков (не делим на 2!)
-    const growTime = Math.floor(hybrid1Data.growTime + hybrid2Data.growTime);
+    // ✅ Время в миллисекундах, переводим в секунды, суммируем
+    const growTime1 = hybrid1Data.growTime / 1000;
+    const growTime2 = hybrid2Data.growTime / 1000;
+    const growTime = Math.floor(growTime1 + growTime2);
     
     // ✅ Цена = СУММА × 1.5
     const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.5);
@@ -183,10 +185,11 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
         result: randomEmoji,
         name: legendaryName,
         rarity: 'legendary',
-        growTime: growTime,
+        growTime: growTime, // В секундах
         sellPrice: sellPrice
     };
 }
+
 
 
 // ✅ НОВАЯ ФУНКЦИЯ: Создание мифического гибрида из двух легендарных
@@ -207,8 +210,10 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     const mythicEmojis = ['🔥', '⚡', '🌈', '💀', '🦄', '🐉', '👹', '🎃', '🔮', '🗡️', '🛡️', '⚔️'];
     const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
     
-    // ✅ Время = сумма двух легендарных (не делим на 2!)
-    const growTime = Math.floor(hybrid1Data.growTime + hybrid2Data.growTime);
+    // ✅ Время в миллисекундах, переводим в секунды, суммируем
+    const growTime1 = hybrid1Data.growTime / 1000;
+    const growTime2 = hybrid2Data.growTime / 1000;
+    const growTime = Math.floor(growTime1 + growTime2);
     
     // ✅ Цена = СУММА × 1.7
     const sellPrice = Math.floor((hybrid1Data.sellPrice + hybrid2Data.sellPrice) * 1.7);
@@ -217,10 +222,11 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
         result: randomEmoji,
         name: mythicName,
         rarity: 'mythic',
-        growTime: growTime,
+        growTime: growTime, // В секундах
         sellPrice: sellPrice
     };
 }
+
 
 
 
@@ -261,41 +267,54 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
     const plant1 = PLANT_DATA[crop1] || getHybridData(crop1, gameState);
     const plant2 = PLANT_DATA[crop2] || getHybridData(crop2, gameState);
     
-    // ✅ ИСПРАВЛЕНИЕ: Проверяем, в каких единицах время
+    // Получаем время в секундах
     let growTime1 = plant1.growTime;
     let growTime2 = plant2.growTime;
     
-    // Если это обычное растение, время в секундах - переводим в миллисекунды
-    if (PLANT_DATA[crop1]) {
-        growTime1 = growTime1 * 1000;
+    // Если это гибрид, время уже в миллисекундах - переводим в секунды
+    if (!PLANT_DATA[crop1] && gameState.hybridData[crop1]) {
+        growTime1 = growTime1 / 1000;
     }
-    if (PLANT_DATA[crop2]) {
-        growTime2 = growTime2 * 1000;
+    if (!PLANT_DATA[crop2] && gameState.hybridData[crop2]) {
+        growTime2 = growTime2 / 1000;
     }
     
-    // ✅ Время = сумма двух овощей (в миллисекундах)
+    // ✅ Время = сумма в секундах
     const growTime = growTime1 + growTime2;
     
     // ✅ Цена = СУММА × 1.3
     const sellPrice = (plant1.sellPrice + plant2.sellPrice) * 1.3;
     
-    return { growTime: growTime / 1000, sellPrice }; // Возвращаем в секундах для консистентности
+    return { growTime, sellPrice }; // Возвращаем в секундах
 }
 
 
 
-// ✅ КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Глобальная переменная для отслеживания инициализации
+
 let labUIInitialized = false;
-let crop1Global = null;
-let crop2Global = null;
-let mixingTimerInterval = null; 
+let cropSelections = {
+    epic: { crop1: null, crop2: null },
+    legendary: { crop1: null, crop2: null },
+    mythic: { crop1: null, crop2: null }
+};
+let mixingTimerIntervals = {
+    epic: null,
+    legendary: null,
+    mythic: null
+};
 
 function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA) {
     const labContainer = document.getElementById('inventory-tab');
     if (!labContainer) return;
 
-    // ✅ Инициализация данных
-    if (gameState.hybridMixing === undefined) gameState.hybridMixing = null;
+    // ✅ Инициализация данных для параллельных процессов
+    if (!gameState.hybridMixings) {
+        gameState.hybridMixings = {
+            epic: null,
+            legendary: null,
+            mythic: null
+        };
+    }
     if (!gameState.hybridData) gameState.hybridData = {};
 
     // ✅ Отрисовываем HTML только один раз
@@ -304,7 +323,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         
         labContainer.innerHTML = `
             <div class="lab-container">
-                <!-- ✅ Вкладки сверху -->
                 <div class="hybrid-tabs">
                     <button class="hybrid-tab active" data-rarity="epic">Эпические</button>
                     <button class="hybrid-tab" data-rarity="legendary">Легендарные</button>
@@ -336,7 +354,6 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             </div>
         `;
 
-
         const slot1El = document.getElementById('slot1');
         const slot2El = document.getElementById('slot2');
         const mixBtn = document.getElementById('mixBtn');
@@ -346,36 +363,29 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         const cropModalClose = document.querySelector('.crop-modal-close');
         let activeSlot = null;
 
+        // ✅ Функция получения активной редкости
+        function getActiveRarity() {
+            const activeTab = document.querySelector('.hybrid-tab.active');
+            return activeTab ? activeTab.dataset.rarity : 'epic';
+        }
+
         function openCropModal(slotNumber) {
             activeSlot = slotNumber;
+            const activeRarity = getActiveRarity();
             
-            // ✅ Получаем активную вкладку
-            const activeTab = document.querySelector('.hybrid-tab.active');
-            const activeRarity = activeTab ? activeTab.dataset.rarity : 'epic';
-            
-            // ✅ Фильтруем овощи в зависимости от вкладки
             let crops = Object.keys(gameState.warehouse).filter(k => gameState.warehouse[k] > 0);
             
             if (activeRarity === 'epic') {
-                // Эпические: показываем ТОЛЬКО обычные овощи с грядки
                 crops = crops.filter(crop => PLANT_DATA[crop]);
-            } 
-            else if (activeRarity === 'legendary') {
-                // Легендарные: показываем ТОЛЬКО эпические гибриды
+            } else if (activeRarity === 'legendary') {
                 crops = crops.filter(crop => {
-                    // ✅ ИСПРАВЛЕНИЕ: Сначала проверяем, что это НЕ обычный овощ
                     if (PLANT_DATA[crop]) return false;
-                    
                     const hybridData = gameState.hybridData[crop];
                     return hybridData && hybridData.rarity === 'epic';
                 });
-            } 
-            else if (activeRarity === 'mythic') {
-                // Мифические: показываем ТОЛЬКО легендарные гибриды
+            } else if (activeRarity === 'mythic') {
                 crops = crops.filter(crop => {
-                    // ✅ ИСПРАВЛЕНИЕ: Сначала проверяем, что это НЕ обычный овощ
                     if (PLANT_DATA[crop]) return false;
-                    
                     const hybridData = gameState.hybridData[crop];
                     return hybridData && hybridData.rarity === 'legendary';
                 });
@@ -402,12 +412,13 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                     </div>
                 `;
                 li.onclick = () => {
+                    const activeRarity = getActiveRarity();
                     if (activeSlot === 1) {
-                        crop1Global = crop;
+                        cropSelections[activeRarity].crop1 = crop;
                         slot1El.innerHTML = `<span class="slot-emoji">${crop}</span>`;
                         slot1El.classList.add('filled');
                     } else {
-                        crop2Global = crop;
+                        cropSelections[activeRarity].crop2 = crop;
                         slot2El.innerHTML = `<span class="slot-emoji">${crop}</span>`;
                         slot2El.classList.add('filled');
                     }
@@ -418,18 +429,17 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             cropModal.classList.remove('hidden');
         }
 
-
-
         cropModalClose.onclick = () => cropModal.classList.add('hidden');
         cropModal.onclick = (e) => { 
             if (e.target === cropModal) cropModal.classList.add('hidden'); 
         };
         
         slot1El.onclick = () => {
-            if (gameState.hybridMixing) return;
+            const activeRarity = getActiveRarity();
+            if (gameState.hybridMixings[activeRarity]) return;
             
-            if (crop1Global) {
-                crop1Global = null;
+            if (cropSelections[activeRarity].crop1) {
+                cropSelections[activeRarity].crop1 = null;
                 slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
                 slot1El.classList.remove('filled');
             } else {
@@ -438,10 +448,11 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         };
         
         slot2El.onclick = () => {
-            if (gameState.hybridMixing) return;
+            const activeRarity = getActiveRarity();
+            if (gameState.hybridMixings[activeRarity]) return;
             
-            if (crop2Global) {
-                crop2Global = null;
+            if (cropSelections[activeRarity].crop2) {
+                cropSelections[activeRarity].crop2 = null;
                 slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
                 slot2El.classList.remove('filled');
             } else {
@@ -450,58 +461,53 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
         };
 
         mixBtn.onclick = () => {
-            if (!crop1Global || !crop2Global) { 
+            const activeRarity = getActiveRarity();
+            const crop1 = cropSelections[activeRarity].crop1;
+            const crop2 = cropSelections[activeRarity].crop2;
+            
+            if (!crop1 || !crop2) { 
                 msgEl.innerHTML = '<div class="result-error">❌ Выберите два овоща!</div>'; 
                 return; 
             }
-            if (crop1Global === crop2Global) { 
+            if (crop1 === crop2) { 
                 msgEl.innerHTML = '<div class="result-warning">⚠️ Одинаковые овощи!</div>'; 
                 return; 
             }
-            
-            // ✅ Определяем активную вкладку
-            const activeTab = document.querySelector('.hybrid-tab.active');
-            const activeRarity = activeTab ? activeTab.dataset.rarity : 'epic';
             
             let recipe = null;
             let stats = null;
             
             if (activeRarity === 'epic') {
-                // Эпические: используем стандартные рецепты
-                recipe = getHybridRecipe(crop1Global, crop2Global);
+                recipe = getHybridRecipe(crop1, crop2);
                 if (!recipe) { 
                     msgEl.innerHTML = '<div class="result-warning">🔬 Комбинация не работает!</div>'; 
                     return; 
                 }
-                stats = calculateHybridStats(crop1Global, crop2Global, PLANT_DATA, gameState);
+                stats = calculateHybridStats(crop1, crop2, PLANT_DATA, gameState);
                 stats.name = recipe.name;
                 stats.resultEmoji = recipe.result;
                 stats.rarity = 'epic';
-            } 
-            else if (activeRarity === 'legendary') {
-                // Легендарные: создаем из двух эпиков
-                recipe = createLegendaryHybrid(crop1Global, crop2Global, gameState);
+            } else if (activeRarity === 'legendary') {
+                recipe = createLegendaryHybrid(crop1, crop2, gameState);
                 if (!recipe) { 
                     msgEl.innerHTML = '<div class="result-warning">⚠️ Нужны два эпических гибрида!</div>'; 
                     return; 
                 }
                 stats = {
-                    growTime: recipe.growTime / 1000,
+                    growTime: recipe.growTime,
                     sellPrice: recipe.sellPrice,
                     name: recipe.name,
                     resultEmoji: recipe.result,
                     rarity: 'legendary'
                 };
-            } 
-            else if (activeRarity === 'mythic') {
-                // Мифические: создаем из двух легендарных
-                recipe = createMythicHybrid(crop1Global, crop2Global, gameState);
+            } else if (activeRarity === 'mythic') {
+                recipe = createMythicHybrid(crop1, crop2, gameState);
                 if (!recipe) { 
                     msgEl.innerHTML = '<div class="result-warning">⚠️ Нужны два легендарных гибрида!</div>'; 
                     return; 
                 }
                 stats = {
-                    growTime: recipe.growTime / 1000,
+                    growTime: recipe.growTime,
                     sellPrice: recipe.sellPrice,
                     name: recipe.name,
                     resultEmoji: recipe.result,
@@ -516,23 +522,19 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
                 rarity: stats.rarity
             };
             
-            gameState.warehouse[crop1Global]--;
-            gameState.warehouse[crop2Global]--;
+            gameState.warehouse[crop1]--;
+            gameState.warehouse[crop2]--;
             
-            if (gameState.warehouse[crop1Global] <= 0) {
-                delete gameState.warehouse[crop1Global];
-            }
-            if (gameState.warehouse[crop2Global] <= 0) {
-                delete gameState.warehouse[crop2Global];
-            }
+            if (gameState.warehouse[crop1] <= 0) delete gameState.warehouse[crop1];
+            if (gameState.warehouse[crop2] <= 0) delete gameState.warehouse[crop2];
             
-            gameState.hybridMixing = { 
+            gameState.hybridMixings[activeRarity] = { 
                 startTime: Date.now(), 
                 duration: stats.growTime * 1000, 
                 resultEmoji: stats.resultEmoji, 
                 resultName: stats.name, 
-                crop1: crop1Global, 
-                crop2: crop2Global 
+                crop1: crop1, 
+                crop2: crop2 
             };
             
             updateBalanceDisplay();
@@ -543,77 +545,130 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             slot1El.style.pointerEvents = 'none';
             slot2El.style.pointerEvents = 'none';
             
-            startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+            startMixingTimer(activeRarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
         };
 
-
-        // ✅ Обработчики для вкладок (просто переключение активной)
-        // ✅ Обработчики для вкладок с анимацией
-        // ✅ Обработчики для вкладок с анимацией
+        // ✅ Обработчики для вкладок
         const hybridTabs = document.querySelectorAll('.hybrid-tab');
-        
-
         hybridTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Убираем активный класс со всех вкладок
                 hybridTabs.forEach(t => t.classList.remove('active'));
-                
-                // Добавляем анимацию
-                labContainer.style.animation = 'none';
-                setTimeout(() => {
-                    labContainer.style.animation = 'fadeIn 0.3s ease';
-                }, 10);
-                
-                // Активируем выбранную вкладку
                 tab.classList.add('active');
-                
-                // Сбрасываем выбранные овощи при переключении
-                crop1Global = null;
-                crop2Global = null;
-                const slot1El = document.getElementById('slot1');
-                const slot2El = document.getElementById('slot2');
-                slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
-                slot1El.classList.remove('filled');
-                slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
-                slot2El.classList.remove('filled');
+                updateLabUI();
             });
         });
-    
-
     }
 
-    // ✅ Восстанавливаем UI при каждом заходе в лабораторию
-    const slot1El = document.getElementById('slot1');
-    const slot2El = document.getElementById('slot2');
-    const mixBtn = document.getElementById('mixBtn');
-    const msgEl = document.getElementById('msg');
+    // ✅ Функция обновления UI для активной вкладки
+    function updateLabUI() {
+        const activeRarity = getActiveRarity();
+        const slot1El = document.getElementById('slot1');
+        const slot2El = document.getElementById('slot2');
+        const mixBtn = document.getElementById('mixBtn');
+        const msgEl = document.getElementById('msg');
 
-    if (gameState.hybridMixing) {
-        crop1Global = gameState.hybridMixing.crop1;
-        crop2Global = gameState.hybridMixing.crop2;
-        slot1El.innerHTML = `<span class="slot-emoji">${crop1Global}</span>`;
-        slot1El.classList.add('filled');
-        slot2El.innerHTML = `<span class="slot-emoji">${crop2Global}</span>`;
-        slot2El.classList.add('filled');
-        mixBtn.disabled = true;
-        mixBtn.style.opacity = '0.5';
-        slot1El.style.pointerEvents = 'none';
-        slot2El.style.pointerEvents = 'none';
-        startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
-    } else {
-        crop1Global = null;
-        crop2Global = null;
-        slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
-        slot1El.classList.remove('filled');
-        slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
-        slot2El.classList.remove('filled');
+        if (gameState.hybridMixings[activeRarity]) {
+            const mixing = gameState.hybridMixings[activeRarity];
+            slot1El.innerHTML = `<span class="slot-emoji">${mixing.crop1}</span>`;
+            slot1El.classList.add('filled');
+            slot2El.innerHTML = `<span class="slot-emoji">${mixing.crop2}</span>`;
+            slot2El.classList.add('filled');
+            mixBtn.disabled = true;
+            mixBtn.style.opacity = '0.5';
+            slot1El.style.pointerEvents = 'none';
+            slot2El.style.pointerEvents = 'none';
+            startMixingTimer(activeRarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        } else {
+            const crop1 = cropSelections[activeRarity].crop1;
+            const crop2 = cropSelections[activeRarity].crop2;
+            
+            slot1El.innerHTML = crop1 ? `<span class="slot-emoji">${crop1}</span>` : '<span class="slot-placeholder">?</span>';
+            slot1El.classList.toggle('filled', !!crop1);
+            slot2El.innerHTML = crop2 ? `<span class="slot-emoji">${crop2}</span>` : '<span class="slot-placeholder">?</span>';
+            slot2El.classList.toggle('filled', !!crop2);
+            
+            mixBtn.disabled = false;
+            mixBtn.style.opacity = '1';
+            slot1El.style.pointerEvents = 'all';
+            slot2El.style.pointerEvents = 'all';
+            msgEl.innerHTML = '';
+        }
+    }
+
+    function getActiveRarity() {
+        const activeTab = document.querySelector('.hybrid-tab.active');
+        return activeTab ? activeTab.dataset.rarity : 'epic';
+    }
+
+    updateLabUI();
+}
+
+// ✅ Обновленная функция таймера с поддержкой редкости
+function startMixingTimer(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
+    const mixing = gameState.hybridMixings[rarity];
+    if (!mixing) return;
+    
+    if (mixingTimerIntervals[rarity]) {
+        clearInterval(mixingTimerIntervals[rarity]);
+        mixingTimerIntervals[rarity] = null;
+    }
+    
+    const elapsed = Date.now() - mixing.startTime;
+    let remainingTime = Math.max(0, Math.floor((mixing.duration - elapsed) / 1000));
+    
+    if (remainingTime === 0) {
+        showClaimButton(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        return;
+    }
+    
+    msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}</div>`;
+    const timerEl = document.getElementById('hybridTimer');
+    
+    mixingTimerIntervals[rarity] = setInterval(() => {
+        remainingTime--;
+        if (timerEl) timerEl.textContent = remainingTime;
+        
+        if (remainingTime <= 0) {
+            clearInterval(mixingTimerIntervals[rarity]);
+            mixingTimerIntervals[rarity] = null;
+            
+            if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            showClaimButton(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        }
+    }, 1000);
+}
+
+function showClaimButton(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
+    const mixing = gameState.hybridMixings[rarity];
+    
+    if (mixingTimerIntervals[rarity]) {
+        clearInterval(mixingTimerIntervals[rarity]);
+        mixingTimerIntervals[rarity] = null;
+    }
+    
+    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} ${mixing.resultName}</button>`;
+    const claimBtn = document.getElementById('claimBtn');
+    
+    claimBtn.onclick = () => {
+        gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
+        gameState.hybridMixings[rarity] = null;
+        cropSelections[rarity] = { crop1: null, crop2: null };
+        saveGameData();
+        
         mixBtn.disabled = false;
         mixBtn.style.opacity = '1';
         slot1El.style.pointerEvents = 'all';
         slot2El.style.pointerEvents = 'all';
+        slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot1El.classList.remove('filled');
+        slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot2El.classList.remove('filled');
         msgEl.innerHTML = '';
-    }
+    };
 }
+
 
 
 
@@ -671,7 +726,14 @@ function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, sl
     
     claimBtn.onclick = () => {
         gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
-        gameState.hybridMixing = null;
+        if (!gameState.hybridMixings) {
+            gameState.hybridMixings = {
+                epic: null,
+                legendary: null,
+                mythic: null
+            };
+        }
+
         saveGameData();
         
         mixBtn.disabled = false;
