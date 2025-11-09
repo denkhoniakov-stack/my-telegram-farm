@@ -169,7 +169,8 @@ function createLegendaryHybrid(epic1, epic2, gameState) {
     const halfIndex2 = Math.floor(name2.length / 2);
     const legendaryName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
     
-    const legendaryEmojis = ['⭐', '💎', '👑', '🏆', '🔱', '🎖️', '🌟', '✨', '💫', '🎯', '🏅', '🔰'];
+    const legendaryEmojis = ['🍱', '🍛', '🍜', '🍝', '🥘', '🥗', '🍲', '🥙', '🌮', '🌯', '🥪', '🍕'];
+
     const randomEmoji = legendaryEmojis[Math.floor(Math.random() * legendaryEmojis.length)];
     
     // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
@@ -202,7 +203,8 @@ function createMythicHybrid(legendary1, legendary2, gameState) {
     const halfIndex2 = Math.floor(name2.length / 2);
     const mythicName = name1.slice(0, halfIndex1) + name2.slice(halfIndex2);
     
-    const mythicEmojis = ['🔥', '⚡', '🌈', '💀', '🦄', '🐉', '👹', '🎃', '🔮', '🗡️', '🛡️', '⚔️'];
+    const mythicEmojis = ['🍰', '🎂', '🧁', '🍮', '🍩', '🍪', '🥧', '🍨', '🍧', '🍡', '🍢', '🍣'];
+
     const randomEmoji = mythicEmojis[Math.floor(Math.random() * mythicEmojis.length)];
     
     // Время в секундах (берём из миллисекунд и делим на 1000, потом складываем)
@@ -628,25 +630,32 @@ function showClaimButton(rarity, gameState, tg, saveGameData, msgEl, mixBtn, slo
         mixingTimerIntervals[rarity] = null;
     }
     
-    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} ${mixing.resultName}</button>`;
-    const claimBtn = document.getElementById('claimBtn');
+    // ✅ ПРОВЕРЯЕМ: Показываем кнопку только если активна нужная вкладка
+    const activeTab = document.querySelector('.hybrid-tab.active');
+    const activeRarity = activeTab ? activeTab.dataset.rarity : 'epic';
     
-    claimBtn.onclick = () => {
-        gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
-        gameState.hybridMixings[rarity] = null;
-        cropSelections[rarity] = { crop1: null, crop2: null };
-        saveGameData();
+    if (activeRarity === rarity) {
+        msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} ${mixing.resultName}</button>`;
+        const claimBtn = document.getElementById('claimBtn');
         
-        mixBtn.disabled = false;
-        mixBtn.style.opacity = '1';
-        slot1El.style.pointerEvents = 'all';
-        slot2El.style.pointerEvents = 'all';
-        slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
-        slot1El.classList.remove('filled');
-        slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
-        slot2El.classList.remove('filled');
-        msgEl.innerHTML = '';
-    };
+        claimBtn.onclick = () => {
+            gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
+            gameState.hybridMixings[rarity] = null;
+            cropSelections[rarity] = { crop1: null, crop2: null };
+            saveGameData();
+            
+            mixBtn.disabled = false;
+            mixBtn.style.opacity = '1';
+            slot1El.style.pointerEvents = 'all';
+            slot2El.style.pointerEvents = 'all';
+            slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
+            slot1El.classList.remove('filled');
+            slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
+            slot2El.classList.remove('filled');
+            msgEl.innerHTML = '';
+        };
+    }
+    // Если вкладка неактивна - кнопка появится при переключении через updateLabUI()
 }
 
 
