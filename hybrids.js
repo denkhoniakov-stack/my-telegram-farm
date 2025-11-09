@@ -69,6 +69,7 @@ function calculateHybridStats(crop1, crop2, PLANT_DATA, gameState) {
 let labUIInitialized = false;
 let crop1Global = null;
 let crop2Global = null;
+let mixingTimerInterval = null; 
 
 function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA) {
     const labContainer = document.getElementById('inventory-tab');
@@ -266,16 +267,34 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
 function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;
     if (!mixing) return;
+    
+    // ✅ ДОБАВЛЕНО: Очищаем предыдущий таймер, если он существует
+    if (mixingTimerInterval) {
+        clearInterval(mixingTimerInterval);
+        mixingTimerInterval = null;
+    }
+    
     const elapsed = Date.now() - mixing.startTime;
     let remainingTime = Math.max(0, Math.floor((mixing.duration - elapsed) / 1000));
-    if (remainingTime === 0) { showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El); return; }
-    msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}с</div>`;
+    
+    if (remainingTime === 0) {
+        showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
+        return;
+    }
+    
+    msgEl.innerHTML = `<div class="simple-timer" id="hybridTimer">${remainingTime}</div>`;
     const timerEl = document.getElementById('hybridTimer');
-    const timerInterval = setInterval(() => {
+    
+    // ✅ ИСПРАВЛЕНИЕ: Сохраняем ID таймера в глобальную переменную
+    mixingTimerInterval = setInterval(() => {
         remainingTime--;
-        if (timerEl) timerEl.textContent = `${remainingTime}с`;
+        if (timerEl) {
+            timerEl.textContent = remainingTime;
+        }
         if (remainingTime <= 0) {
-            clearInterval(timerInterval);
+            clearInterval(mixingTimerInterval);
+            mixingTimerInterval = null; // ✅ ДОБАВЛЕНО: очищаем переменную
+            
             if (tg.HapticFeedback && typeof tg.HapticFeedback.notificationOccurred === 'function') {
                 tg.HapticFeedback.notificationOccurred('success');
             }
@@ -284,22 +303,35 @@ function startMixingTimer(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, s
     }, 1000);
 }
 
+
 function showClaimButton(gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El) {
     const mixing = gameState.hybridMixing;
-    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} Получить ${mixing.resultName}</button>`;
+    
+    // ✅ ДОБАВЛЕНО: Очищаем таймер при показе кнопки сбора
+    if (mixingTimerInterval) {
+        clearInterval(mixingTimerInterval);
+        mixingTimerInterval = null;
+    }
+    
+    msgEl.innerHTML = `<button id="claimBtn" class="claim-hybrid-btn">${mixing.resultEmoji} ${mixing.resultName}</button>`;
     const claimBtn = document.getElementById('claimBtn');
+    
     claimBtn.onclick = () => {
         gameState.warehouse[mixing.resultEmoji] = (gameState.warehouse[mixing.resultEmoji] || 0) + 1;
         gameState.hybridMixing = null;
         saveGameData();
+        
         mixBtn.disabled = false;
         mixBtn.style.opacity = '1';
         slot1El.style.pointerEvents = 'all';
         slot2El.style.pointerEvents = 'all';
-        slot1El.innerHTML = '<span class="slot-placeholder">?</span>'; slot1El.classList.remove('filled');
-        slot2El.innerHTML = '<span class="slot-placeholder">?</span>'; slot2El.classList.remove('filled');
+        slot1El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot1El.classList.remove('filled');
+        slot2El.innerHTML = '<span class="slot-placeholder">?</span>';
+        slot2El.classList.remove('filled');
         msgEl.innerHTML = '';
         crop1Global = null;
         crop2Global = null;
     };
 }
+
