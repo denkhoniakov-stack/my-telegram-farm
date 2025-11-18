@@ -1,0 +1,308 @@
+/* --- СТИЛИ ДЛЯ МОДАЛЬНОГО ОКНА НАСТРОЕК --- */
+
+#settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#settings-modal:not(.hidden) {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.settings-content {
+  background: linear-gradient(180deg, #fff8e1 0%, #f5ecd7 100%);
+  padding: 0;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  border: 3px solid #8B5A2B;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+#settings-modal:not(.hidden) .settings-content {
+  transform: scale(1);
+}
+
+/* --- ЗАГОЛОВОК НАСТРОЕК --- */
+
+.settings-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  border-radius: 17px 17px 0 0;
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-family: 'Nunito', Arial, sans-serif;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.settings-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 35px;
+  height: 35px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.settings-close:hover {
+  background-color: #ff6b6b;
+  transform: rotate(90deg);
+}
+
+/* --- ОСНОВНОЙ КОНТЕНТ --- */
+
+.settings-body {
+  padding: 20px;
+}
+
+.settings-section {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 2px solid rgba(139, 90, 43, 0.2);
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4a2c0f;
+  margin-bottom: 12px;
+  font-family: 'Nunito', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-icon {
+  font-size: 20px;
+}
+
+/* --- ПОЛЕ ИЗМЕНЕНИЯ ИМЕНИ --- */
+
+.name-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.name-input-wrapper {
+  position: relative;
+}
+
+#name-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #c8b89a;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'Nunito', Arial, sans-serif;
+  background: white;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+#name-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#name-input.error {
+  border-color: #ff6b6b;
+}
+
+#name-input.success {
+  border-color: #4CAF50;
+}
+
+.input-counter {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #999;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.name-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.save-name-btn,
+.cancel-name-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  font-family: 'Nunito', Arial, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-name-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.save-name-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.save-name-btn:active {
+  transform: scale(0.98);
+}
+
+.save-name-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancel-name-btn {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.cancel-name-btn:hover {
+  background: #d0d0d0;
+}
+
+.cancel-name-btn:active {
+  transform: scale(0.98);
+}
+
+/* --- СООБЩЕНИЯ ОБ ОШИБКАХ И ПОДСКАЗКИ --- */
+
+.name-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.name-error {
+  font-size: 13px;
+  color: #ff6b6b;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #ff6b6b;
+  display: none;
+}
+
+.name-error.show {
+  display: block;
+}
+
+.name-success {
+  font-size: 13px;
+  color: #4CAF50;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #4CAF50;
+  display: none;
+}
+
+.name-success.show {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- ТЕКУЩЕЕ ИМЯ --- */
+
+.current-name-display {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.current-name-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.current-name-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  font-family: 'Nunito', Arial, sans-serif;
+}
+
+/* --- ДРУГИЕ СЕКЦИИ НАСТРОЕК (для будущего) --- */
+
+.settings-info {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  text-align: center;
+  padding: 10px;
+}
+
+.settings-info-icon {
+  font-size: 16px;
+  margin-right: 5px;
+}
