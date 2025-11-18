@@ -1,45 +1,131 @@
-/* --- СТИЛИ ДЛЯ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ --- */
-#user-profile {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 200;
-  gap: 5px;
+// --- МОДУЛЬ УПРАВЛЕНИЯ ПРОФИЛЕМ ПОЛЬЗОВАТЕЛЯ ---
+
+// Список случайных имен для генерации
+const RANDOM_NAMES = [
+  'Фермер', 'Садовод', 'Агроном', 'Дачник', 'Земледелец',
+  'Огородник', 'Овощевод', 'Растениевод', 'Урожайник', 'Ботаник',
+  'Сеятель', 'Пахарь', 'Жнец', 'Плантатор', 'Культиватор',
+  'Хозяин', 'Труженик', 'Посевник', 'Урожаец', 'Зеленщик'
+];
+
+// Класс для управления профилем пользователя
+class UserProfile {
+  constructor() {
+    this.userName = null;
+    this.avatarId = 'default';
+    this.userNameElement = null;
+    this.userAvatarElement = null;
+  }
+
+  // Инициализация профиля
+  initialize() {
+    // Получаем элементы DOM
+    this.userNameElement = document.getElementById('user-name');
+    this.userAvatarElement = document.getElementById('user-avatar');
+
+    // Загружаем сохраненные данные
+    this.loadProfile();
+
+    // Отображаем профиль
+    this.updateDisplay();
+
+    // Добавляем обработчик клика на аватарку (для будущего функционала)
+    this.setupEventListeners();
+  }
+
+  // Генерация случайного имени
+  generateRandomName() {
+    const randomIndex = Math.floor(Math.random() * RANDOM_NAMES.length);
+    return RANDOM_NAMES[randomIndex];
+  }
+
+  // Загрузка профиля из хранилища
+  loadProfile() {
+    // Проверяем localStorage
+    const savedName = localStorage.getItem('userName');
+    const savedAvatar = localStorage.getItem('userAvatar');
+
+    if (savedName) {
+      this.userName = savedName;
+    } else {
+      // Генерируем новое случайное имя
+      this.userName = this.generateRandomName();
+      this.saveProfile();
+    }
+
+    if (savedAvatar) {
+      this.avatarId = savedAvatar;
+    }
+  }
+
+  // Сохранение профиля в хранилище
+  saveProfile() {
+    localStorage.setItem('userName', this.userName);
+    localStorage.setItem('userAvatar', this.avatarId);
+  }
+
+  // Обновление отображения профиля
+  updateDisplay() {
+    if (this.userNameElement) {
+      this.userNameElement.innerText = this.userName;
+    }
+
+    // В будущем здесь можно будет установить картинку аватарки
+    if (this.userAvatarElement) {
+      // Пока оставляем пустым
+      this.userAvatarElement.innerHTML = '';
+    }
+  }
+
+  // Установка нового имени (для будущего функционала настроек)
+  setUserName(newName) {
+    if (newName && newName.trim().length > 0) {
+      this.userName = newName.trim();
+      this.saveProfile();
+      this.updateDisplay();
+      return true;
+    }
+    return false;
+  }
+
+  // Установка новой аватарки (для будущего функционала)
+  setAvatar(avatarId) {
+    this.avatarId = avatarId;
+    this.saveProfile();
+    this.updateDisplay();
+  }
+
+  // Настройка обработчиков событий
+  setupEventListeners() {
+    if (this.userAvatarElement) {
+      this.userAvatarElement.addEventListener('click', () => {
+        // Здесь можно будет открыть меню выбора аватарки
+        console.log('Клик по аватарке - здесь будет меню настроек');
+        // В будущем: openAvatarSettings();
+      });
+    }
+  }
+
+  // Получить текущее имя пользователя
+  getUserName() {
+    return this.userName;
+  }
+
+  // Получить текущий ID аватарки
+  getAvatarId() {
+    return this.avatarId;
+  }
 }
 
-#user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+// Создаем глобальный экземпляр профиля
+const userProfile = new UserProfile();
+
+// Функция для инициализации (вызывается из main script)
+function initializeUserProfile() {
+  userProfile.initialize();
 }
 
-#user-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
-}
-
-#user-name {
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: bold;
-  font-family: 'Nunito', Arial, sans-serif;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  max-width: 80px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+// Экспортируем для использования в других файлах
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { UserProfile, initializeUserProfile, userProfile };
 }
