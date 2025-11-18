@@ -126,6 +126,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabContents = document.querySelectorAll('.shop-tab-content');
     let activeBed = null;
 
+    // --- ГЕНЕРАТОР СЛУЧАЙНЫХ ИМЕН ---
+    const RANDOM_NAMES = [
+    'Фермер', 'Садовод', 'Агроном', 'Дачник', 'Земледелец',
+    'Огородник', 'Овощевод', 'Растениевод', 'Урожайник', 'Ботаник',
+    'Сеятель', 'Пахарь', 'Жнец', 'Плантатор', 'Культиватор'
+    ];
+
+    function generateRandomName() {
+    const randomIndex = Math.floor(Math.random() * RANDOM_NAMES.length);
+    return RANDOM_NAMES[randomIndex];
+    }
+
+    function initializeUserProfile() {
+    const userNameElement = document.getElementById('user-name');
+    
+    // Проверяем, есть ли сохраненное имя
+    let savedName = localStorage.getItem('userName');
+    
+    if (!savedName) {
+        // Если имени нет, генерируем случайное
+        savedName = generateRandomName();
+        localStorage.setItem('userName', savedName);
+    }
+    
+    userNameElement.innerText = savedName;
+    }
+
+
 
     
     // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ ---
@@ -154,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                         gameState.hybridData = loaded.hybridData || {};
+                        callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
+                        initializeUserProfile(); // ✅ ДОБАВЬТЕ ЭТУ СТРОКУ
+                        initializeSettings();
                         
                         // ✅ НОВОЕ: Загружаем множественные процессы смешивания
                         if (loaded.hybridMixings !== undefined) {
@@ -197,6 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
                     gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
                     gameState.hybridData = loaded.hybridData || {};
+                    callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
+                    initializeUserProfile(); // ✅ ДОБАВЬТЕ ЭТУ СТРОКУ
+                    initializeSettings();
                     
                     // ✅ НОВОЕ: Загружаем множественные процессы смешивания
                     if (loaded.hybridMixings !== undefined) {

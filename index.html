@@ -9,8 +9,17 @@
     <title>Моя Ферма</title>
     <!-- Новая версия для сброса кэша -->
     <link rel="stylesheet" href="style.css?v=10.0351">
+    <link rel="stylesheet" href="profile/profile.css">
+    <!-- Стили настроек -->
+    <link rel="stylesheet" href="settings/settings.css">
 </head>
 <body>
+    <!-- Аватарка пользователя -->
+    <div id="user-profile">
+    <div id="user-avatar"></div>
+    <div id="user-name">Игрок</div>
+    </div>
+
     <!-- ЭЛЕМЕНТ ДЛЯ РАЗМЫТОГО ФОНА -->
     <div class="background-overlay"></div>
 
@@ -126,7 +135,19 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Новая версия для сброса кэша -->
     <script src="hybrids.js?v=1.232"></script>
+    <!-- Скрипты профиля -->
+    <script src="profile/avatars.js"></script>
+    <script src="profile/profile.js"></script>
+    <!-- Скрипты настроек -->
+    <script src="settings/validation.js"></script>
+    <script src="settings/settings.js"></script>
+
     <script src="script.js?v=10.0121"></script>
+        
+
+    
     <button id="reset-button" style="display: none; position: fixed; bottom: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 8px; z-index: 9999;">🔄 Сброс</button>
 </body>
+
+
 </html>
