@@ -1,4 +1,4 @@
-// --- МОДУЛЬ НАСТРОЕК ---
+// --- МОДУЛЬ НАСТРОЕК (ВЕРСИЯ С ДЕЛЕГИРОВАНИЕМ) ---
 
 class SettingsManager {
     constructor() {
@@ -12,16 +12,21 @@ class SettingsManager {
 
     initialize() {
         this.createSettingsModal();
-        if (this.modal) {
-            this.setupEventListeners();
-            console.log('[SETTINGS] ✅ Модуль настроек инициализирован');
-        }
+        this.setupGlobalEventListeners(); // Используем один глобальный обработчик
+        console.log('[SETTINGS] ✅ Модуль настроек инициализирован');
     }
 
     createSettingsModal() {
+        // Если модальное окно уже есть, не создаем его заново
+        if (document.getElementById('settings-modal')) {
+            this.modal = document.getElementById('settings-modal');
+            return;
+        }
+
         const modal = document.createElement('div');
         modal.id = 'settings-modal';
         modal.className = 'modal hidden';
+        // Возвращаем оригинальную HTML структуру
         modal.innerHTML = `
             <div class="settings-content">
                 <div class="settings-header">
@@ -48,79 +53,53 @@ class SettingsManager {
         
         document.body.appendChild(modal);
         this.modal = modal;
-        
         console.log('[SETTINGS] Модальное окно создано');
     }
 
-    setupEventListeners() {
-        // Кнопка закрытия
-        const closeBtn = this.modal.querySelector('.settings-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                console.log('[SETTINGS] Закрытие настроек');
-                this.close();
-            });
-        }
+    // ГЛАВНОЕ ИЗМЕНЕНИЕ: Один обработчик для всего документа
+    setupGlobalEventListeners() {
+        document.body.addEventListener('click', (e) => {
+            // Клик по кнопке "Сохранить"
+            if (e.target.id === 'save-name-btn') {
+                e.preventDefault();
+                console.log('[SETTINGS] 🔴 Клик по кнопке СОХРАНИТЬ (через делегирование)');
+                this.saveName();
+                return;
+            }
 
-        // Закрытие по клику вне окна
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
+            // Клик по кнопке "Закрыть"
+            if (e.target.closest('.settings-close')) {
+                console.log('[SETTINGS] Клик по кнопке ЗАКРЫТЬ');
                 this.close();
+                return;
+            }
+
+            // Клик по фону модального окна
+            if (e.target.id === 'settings-modal') {
+                console.log('[SETTINGS] Клик по фону');
+                this.close();
+                return;
+            }
+        });
+
+        // Отдельный обработчик для Enter, так как он не является кликом
+        document.body.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.id === 'name-input') {
+                e.preventDefault();
+                console.log('[SETTINGS] Нажат Enter');
+                this.saveName();
             }
         });
         
-        console.log('[SETTINGS] Базовые обработчики установлены');
+        console.log('[SETTINGS] ✅ Глобальные обработчики событий установлены');
     }
 
-    // НОВЫЙ МЕТОД: Обновление ссылок на элементы
     updateElementReferences() {
         this.nameInput = document.getElementById('name-input');
         this.saveButton = document.getElementById('save-name-btn');
         this.errorMessage = this.modal.querySelector('.name-error');
         this.successMessage = this.modal.querySelector('.name-success');
         this.currentNameValue = document.getElementById('current-name-value');
-        
-        console.log('[SETTINGS] Элементы обновлены:', {
-            nameInput: !!this.nameInput,
-            saveButton: !!this.saveButton,
-            errorMessage: !!this.errorMessage,
-            successMessage: !!this.successMessage,
-            currentNameValue: !!this.currentNameValue
-        });
-    }
-
-    // НОВЫЙ МЕТОД: Установка обработчиков для кнопки сохранения
-    attachSaveButtonHandler() {
-        if (this.saveButton) {
-            // Удаляем старый обработчик (если есть)
-            const newButton = this.saveButton.cloneNode(true);
-            this.saveButton.parentNode.replaceChild(newButton, this.saveButton);
-            this.saveButton = newButton;
-            
-            // Устанавливаем новый обработчик
-            this.saveButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('[SETTINGS] 🔴 Клик по кнопке сохранения!');
-                this.saveName();
-            });
-            
-            console.log('[SETTINGS] ✅ Обработчик кнопки сохранения установлен');
-        } else {
-            console.error('[SETTINGS] ❌ Кнопка сохранения не найдена!');
-        }
-        
-        // Обработчик Enter в поле ввода
-        if (this.nameInput) {
-            this.nameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    console.log('[SETTINGS] Нажат Enter');
-                    this.saveName();
-                }
-            });
-            this.nameInput.addEventListener('input', () => this.clearMessages());
-        }
     }
 
     open() {
@@ -136,11 +115,8 @@ class SettingsManager {
         
         console.log('[SETTINGS] Открытие настроек');
         
-        // ВАЖНО: Обновляем ссылки на элементы при каждом открытии
+        // Обновляем ссылки на элементы при каждом открытии
         this.updateElementReferences();
-        
-        // ВАЖНО: Устанавливаем обработчик кнопки
-        this.attachSaveButtonHandler();
         
         // Показываем текущее имя
         const currentName = userProfile.getUserName();
@@ -157,9 +133,7 @@ class SettingsManager {
         this.modal.classList.remove('hidden');
         
         setTimeout(() => {
-            if (this.nameInput) {
-                this.nameInput.focus();
-            }
+            if (this.nameInput) this.nameInput.focus();
         }, 100);
     }
 
@@ -167,22 +141,20 @@ class SettingsManager {
         if (this.modal) {
             this.modal.classList.add('hidden');
             this.clearMessages();
-            if (this.nameInput) {
-                this.nameInput.value = '';
-            }
         }
     }
 
     async saveName() {
-        console.log('[SETTINGS] 🔵 saveName() вызван');
-        
+        // Убедимся, что ссылки на элементы актуальны
+        this.updateElementReferences();
+
         if (!this.nameInput) {
-            console.error('[SETTINGS] Поле ввода не найдено');
+            console.error('[SETTINGS] ❌ Поле ввода не найдено');
             return;
         }
 
         const newName = this.nameInput.value.trim();
-        console.log(`[SETTINGS] Введено имя: "${newName}"`);
+        console.log(`[SETTINGS] 🔵 Введено имя для сохранения: "${newName}"`);
 
         // Валидация
         if (newName.length < 2 || newName.length > 20) {
@@ -202,16 +174,8 @@ class SettingsManager {
             
             if (success) {
                 this.showSuccess('✅ Имя успешно сохранено!');
-                
-                // Обновляем отображение текущего имени
-                if (this.currentNameValue) {
-                    this.currentNameValue.textContent = newName;
-                }
-                
-                // Закрываем окно через 1.5 секунды
-                setTimeout(() => {
-                    this.close();
-                }, 1500);
+                if (this.currentNameValue) this.currentNameValue.textContent = newName;
+                setTimeout(() => this.close(), 1500);
             } else {
                 this.showError('Не удалось сохранить имя');
             }
@@ -222,36 +186,24 @@ class SettingsManager {
     }
 
     showError(message) {
-        console.log('[SETTINGS] ⚠️ Показ ошибки:', message);
         if (this.errorMessage) {
             this.errorMessage.textContent = message;
             this.errorMessage.style.display = 'block';
         }
-        if (this.successMessage) {
-            this.successMessage.style.display = 'none';
-        }
+        if (this.successMessage) this.successMessage.style.display = 'none';
     }
 
     showSuccess(message) {
-        console.log('[SETTINGS] ✅ Показ успеха:', message);
         if (this.successMessage) {
             this.successMessage.textContent = message;
             this.successMessage.style.display = 'block';
         }
-        if (this.errorMessage) {
-            this.errorMessage.style.display = 'none';
-        }
+        if (this.errorMessage) this.errorMessage.style.display = 'none';
     }
 
     clearMessages() {
-        if (this.errorMessage) {
-            this.errorMessage.style.display = 'none';
-            this.errorMessage.textContent = '';
-        }
-        if (this.successMessage) {
-            this.successMessage.style.display = 'none';
-            this.successMessage.textContent = '';
-        }
+        if (this.errorMessage) this.errorMessage.style.display = 'none';
+        if (this.successMessage) this.successMessage.style.display = 'none';
     }
 }
 
