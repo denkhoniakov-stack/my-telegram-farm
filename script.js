@@ -209,14 +209,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ШАГ 3: Инициализация модулей ПОСЛЕ загрузки данных
                 setTimeout(async () => {
                     // Инициализируем реестр имён
-                    if (typeof initializeNameRegistry === 'function') {
-                        await initializeNameRegistry();
+                    if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
+                        const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
+                        await nameRegistry.initialize(userId);
                         console.log('✅ Реестр имён загружен');
                     }
                     
-                    // Инициализируем настройки
-                    if (typeof initializeSettings === 'function') {
-                        initializeSettings();
+                    // Инициализируем настройки - ИСПРАВЛЕНО!
+                    if (typeof settingsManager !== 'undefined') {
+                        settingsManager.initialize();
+                        console.log('✅ Модуль настроек инициализирован');
                     }
                     
                     // Подключаем кнопку настроек
@@ -269,14 +271,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // ШАГ 3: Инициализация модулей ПОСЛЕ загрузки данных
             setTimeout(async () => {
                 // Инициализируем реестр имён
-                if (typeof initializeNameRegistry === 'function') {
-                    await initializeNameRegistry();
+                if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
+                    const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
+                    await nameRegistry.initialize(userId);
                     console.log('✅ Реестр имён загружен');
                 }
                 
-                // Инициализируем настройки
-                if (typeof initializeSettings === 'function') {
-                    initializeSettings();
+                // Инициализируем настройки - ИСПРАВЛЕНО!
+                if (typeof settingsManager !== 'undefined') {
+                    settingsManager.initialize();
+                    console.log('✅ Модуль настроек инициализирован');
                 }
                 
                 // Подключаем кнопку настроек
@@ -294,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
     }
+
 
 
 
