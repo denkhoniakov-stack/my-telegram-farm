@@ -47,17 +47,9 @@ class SettingsManager {
         `;
         
         document.body.appendChild(modal);
-        
-        // ВАЖНО: Получаем ссылки на элементы ПОСЛЕ добавления в DOM
         this.modal = modal;
-        this.nameInput = document.getElementById('name-input');
-        this.saveButton = document.getElementById('save-name-btn');
-        this.errorMessage = this.modal.querySelector('.name-error');
-        this.successMessage = this.modal.querySelector('.name-success');
-        this.currentNameValue = document.getElementById('current-name-value');
         
         console.log('[SETTINGS] Модальное окно создано');
-        console.log('[SETTINGS] Кнопка сохранения:', this.saveButton ? '✅ найдена' : '❌ НЕ найдена');
     }
 
     setupEventListeners() {
@@ -76,31 +68,59 @@ class SettingsManager {
                 this.close();
             }
         });
+        
+        console.log('[SETTINGS] Базовые обработчики установлены');
+    }
 
-        // ГЛАВНОЕ ИСПРАВЛЕНИЕ: Кнопка сохранения с проверкой
+    // НОВЫЙ МЕТОД: Обновление ссылок на элементы
+    updateElementReferences() {
+        this.nameInput = document.getElementById('name-input');
+        this.saveButton = document.getElementById('save-name-btn');
+        this.errorMessage = this.modal.querySelector('.name-error');
+        this.successMessage = this.modal.querySelector('.name-success');
+        this.currentNameValue = document.getElementById('current-name-value');
+        
+        console.log('[SETTINGS] Элементы обновлены:', {
+            nameInput: !!this.nameInput,
+            saveButton: !!this.saveButton,
+            errorMessage: !!this.errorMessage,
+            successMessage: !!this.successMessage,
+            currentNameValue: !!this.currentNameValue
+        });
+    }
+
+    // НОВЫЙ МЕТОД: Установка обработчиков для кнопки сохранения
+    attachSaveButtonHandler() {
         if (this.saveButton) {
+            // Удаляем старый обработчик (если есть)
+            const newButton = this.saveButton.cloneNode(true);
+            this.saveButton.parentNode.replaceChild(newButton, this.saveButton);
+            this.saveButton = newButton;
+            
+            // Устанавливаем новый обработчик
             this.saveButton.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('[SETTINGS] 🔴 Клик по кнопке сохранения!');
                 this.saveName();
             });
+            
             console.log('[SETTINGS] ✅ Обработчик кнопки сохранения установлен');
         } else {
             console.error('[SETTINGS] ❌ Кнопка сохранения не найдена!');
         }
-
-        // Сохранение по Enter
+        
+        // Обработчик Enter в поле ввода
         if (this.nameInput) {
             this.nameInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
+                    e.preventDefault();
                     console.log('[SETTINGS] Нажат Enter');
                     this.saveName();
                 }
             });
             this.nameInput.addEventListener('input', () => this.clearMessages());
         }
-        
-        console.log('[SETTINGS] Все обработчики событий установлены');
     }
 
     open() {
@@ -115,6 +135,12 @@ class SettingsManager {
         }
         
         console.log('[SETTINGS] Открытие настроек');
+        
+        // ВАЖНО: Обновляем ссылки на элементы при каждом открытии
+        this.updateElementReferences();
+        
+        // ВАЖНО: Устанавливаем обработчик кнопки
+        this.attachSaveButtonHandler();
         
         // Показываем текущее имя
         const currentName = userProfile.getUserName();
