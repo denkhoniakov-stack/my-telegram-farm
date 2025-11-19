@@ -15,9 +15,24 @@ class SettingsManager {
 
   // Инициализация модуля настроек
   initialize() {
-    this.createSettingsModal();
-    this.setupEventListeners();
+      console.log('🔧 Инициализация модуля настроек...');
+      
+      try {
+          this.createSettingsModal();
+          
+          // Проверяем ПОСЛЕ создания
+          if (this.modal) {
+              console.log('✅ Модальное окно создано');
+              this.setupEventListeners();
+              console.log('✅ Обработчики событий подключены');
+          } else {
+              console.error('❌ Ошибка: модальное окно не создалось (this.modal = null)');
+          }
+      } catch (error) {
+          console.error('❌ Ошибка при инициализации настроек:', error);
+      }
   }
+
 
   // Создание HTML-структуры модального окна
   createSettingsModal() {
@@ -72,10 +87,7 @@ class SettingsManager {
           </div>
           
           <!-- Можно добавить другие секции настроек -->
-          <div class="settings-info">
-            <span class="settings-info-icon">ℹ️</span>
-            В будущем здесь появятся дополнительные настройки
-          </div>
+          
         </div>
       </div>
     `;
@@ -95,7 +107,7 @@ class SettingsManager {
 
   // Настройка обработчиков событий
   setupEventListeners() {
-    // Закрытие модального окна
+  // Закрытие модального окна
     const closeButton = this.modal.querySelector('.settings-close');
     closeButton.addEventListener('click', () => this.close());
 
@@ -130,13 +142,8 @@ class SettingsManager {
       }
     });
 
-    // Обработчик кнопки настроек в навигации
-    const settingsButton = document.getElementById('nav-settings');
-    if (settingsButton) {
-      settingsButton.addEventListener('click', () => {
-        this.open();
-      });
-    }
+    
+
   }
 
   // Открытие модального окна
@@ -206,41 +213,86 @@ class SettingsManager {
   }
 
   // Сохранение нового имени
-  saveName() {
-    const value = this.nameInput.value;
-    
-    // Валидация
-    const result = nameValidator.validate(value);
-    
-    if (!result.valid) {
-      this.errorMessage.textContent = result.errors[0];
-      this.errorMessage.classList.add('show');
-      this.nameInput.classList.add('error');
-      return;
-    }
-
-    // Очищенное имя
-    const cleanName = result.cleanName;
-
-    // Сохраняем через профиль пользователя
-    if (typeof userProfile !== 'undefined') {
-      const success = userProfile.setUserName(cleanName);
+  async saveName() {
+      const value = this.nameInput.value;
+      const result = nameValidator.validate(value);
       
-      if (success) {
-        // Показываем успешное сообщение
-        this.successMessage.classList.add('show');
-        this.errorMessage.classList.remove('show');
-        this.nameInput.classList.remove('error');
-        this.nameInput.classList.add('success');
-        this.currentNameValue.textContent = cleanName;
-
-        // Закрываем модальное окно через 1 секунду
-        setTimeout(() => {
-          this.close();
-        }, 1000);
+      if (!result.valid) {
+          this.errorMessage.textContent = result.errors[0];
+          this.errorMessage.classList.add('show');
+          this.nameInput.classList.add('error');
+          return;
       }
-    }
+      
+      const cleanName = result.cleanName;
+      
+      // Проверка на совпадение с текущим именем
+      if (typeof userProfile !== 'undefined') {
+          const currentName = userProfile.getUserName();
+          if (cleanName === currentName) {
+              this.errorMessage.textContent = '⚠️ Вы уже используете это имя!';
+              this.errorMessage.classList.add('show');
+              this.nameInput.classList.add('error');
+              return;
+          }
+      }
+      
+      // Проверка уникальности среди всех пользователей
+      if (typeof nameRegistry !== 'undefined' && nameRegistry.isNameTaken(cleanName)) {
+          this.errorMessage.textContent = '❌ Имя "' + cleanName + '" уже занято!';
+          this.errorMessage.classList.add('show');
+          this.nameInput.classList.add('error');
+          return;
+      }
+      
+      // Блокируем кнопку
+      this.saveButton.disabled = true;
+      const originalText = this.saveButton.textContent;
+      this.saveButton.textContent = 'Сохранение...';
+      
+      try {
+          // Регистрируем имя в глобальном реестре
+          if (typeof nameRegistry !== 'undefined') {
+              const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
+              await nameRegistry.registerName(cleanName, userId);
+          }
+          
+          // Сохраняем в профиль
+          if (typeof userProfile !== 'undefined') {
+              const success = userProfile.setUserName(cleanName);
+              
+              if (success) {
+                  this.successMessage.textContent = '✅ Сохранено!';
+                  this.successMessage.classList.add('show');
+                  this.errorMessage.classList.remove('show');
+                  this.nameInput.classList.remove('error');
+                  this.nameInput.classList.add('success');
+                  this.currentNameValue.textContent = cleanName;
+                  this.nameInput.value = '';
+                  this.updateCounter();
+                  
+                  // Убираем сообщение об успехе через 2 секунды
+                  setTimeout(() => {
+                      this.successMessage.classList.remove('show');
+                      this.nameInput.classList.remove('success');
+                  }, 2000);
+                  
+                  // НЕ ЗАКРЫВАЕМ ОКНО - удалена строка this.close()
+              } else {
+                  this.errorMessage.textContent = '❌ Ошибка сохранения';
+                  this.errorMessage.classList.add('show');
+              }
+          }
+      } catch (error) {
+          console.error('Ошибка:', error);
+          this.errorMessage.textContent = '❌ Ошибка';
+          this.errorMessage.classList.add('show');
+      } finally {
+          this.saveButton.disabled = false;
+          this.saveButton.textContent = originalText;
+      }
   }
+
 }
 
 // Создаем глобальный экземпляр менеджера настроек
