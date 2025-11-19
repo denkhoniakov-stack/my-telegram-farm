@@ -239,7 +239,7 @@ class SettingsManager {
           }
       }
       
-      // Проверка уникальности среди всех пользователей
+      // Проверка уникальности
       if (typeof nameRegistry !== 'undefined' && nameRegistry.isNameTaken(cleanName)) {
           this.errorMessage.textContent = '❌ Имя "' + cleanName + '" уже занято!';
           this.errorMessage.classList.add('show');
@@ -253,15 +253,15 @@ class SettingsManager {
       this.saveButton.textContent = 'Сохранение...';
       
       try {
-          // Регистрируем имя в глобальном реестре
+          // Регистрация имени в реестре
           if (typeof nameRegistry !== 'undefined') {
               const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
-              await nameRegistry.registerName(cleanName, userId);
+              await nameRegistry.registerName(cleanName, userId); // ← await обязателен!
           }
           
-          // Сохраняем в профиль
+          // Сохранение в профиль
           if (typeof userProfile !== 'undefined') {
-              const success = userProfile.setUserName(cleanName);
+              const success = await userProfile.setUserName(cleanName); // ← await обязателен!
               
               if (success) {
                   this.successMessage.textContent = '✅ Сохранено!';
@@ -273,27 +273,26 @@ class SettingsManager {
                   this.nameInput.value = '';
                   this.updateCounter();
                   
-                  // Убираем сообщение об успехе через 2 секунды
+                  // Убираем сообщение через 2 секунды
                   setTimeout(() => {
                       this.successMessage.classList.remove('show');
                       this.nameInput.classList.remove('success');
                   }, 2000);
-                  
-                  // НЕ ЗАКРЫВАЕМ ОКНО - удалена строка this.close()
               } else {
                   this.errorMessage.textContent = '❌ Ошибка сохранения';
                   this.errorMessage.classList.add('show');
               }
           }
       } catch (error) {
-          console.error('Ошибка:', error);
-          this.errorMessage.textContent = '❌ Ошибка';
+          console.error('❌ Ошибка:', error);
+          this.errorMessage.textContent = '❌ Ошибка: ' + error.message;
           this.errorMessage.classList.add('show');
       } finally {
           this.saveButton.disabled = false;
           this.saveButton.textContent = originalText;
       }
   }
+
 
 }
 
