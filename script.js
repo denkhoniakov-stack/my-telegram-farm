@@ -1015,35 +1015,28 @@ if (isAdmin) {
 }
 });
 
-// ========== ИНИЦИАЛИЗАЦИЯ МОДУЛЕЙ ==========
-// Добавьте этот код в самый конец script.js
 
-// Дожидаемся полной загрузки DOM
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ DOM загружен');
-    
-    // Принудительная инициализация настроек через 2 секунды
-    setTimeout(() => {
-        console.log('⏰ Запуск инициализации настроек...');
-        
-        if (typeof initializeSettings === 'function') {
-            initializeSettings();
-        } else {
-            console.error('❌ initializeSettings не найдена!');
-        }
-        
-        // Подключаем кнопку
-        setTimeout(() => {
-            const btn = document.getElementById('nav-settings');
-            if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
-                btn.onclick = function() {
-                    console.log('🎯 Клик!');
-                    settingsManager.open();
-                };
-                console.log('✅ Кнопка настроек подключена!');
-            } else {
-                console.warn('⚠️ Кнопка или settingsManager не готовы');
-            }
-        }, 1000);
-    }, 2000);
-});
+// ✅ ИСПРАВЛЕННЫЙ КОД
+setTimeout(() => {
+  console.log('Попытка инициализации настроек...');
+  
+  if (typeof settingsManager !== 'undefined' && typeof settingsManager.initialize === 'function') {
+    settingsManager.initialize();  // ← ПРАВИЛЬНЫЙ ВЫЗОВ
+    console.log('✅ settingsManager инициализирован');
+  } else {
+    console.error('settingsManager не найден!');
+  }
+  
+  setTimeout(() => {
+    const btn = document.getElementById('nav-settings');
+    if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
+      btn.onclick = function() {
+        console.log('Клик по кнопке настроек!');
+        settingsManager.open();
+      };
+      console.log('Кнопка настроек подключена!');
+    } else {
+      console.warn('Кнопка или settingsManager не готовы');
+    }
+  }, 1000);
+}, 2000);
