@@ -167,13 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
     async function loadGameData(callback) {
-        console.log('[LOADER] 1. Начало загрузки...');
-
-        // ШАГ 1: Асинхронно загружаем профиль пользователя
+        // ШАГ 1: ЕДИНСТВЕННОЕ ДОБАВЛЕНИЕ - загружаем профиль ПЕРВЫМ
         await userProfile.initialize();
-        console.log('[LOADER] 2. Профиль пользователя загружен. Имя:', userProfile.getUserName());
-
-        // ШАГ 2: Загружаем основное состояние игры (farmGame)
+        console.log('[PROFILE] Профиль загружен. Имя:', userProfile.getUserName());
+        
+        // ШАГ 2: ВСЯ ОРИГИНАЛЬНАЯ ЛОГИКА ЗАГРУЗКИ ИГРЫ (БЕЗ ИЗМЕНЕНИЙ!)
         if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
             tg.CloudStorage.getItem('farmGame', (err, data) => {
                 if (!err && data) {
@@ -205,23 +203,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 callback();
-                
-                // ШАГ 3: Инициализация модулей ПОСЛЕ загрузки данных
+
                 setTimeout(async () => {
-                    // Инициализируем реестр имён
+                    // Инициализация реестра имён
                     if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
                         const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
                         await nameRegistry.initialize(userId);
                         console.log('✅ Реестр имён загружен');
                     }
                     
-                    // Инициализируем настройки - ИСПРАВЛЕНО!
+                    // Инициализация настроек
                     if (typeof settingsManager !== 'undefined') {
                         settingsManager.initialize();
-                        console.log('✅ Модуль настроек инициализирован');
                     }
                     
-                    // Подключаем кнопку настроек
                     setTimeout(() => {
                         const btn = document.getElementById('nav-settings');
                         if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
@@ -236,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500);
             });
         } else {
-            // localStorage
             const data = localStorage.getItem('farmGame');
             if (data) {
                 try {
@@ -267,23 +261,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             callback();
-            
-            // ШАГ 3: Инициализация модулей ПОСЛЕ загрузки данных
+
             setTimeout(async () => {
-                // Инициализируем реестр имён
+                // Инициализация реестра имён
                 if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
                     const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
                     await nameRegistry.initialize(userId);
                     console.log('✅ Реестр имён загружен');
                 }
                 
-                // Инициализируем настройки - ИСПРАВЛЕНО!
+                // Инициализация настроек
                 if (typeof settingsManager !== 'undefined') {
                     settingsManager.initialize();
-                    console.log('✅ Модуль настроек инициализирован');
                 }
                 
-                // Подключаем кнопку настроек
                 setTimeout(() => {
                     const btn = document.getElementById('nav-settings');
                     if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
@@ -298,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
     }
+
 
 
 
