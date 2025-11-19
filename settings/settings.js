@@ -46,7 +46,6 @@ class SettingsManager {
         `;
         document.body.appendChild(modal);
         
-        // Кэшируем элементы
         this.modal = modal;
         this.nameInput = document.getElementById('name-input');
         this.saveButton = document.getElementById('save-name-btn');
@@ -90,7 +89,6 @@ class SettingsManager {
         console.log('[SETTINGS] Начинаем сохранение...');
         const newName = this.nameInput.value.trim();
         
-        // 1. Валидация
         if (!newName) {
             this.showError('Имя не может быть пустым.');
             return;
@@ -100,22 +98,17 @@ class SettingsManager {
             return;
         }
         
-        // 2. Блокировка UI
         this.saveButton.disabled = true;
         this.saveButton.textContent = 'Сохранение...';
         this.clearMessages();
 
         try {
-            // 3. Асинхронное сохранение
             const success = await userProfile.setUserName(newName);
 
             if (success) {
-                // 4. Успех
-                console.log('[SETTINGS] Имя успешно сохранено и синхронизировано.');
+                console.log('[SETTINGS] Имя успешно сохранено.');
                 this.showSuccess('✅ Сохранено!');
                 this.currentNameValue.textContent = newName;
-                
-                // Обновляем имя на главном экране
                 userProfile.updateDisplay(); 
                 
                 setTimeout(() => {
@@ -127,11 +120,9 @@ class SettingsManager {
             }
 
         } catch (error) {
-            // 5. Ошибка
-            console.error('❌ [SETTINGS] Ошибка при сохранении имени:', error);
-            this.showError('Не удалось сохранить. Попробуйте снова.');
+            console.error('❌ [SETTINGS] Ошибка:', error);
+            this.showError('Не удалось сохранить.');
         } finally {
-            // 6. Разблокировка UI
             this.saveButton.disabled = false;
             this.saveButton.textContent = 'Сохранить';
         }
