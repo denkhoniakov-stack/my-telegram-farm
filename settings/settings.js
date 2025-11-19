@@ -107,44 +107,46 @@ class SettingsManager {
 
   // Настройка обработчиков событий
   setupEventListeners() {
-  // Закрытие модального окна
-    const closeButton = this.modal.querySelector('.settings-close');
-    closeButton.addEventListener('click', () => this.close());
+      // Кнопка закрытия
+      const closeButton = this.modal.querySelector('.settings-close');
+      closeButton.addEventListener('click', () => {
+          this.close();
+      });
 
-    // Закрытие по клику вне модального окна
-    this.modal.addEventListener('click', (e) => {
-      if (e.target === this.modal) {
-        this.close();
-      }
-    });
+      // Закрытие по клику на фон
+      this.modal.addEventListener('click', (e) => {
+          if (e.target === this.modal) {
+              this.close();
+          }
+      });
 
-    // Кнопка отмены
-    this.cancelButton.addEventListener('click', () => {
-      this.resetForm();
-      this.close();
-    });
+      // Кнопка отмены
+      this.cancelButton.addEventListener('click', () => {
+          this.resetForm();
+          this.close();
+      });
 
-    // Кнопка сохранения
-    this.saveButton.addEventListener('click', () => {
-      this.saveName();
-    });
+      // Кнопка сохранения - ИСПРАВЛЕНО!
+      this.saveButton.addEventListener('click', () => {
+          console.log('🎯 Клик по кнопке Сохранить');
+          this.saveName(); // ← Стрелочная функция сохраняет this!
+      });
 
-    // Валидация при вводе
-    this.nameInput.addEventListener('input', () => {
-      this.validateInput();
-      this.updateCounter();
-    });
+      // Валидация при вводе
+      this.nameInput.addEventListener('input', () => {
+          this.validateInput();
+          this.updateCounter();
+      });
 
-    // Сохранение по Enter
-    this.nameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.saveName();
-      }
-    });
-
-    
-
+      // Сохранение по Enter
+      this.nameInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !this.saveButton.disabled) {
+              console.log('⌨️ Нажат Enter');
+              this.saveName();
+          }
+      });
   }
+
 
   // Открытие модального окна
   open() {
