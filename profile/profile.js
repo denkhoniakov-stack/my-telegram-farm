@@ -35,17 +35,21 @@ class UserProfile {
       // Проверяем, доступен ли Telegram CloudStorage
       if (typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
           // Загружаем из CloudStorage
+          console.log('🔍 Загрузка из CloudStorage...');
           tg.CloudStorage.getItem('userName', (err, savedName) => {
               if (!err && savedName) {
                   this.userName = savedName;
                   console.log('✅ Имя загружено из CloudStorage:', savedName);
               } else {
                   this.userName = this.generateRandomName();
+                  console.log('📝 Сгенерировано случайное имя:', this.userName);
                   this.saveProfile();
               }
               
-              // Обновляем отображение после загрузки
-              setTimeout(() => this.updateDisplay(), 200);
+              // Обновляем отображение ПОСЛЕ загрузки
+              setTimeout(() => {
+                  this.updateDisplay();
+              }, 300);
           });
           
           tg.CloudStorage.getItem('userAvatar', (err, savedAvatar) => {
@@ -55,6 +59,7 @@ class UserProfile {
           });
       } else {
           // Fallback на localStorage
+          console.log('🔍 Загрузка из localStorage...');
           const savedName = localStorage.getItem('userName');
           const savedAvatar = localStorage.getItem('userAvatar');
 
@@ -63,6 +68,7 @@ class UserProfile {
               console.log('✅ Имя загружено из localStorage:', savedName);
           } else {
               this.userName = this.generateRandomName();
+              console.log('📝 Сгенерировано случайное имя:', this.userName);
               this.saveProfile();
           }
 
@@ -71,6 +77,7 @@ class UserProfile {
           }
       }
   }
+
 
 
   async saveProfile() {
