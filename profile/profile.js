@@ -16,12 +16,19 @@ class UserProfile {
     async initialize() {
         console.log('[PROFILE] 1. Начало инициализации профиля...');
         
+        // ✅ ЖДЁМ ИНИЦИАЛИЗАЦИИ CloudStorage (для Telegram Desktop)
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         const isCloud = typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function';
+        
+        console.log('[PROFILE] CloudStorage доступен?', isCloud);
+        console.log('[PROFILE] tg объект:', typeof tg);
+        console.log('[PROFILE] tg.CloudStorage:', typeof tg?.CloudStorage);
         
         try {
             if (isCloud) {
-                // === TELEGRAM CLOUD STORAGE (СИНХРОНИЗИРОВАННЫЙ) ===
-                console.log('[PROFILE] Используется CloudStorage');
+                // === TELEGRAM CLOUD STORAGE ===
+                console.log('[PROFILE] ✅ Используется CloudStorage');
                 
                 this.userName = await this.getItemFromCloud('userName');
                 this.avatarId = await this.getItemFromCloud('userAvatar') || 'default';
@@ -36,16 +43,10 @@ class UserProfile {
                     console.log('[PROFILE] 4. Сохранено в CloudStorage');
                 }
                 
-                // ОЧИЩАЕМ СТАРЫЕ ДАННЫЕ ИЗ localStorage (однократно)
-                if (localStorage.getItem('userName')) {
-                    console.warn('[PROFILE] Найдены старые данные в localStorage. Удаляем...');
-                    localStorage.removeItem('userName');
-                    localStorage.removeItem('userAvatar');
-                }
-                
             } else {
-                // === ЛОКАЛЬНАЯ РАЗРАБОТКА (localStorage) ===
-                console.warn('[PROFILE] CloudStorage недоступен. Используется localStorage.');
+                // === FALLBACK (НЕ ДОЛЖНО ПРОИСХОДИТЬ В TELEGRAM!) ===
+                console.error('[PROFILE] ⚠️ CloudStorage НЕДОСТУПЕН! Это не должно происходить в Telegram!');
+                console.error('[PROFILE] Проверьте версию Telegram Desktop');
                 
                 this.userName = localStorage.getItem('userName');
                 this.avatarId = localStorage.getItem('userAvatar') || 'default';
@@ -54,7 +55,7 @@ class UserProfile {
                 
                 if (!this.userName) {
                     this.userName = this.generateRandomName();
-                    this.saveProfile();
+                    localStorage.setItem('userName', this.userName);
                 }
             }
 
@@ -68,6 +69,7 @@ class UserProfile {
             this.updateDisplay();
         }
     }
+
 
     
     async setUserName(newName) {
