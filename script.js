@@ -197,122 +197,86 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
-    function loadGameData(callback) {
-        if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
-            tg.CloudStorage.getItem('farmGame', (err, data) => {
-                if (!err && data) {
+    async function loadGameData(callback) {
+        console.log('[LOADER] 1. Начало загрузки...');
+
+        // ШАГ 1: Асинхронно загружаем профиль пользователя и ЖДЕМ завершения
+        // Это гарантирует, что имя будет одинаковым ДО загрузки всего остального
+        await userProfile.initialize();
+        console.log('[LOADER] 2. Профиль пользователя загружен. Имя:', userProfile.getUserName());
+
+        // ШАГ 2: Загружаем основное состояние игры (farmGame)
+        const loadGameState = () => new Promise((resolve) => {
+            const isCloud = typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function';
+            
+            if (isCloud) {
+                tg.CloudStorage.getItem('farmGame', (err, data) => {
+                    if (!err && data) {
+                        try {
+                            const loaded = JSON.parse(data);
+                            Object.assign(gameState, loaded); // Копируем все свойства
+                            console.log('[LOADER] 3. Сохранения игры (farmGame) загружены из CloudStorage.');
+                        } catch (e) {
+                            console.error('Ошибка парсинга farmGame из CloudStorage:', e);
+                        }
+                    } else {
+                        console.log('[LOADER] 3. Сохранения farmGame в CloudStorage не найдены.');
+                    }
+                    resolve();
+                });
+            } else {
+                const data = localStorage.getItem('farmGame');
+                if (data) {
                     try {
                         const loaded = JSON.parse(data);
-                        gameState.balance = loaded.balance || 100;
-                        gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
-                        gameState.warehouse = loaded.warehouse || {};
-                        gameState.items = loaded.items || {};
-                        gameState.garden = loaded.garden || {};
-                        gameState.unlockedBeds = loaded.unlockedBeds || 3;
-                        gameState.discoveredHybrids = loaded.discoveredHybrids || [];
-                        gameState.hybridData = loaded.hybridData || {};
-
-                        if (loaded.hybridMixings !== undefined) {
-                            gameState.hybridMixings = loaded.hybridMixings;
-                        } else {
-                            gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
-                        }
-
-                        if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
-                            gameState.hybridMixings.epic = loaded.hybridMixing;
-                        }
+                        Object.assign(gameState, loaded);
+                        console.log('[LOADER] 3. Сохранения игры (farmGame) загружены из localStorage.');
                     } catch (e) {
-                        console.error('Ошибка:', e);
+                        console.error('Ошибка парсинга farmGame из localStorage:', e);
                     }
                 } else {
-                    gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
+                    console.log('[LOADER] 3. Сохранения farmGame в localStorage не найдены.');
                 }
-                
-                callback();
-                initializeUserProfile();
-
-                setTimeout(async () => {
-                    // ← ДОБАВИЛИ ИНИЦИАЛИЗАЦИЮ РЕЕСТРА ИМЁН
-                    if (typeof initializeNameRegistry === 'function') {
-                        await initializeNameRegistry();
-                        console.log('✅ Реестр имён загружен');
-                    }
-                    
-                    if (typeof initializeSettings === 'function') {
-                        initializeSettings();
-                    }
-                    
-                    setTimeout(() => {
-                        const btn = document.getElementById('nav-settings');
-                        if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
-                            btn.addEventListener('click', function() {
-                                settingsManager.open();
-                            });
-                            console.log('✅ Кнопка настроек подключена (CloudStorage)');
-                        } else {
-                            console.warn('⚠️ Кнопка или settingsManager не найдены');
-                        }
-                    }, 1000);
-                }, 500);
-            });
-        } else {
-            const data = localStorage.getItem('farmGame');
-            if (data) {
-                try {
-                    const loaded = JSON.parse(data);
-                    gameState.balance = loaded.balance || 100;
-                    gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
-                    gameState.warehouse = loaded.warehouse || {};
-                    gameState.items = loaded.items || {};
-                    gameState.garden = loaded.garden || {};
-                    gameState.unlockedBeds = loaded.unlockedBeds || 3;
-                    gameState.discoveredHybrids = loaded.discoveredHybrids || [];
-                    gameState.hybridData = loaded.hybridData || {};
-
-                    if (loaded.hybridMixings !== undefined) {
-                        gameState.hybridMixings = loaded.hybridMixings;
-                    } else {
-                        gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
-                    }
-
-                    if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
-                        gameState.hybridMixings.epic = loaded.hybridMixing;
-                    }
-                } catch (e) {
-                    console.error('Ошибка:', e);
-                }
-            } else {
-                gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
+                resolve();
             }
-            
-            callback();
-            initializeUserProfile();
+        });
 
-            setTimeout(async () => {
-                // ← ДОБАВИЛИ ИНИЦИАЛИЗАЦИЮ РЕЕСТРА ИМЁН
-                if (typeof initializeNameRegistry === 'function') {
-                    await initializeNameRegistry();
-                    console.log('✅ Реестр имён загружен');
-                }
-                
-                if (typeof initializeSettings === 'function') {
-                    initializeSettings();
-                }
-                
-                setTimeout(() => {
-                    const btn = document.getElementById('nav-settings');
-                    if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
-                        btn.addEventListener('click', function() {
-                            settingsManager.open();
-                        });
-                        console.log('✅ Кнопка настроек подключена (localStorage)');
-                    } else {
-                        console.warn('⚠️ Кнопка или settingsManager не найдены');
-                    }
-                }, 1000);
-            }, 500);
+        await loadGameState();
+
+        // ШАГ 3: Теперь, когда все данные загружены, инициализируем UI
+        console.log('[LOADER] 4. Все данные загружены, инициализируем UI...');
+        
+        // Инициализируем модуль настроек
+        if (typeof initializeSettings === 'function') {
+            initializeSettings();
         }
+        
+        // Инициализируем реестр имен (если он используется)
+        if (typeof initializeNameRegistry === 'function') {
+            await initializeNameRegistry();
+        }
+        
+        // Подключаем кнопку настроек
+        const settingsButton = document.getElementById('nav-settings');
+        if (settingsButton) {
+            settingsButton.addEventListener('click', () => {
+                if (userProfile.isInitialized) {
+                    settingsManager.open();
+                } else {
+                    alert('Профиль еще загружается, подождите...');
+                }
+            });
+            console.log("[LOADER] 5. Кнопка настроек подключена.");
+        }
+        
+        // ШАГ 4: Вызываем финальный callback, который отрисовывает игру
+        if (typeof callback === 'function') {
+            callback();
+        }
+
+        console.log("🚀 [LOADER] Приложение полностью готово!");
     }
+
 
 
 
