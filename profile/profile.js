@@ -1,6 +1,5 @@
 // --- МОДУЛЬ УПРАВЛЕНИЯ ПРОФИЛЕМ ПОЛЬЗОВАТЕЛЯ ---
 
-// Список случайных имен для генерации
 const RANDOM_NAMES = [
   'Фермер', 'Садовод', 'Агроном', 'Дачник', 'Земледелец',
   'Огородник', 'Овощевод', 'Растениевод', 'Урожайник', 'Ботаник',
@@ -8,7 +7,6 @@ const RANDOM_NAMES = [
   'Хозяин', 'Труженик', 'Посевник', 'Урожаец', 'Зеленщик'
 ];
 
-// Класс для управления профилем пользователя
 class UserProfile {
   constructor() {
     this.userName = null;
@@ -17,38 +15,30 @@ class UserProfile {
     this.userAvatarElement = null;
   }
 
-  // Инициализация профиля
   initialize() {
-    // Получаем элементы DOM
-    this.userNameElement = document.getElementById('user-name');
-    this.userAvatarElement = document.getElementById('user-avatar');
-
-    // Загружаем сохраненные данные
     this.loadProfile();
-
-    // Отображаем профиль
-    this.updateDisplay();
-
-    // Добавляем обработчик клика на аватарку (для будущего функционала)
-    this.setupEventListeners();
+    
+    // Ждём, пока DOM загрузится
+    setTimeout(() => {
+      this.userNameElement = document.getElementById('user-name');
+      this.userAvatarElement = document.getElementById('user-avatar');
+      this.updateDisplay();
+      this.setupEventListeners();
+    }, 100);
   }
 
-  // Генерация случайного имени
   generateRandomName() {
     const randomIndex = Math.floor(Math.random() * RANDOM_NAMES.length);
     return RANDOM_NAMES[randomIndex];
   }
 
-  // Загрузка профиля из хранилища
   loadProfile() {
-    // Проверяем localStorage
     const savedName = localStorage.getItem('userName');
     const savedAvatar = localStorage.getItem('userAvatar');
 
     if (savedName) {
       this.userName = savedName;
     } else {
-      // Генерируем новое случайное имя
       this.userName = this.generateRandomName();
       this.saveProfile();
     }
@@ -58,74 +48,80 @@ class UserProfile {
     }
   }
 
-  // Сохранение профиля в хранилище
   saveProfile() {
     localStorage.setItem('userName', this.userName);
     localStorage.setItem('userAvatar', this.avatarId);
   }
 
-  // Обновление отображения профиля
   updateDisplay() {
+    // Проверяем элемент заново на случай, если его ещё нет
+    if (!this.userNameElement) {
+      this.userNameElement = document.getElementById('user-name');
+    }
+    
     if (this.userNameElement) {
       this.userNameElement.innerText = this.userName;
+      this.userNameElement.textContent = this.userName;
+      console.log('✅ Имя обновлено на экране:', this.userName);
+    } else {
+      console.warn('⚠️ Элемент user-name не найден, повторная попытка...');
+      // Пробуем ещё раз через 500мс
+      setTimeout(() => {
+        this.userNameElement = document.getElementById('user-name');
+        if (this.userNameElement) {
+          this.userNameElement.innerText = this.userName;
+          this.userNameElement.textContent = this.userName;
+        }
+      }, 500);
     }
-
-    // В будущем здесь можно будет установить картинку аватарки
+    
     if (this.userAvatarElement) {
-      // Пока оставляем пустым
       this.userAvatarElement.innerHTML = '';
     }
   }
 
-  // Установка нового имени (для будущего функционала настроек)
   setUserName(newName) {
     if (newName && newName.trim().length > 0) {
       this.userName = newName.trim();
       this.saveProfile();
-      this.updateDisplay();
+      this.updateDisplay(); // ← Обновляем отображение
+      console.log('✅ Имя успешно изменено на:', this.userName);
       return true;
     }
     return false;
   }
 
-  // Установка новой аватарки (для будущего функционала)
   setAvatar(avatarId) {
     this.avatarId = avatarId;
     this.saveProfile();
     this.updateDisplay();
   }
 
-  // Настройка обработчиков событий
   setupEventListeners() {
     if (this.userAvatarElement) {
       this.userAvatarElement.addEventListener('click', () => {
-        // Здесь можно будет открыть меню выбора аватарки
-        console.log('Клик по аватарке - здесь будет меню настроек');
-        // В будущем: openAvatarSettings();
+        console.log('Клик по аватарке');
+        // Здесь в будущем будет открытие выбора аватарки
+        // openAvatarSettings();
       });
     }
   }
 
-  // Получить текущее имя пользователя
   getUserName() {
     return this.userName;
   }
 
-  // Получить текущий ID аватарки
   getAvatarId() {
     return this.avatarId;
   }
 }
 
-// Создаем глобальный экземпляр профиля
 const userProfile = new UserProfile();
 
-// Функция для инициализации (вызывается из main script)
 function initializeUserProfile() {
   userProfile.initialize();
 }
 
-// Экспортируем для использования в других файлах
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { UserProfile, initializeUserProfile, userProfile };
 }
