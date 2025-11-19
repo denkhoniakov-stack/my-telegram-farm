@@ -167,83 +167,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
     function loadGameData(callback) {
-    // Проверяем, доступен ли CloudStorage
         if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
-            // Используем Telegram Cloud Storage
             tg.CloudStorage.getItem('farmGame', (err, data) => {
                 if (!err && data) {
                     try {
                         const loaded = JSON.parse(data);
                         gameState.balance = loaded.balance || 100;
-                        gameState.seedInventory = loaded.seedInventory || { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 };
+                        gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                         gameState.warehouse = loaded.warehouse || {};
                         gameState.items = loaded.items || {};
-                        gameState.garden = loaded.garden || [];
+                        gameState.garden = loaded.garden || {};
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                         gameState.hybridData = loaded.hybridData || {};
-                        callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
-                        initializeUserProfile(); // ✅ ДОБАВЬТЕ ЭТУ СТРОКУ
-                        initializeSettings();
-                        
-                        // ✅ НОВОЕ: Загружаем множественные процессы смешивания
+
                         if (loaded.hybridMixings !== undefined) {
                             gameState.hybridMixings = loaded.hybridMixings;
                         } else {
-                            gameState.hybridMixings = {
-                                epic: null,
-                                legendary: null,
-                                mythic: null
-                            };
+                            gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
                         }
-                        
-                        // ✅ МИГРАЦИЯ: Конвертируем старый формат в новый
+
                         if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
                             gameState.hybridMixings.epic = loaded.hybridMixing;
                         }
                     } catch (e) {
-                        console.error('Ошибка загрузки:', e);
+                        console.error('Ошибка:', e);
                     }
                 } else {
-                    // Инициализация если данных нет
-                    gameState.hybridMixings = {
-                        epic: null,
-                        legendary: null,
-                        mythic: null
-                    };
+                    gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
                 }
-                callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
+                
+                callback();
+                initializeUserProfile();
+
+                setTimeout(async () => {
+                    // ← ДОБАВИЛИ ИНИЦИАЛИЗАЦИЮ РЕЕСТРА ИМЁН
+                    if (typeof initializeNameRegistry === 'function') {
+                        await initializeNameRegistry();
+                        console.log('✅ Реестр имён загружен');
+                    }
+                    
+                    if (typeof initializeSettings === 'function') {
+                        initializeSettings();
+                    }
+                    
+                    setTimeout(() => {
+                        const btn = document.getElementById('nav-settings');
+                        if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
+                            btn.addEventListener('click', function() {
+                                settingsManager.open();
+                            });
+                            console.log('✅ Кнопка настроек подключена (CloudStorage)');
+                        } else {
+                            console.warn('⚠️ Кнопка или settingsManager не найдены');
+                        }
+                    }, 1000);
+                }, 500);
             });
         } else {
-            // Fallback: используем localStorage для браузера
             const data = localStorage.getItem('farmGame');
             if (data) {
                 try {
                     const loaded = JSON.parse(data);
                     gameState.balance = loaded.balance || 100;
-                    gameState.seedInventory = loaded.seedInventory || { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 };
+                    gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                     gameState.warehouse = loaded.warehouse || {};
                     gameState.items = loaded.items || {};
-                    gameState.garden = loaded.garden || [];
+                    gameState.garden = loaded.garden || {};
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
-                    gameState.discoveredHybrids = loaded.discoveredHybrids || []; 
+                    gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                     gameState.hybridData = loaded.hybridData || {};
-                    callback(); // ✅ ВЫЗЫВАЕМ CALLBACK ПОСЛЕ ЗАГРУЗКИ
-                    initializeUserProfile(); // ✅ ДОБАВЬТЕ ЭТУ СТРОКУ
-                    initializeSettings();
-                    
-                    // ✅ НОВОЕ: Загружаем множественные процессы смешивания
+
                     if (loaded.hybridMixings !== undefined) {
                         gameState.hybridMixings = loaded.hybridMixings;
                     } else {
-                        gameState.hybridMixings = {
-                            epic: null,
-                            legendary: null,
-                            mythic: null
-                        };
+                        gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
                     }
-                    
-                    // ✅ МИГРАЦИЯ: Конвертируем старый формат в новый
+
                     if (loaded.hybridMixing !== undefined && loaded.hybridMixing !== null) {
                         gameState.hybridMixings.epic = loaded.hybridMixing;
                     }
@@ -251,16 +251,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Ошибка:', e);
                 }
             } else {
-                // Инициализация если данных нет
-                gameState.hybridMixings = {
-                    epic: null,
-                    legendary: null,
-                    mythic: null
-                };
+                gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
             }
-            callback(); // ✅ ВЫЗЫВАЕМ CALLBACK СРАЗУ ДЛЯ LOCALSTORAGE
+            
+            callback();
+            initializeUserProfile();
+
+            setTimeout(async () => {
+                // ← ДОБАВИЛИ ИНИЦИАЛИЗАЦИЮ РЕЕСТРА ИМЁН
+                if (typeof initializeNameRegistry === 'function') {
+                    await initializeNameRegistry();
+                    console.log('✅ Реестр имён загружен');
+                }
+                
+                if (typeof initializeSettings === 'function') {
+                    initializeSettings();
+                }
+                
+                setTimeout(() => {
+                    const btn = document.getElementById('nav-settings');
+                    if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
+                        btn.addEventListener('click', function() {
+                            settingsManager.open();
+                        });
+                        console.log('✅ Кнопка настроек подключена (localStorage)');
+                    } else {
+                        console.warn('⚠️ Кнопка или settingsManager не найдены');
+                    }
+                }, 1000);
+            }, 500);
         }
     }
+
 
 
 
@@ -994,4 +1016,37 @@ if (isAdmin) {
         });
     }
 }
+});
+
+// ========== ИНИЦИАЛИЗАЦИЯ МОДУЛЕЙ ==========
+// Добавьте этот код в самый конец script.js
+
+// Дожидаемся полной загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOM загружен');
+    
+    // Принудительная инициализация настроек через 2 секунды
+    setTimeout(() => {
+        console.log('⏰ Запуск инициализации настроек...');
+        
+        if (typeof initializeSettings === 'function') {
+            initializeSettings();
+        } else {
+            console.error('❌ initializeSettings не найдена!');
+        }
+        
+        // Подключаем кнопку
+        setTimeout(() => {
+            const btn = document.getElementById('nav-settings');
+            if (btn && typeof settingsManager !== 'undefined' && settingsManager.modal) {
+                btn.onclick = function() {
+                    console.log('🎯 Клик!');
+                    settingsManager.open();
+                };
+                console.log('✅ Кнопка настроек подключена!');
+            } else {
+                console.warn('⚠️ Кнопка или settingsManager не готовы');
+            }
+        }, 1000);
+    }, 2000);
 });
