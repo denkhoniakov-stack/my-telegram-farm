@@ -69,7 +69,6 @@ class SettingsManager {
                         <div class="name-success"></div>
 
                         <div class="settings-actions">
-                            <button id="cancel-name-btn" style="display:none;">Отмена</button>
                             <button id="save-name-btn">Сохранить</button>
                         </div>
                     </div>
@@ -83,7 +82,6 @@ class SettingsManager {
         // Получаем элементы
         this.nameInput = document.getElementById('name-input');
         this.saveButton = document.getElementById('save-name-btn');
-        this.cancelButton = document.getElementById('cancel-name-btn');
         this.errorMessage = modal.querySelector('.name-error');
         this.successMessage = modal.querySelector('.name-success');
         this.currentNameValue = document.getElementById('current-name-value');
@@ -91,36 +89,45 @@ class SettingsManager {
     }
 
     setupEventListeners() {
-        // Кнопка закрытия
+        // Кнопка закрытия - ИСПРАВЛЕНО!
         const closeButton = this.modal.querySelector('.settings-close');
-        closeButton.addEventListener('click', () => {
-            this.close();
-        });
-
-        // Закрытие по клику на фон
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.close();
-            }
-        });
-
-        // Кнопка отмены
-        if (this.cancelButton) {
-            this.cancelButton.addEventListener('click', () => {
-                this.resetForm();
+        if (closeButton) {
+            closeButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('✖️ Клик по крестику');
                 this.close();
             });
         }
 
-        // Кнопка сохранения - ИСПРАВЛЕНО!
+        // Закрытие по клику на фон
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                console.log('🎯 Клик по фону');
+                this.close();
+            }
+        });
+
+        // Кнопка сохранения
         this.saveButton.addEventListener('click', () => {
             console.log('🎯 Клик по кнопке Сохранить');
             this.saveName();
         });
 
-        // Валидация при вводе
+        // Валидация при вводе - ИСПРАВЛЕНО!
         this.nameInput.addEventListener('input', () => {
-            this.validateInput();
+            const value = this.nameInput.value;
+            
+            // Очищаем сообщения об ошибках при вводе
+            this.errorMessage.classList.remove('show');
+            this.successMessage.classList.remove('show');
+            
+            if (value.length > 0) {
+                this.validateInput();
+            } else {
+                // Если поле пустое, убираем все стили
+                this.nameInput.classList.remove('error', 'success');
+            }
+            
             this.updateCounter();
         });
 
@@ -139,15 +146,16 @@ class SettingsManager {
             this.currentNameValue.textContent = currentName || 'Не установлено';
             this.modal.classList.remove('hidden');
             this.nameInput.value = '';
-            this.nameInput.focus();
             this.errorMessage.classList.remove('show');
             this.successMessage.classList.remove('show');
             this.nameInput.classList.remove('error', 'success');
             this.updateCounter();
+            setTimeout(() => this.nameInput.focus(), 100);
         }
     }
 
     close() {
+        console.log('🚪 Закрытие окна настроек');
         if (this.modal) {
             this.modal.classList.add('hidden');
             this.resetForm();
@@ -184,12 +192,20 @@ class SettingsManager {
         this.inputCounter.textContent = `${length}/${this.maxLength}`;
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД СОХРАНЕНИЯ
     async saveName() {
         console.log('🎯 Начало сохранения имени...');
         
-        const value = this.nameInput.value;
+        const value = this.nameInput.value.trim();
         console.log('📝 Введённое значение:', value);
+        
+        // Проверка на пустое значение
+        if (!value) {
+            this.errorMessage.textContent = 'Введите имя';
+            this.errorMessage.classList.add('show');
+            this.nameInput.classList.add('error');
+            console.log('❌ Поле пустое');
+            return;
+        }
         
         const result = nameValidator.validate(value);
         console.log('✅ Результат валидации:', result);
@@ -217,15 +233,6 @@ class SettingsManager {
             }
         }
         
-        // Проверка уникальности
-        if (typeof nameRegistry !== 'undefined' && nameRegistry.isNameTaken(cleanName)) {
-            this.errorMessage.textContent = '❌ Имя "' + cleanName + '" уже занято!';
-            this.errorMessage.classList.add('show');
-            this.nameInput.classList.add('error');
-            console.log('❌ Имя занято');
-            return;
-        }
-        
         // Блокируем кнопку
         this.saveButton.disabled = true;
         const originalText = this.saveButton.textContent;
@@ -233,11 +240,11 @@ class SettingsManager {
         console.log('🔒 Кнопка заблокирована');
         
         try {
-            // Регистрация имени в реестре - ДОБАВЛЕН await!
+            // Регистрация имени в реестре
             if (typeof nameRegistry !== 'undefined') {
                 const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
                 console.log('📝 Регистрация имени для пользователя:', userId);
-                await nameRegistry.registerName(cleanName, userId); // ← ДОБАВЛЕН await!
+                await nameRegistry.registerName(cleanName, userId);
                 console.log('✅ Имя зарегистрировано в реестре');
             }
             
@@ -251,17 +258,15 @@ class SettingsManager {
                     this.successMessage.textContent = '✅ Сохранено!';
                     this.successMessage.classList.add('show');
                     this.errorMessage.classList.remove('show');
-                    this.nameInput.classList.remove('error');
-                    this.nameInput.classList.add('success');
+                    this.nameInput.classList.remove('error', 'success');
                     this.currentNameValue.textContent = cleanName;
-                    this.nameInput.value = '';
+                    this.nameInput.value = ''; // Очищаем поле
                     this.updateCounter();
                     
-                    // Убираем сообщение через 2 секунды
+                    // Закрываем окно через 1 секунду
                     setTimeout(() => {
-                        this.successMessage.classList.remove('show');
-                        this.nameInput.classList.remove('success');
-                    }, 2000);
+                        this.close();
+                    }, 1000);
                 } else {
                     console.error('❌ userProfile.setUserName вернул false');
                     this.errorMessage.textContent = '❌ Ошибка сохранения';
