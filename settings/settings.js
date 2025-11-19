@@ -31,21 +31,17 @@ class SettingsManager {
                 <div class="settings-body">
                     <div class="section-title">👤 Изменить имя</div>
                     <div class="current-name-display">
-                        <span class="label">Текущее имя:</span>
-                        <span class="current-name" id="current-user-name"></span>
+                        <div class="current-name-label">Текущее имя:</div>
+                        <div class="current-name-value" id="current-name-value"></div>
                     </div>
-                    <div class="input-group">
-                        <input 
-                            type="text" 
-                            id="new-name-input" 
-                            placeholder="Введите новое имя" 
-                            maxlength="20"
-                            class="name-input"
-                        />
-                        <button id="save-name-btn" class="save-btn">💾 Сохранить</button>
+                    <div class="name-input-wrapper">
+                        <input type="text" id="name-input" placeholder="Введите новое имя..." maxlength="20" autocomplete="off">
                     </div>
-                    <div class="message error-message" id="name-error"></div>
-                    <div class="message success-message" id="name-success"></div>
+                    <div class="name-error"></div>
+                    <div class="name-success"></div>
+                    <div class="settings-actions">
+                        <button id="save-name-btn">Сохранить</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -54,11 +50,11 @@ class SettingsManager {
         
         // ВАЖНО: Получаем ссылки на элементы ПОСЛЕ добавления в DOM
         this.modal = modal;
-        this.nameInput = document.getElementById('new-name-input');
+        this.nameInput = document.getElementById('name-input');
         this.saveButton = document.getElementById('save-name-btn');
-        this.errorMessage = document.getElementById('name-error');
-        this.successMessage = document.getElementById('name-success');
-        this.currentNameValue = document.getElementById('current-user-name');
+        this.errorMessage = this.modal.querySelector('.name-error');
+        this.successMessage = this.modal.querySelector('.name-success');
+        this.currentNameValue = document.getElementById('current-name-value');
         
         console.log('[SETTINGS] Модальное окно создано');
         console.log('[SETTINGS] Кнопка сохранения:', this.saveButton ? '✅ найдена' : '❌ НЕ найдена');
@@ -81,10 +77,11 @@ class SettingsManager {
             }
         });
 
-        // ГЛАВНОЕ ИСПРАВЛЕНИЕ: Кнопка сохранения
+        // ГЛАВНОЕ ИСПРАВЛЕНИЕ: Кнопка сохранения с проверкой
         if (this.saveButton) {
-            this.saveButton.addEventListener('click', () => {
-                console.log('[SETTINGS] Клик по кнопке сохранения!');
+            this.saveButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('[SETTINGS] 🔴 Клик по кнопке сохранения!');
                 this.saveName();
             });
             console.log('[SETTINGS] ✅ Обработчик кнопки сохранения установлен');
@@ -102,6 +99,8 @@ class SettingsManager {
             });
             this.nameInput.addEventListener('input', () => this.clearMessages());
         }
+        
+        console.log('[SETTINGS] Все обработчики событий установлены');
     }
 
     open() {
@@ -123,10 +122,11 @@ class SettingsManager {
             this.currentNameValue.textContent = currentName;
         }
         
-        // Очищаем поле ввода
+        // Очищаем поле ввода и сообщения
         if (this.nameInput) {
             this.nameInput.value = '';
         }
+        this.clearMessages();
         
         this.modal.classList.remove('hidden');
         
@@ -148,7 +148,7 @@ class SettingsManager {
     }
 
     async saveName() {
-        console.log('[SETTINGS] saveName() вызван');
+        console.log('[SETTINGS] 🔵 saveName() вызван');
         
         if (!this.nameInput) {
             console.error('[SETTINGS] Поле ввода не найдено');
@@ -171,7 +171,7 @@ class SettingsManager {
         }
 
         try {
-            console.log('[SETTINGS] Попытка сохранить имя...');
+            console.log('[SETTINGS] 🟢 Попытка сохранить имя через userProfile...');
             const success = await userProfile.setUserName(newName);
             
             if (success) {
@@ -190,13 +190,13 @@ class SettingsManager {
                 this.showError('Не удалось сохранить имя');
             }
         } catch (error) {
-            console.error('[SETTINGS] Ошибка при сохранении:', error);
+            console.error('[SETTINGS] ❌ Ошибка при сохранении:', error);
             this.showError('Произошла ошибка при сохранении');
         }
     }
 
     showError(message) {
-        console.log('[SETTINGS] Показ ошибки:', message);
+        console.log('[SETTINGS] ⚠️ Показ ошибки:', message);
         if (this.errorMessage) {
             this.errorMessage.textContent = message;
             this.errorMessage.style.display = 'block';
@@ -207,7 +207,7 @@ class SettingsManager {
     }
 
     showSuccess(message) {
-        console.log('[SETTINGS] Показ успеха:', message);
+        console.log('[SETTINGS] ✅ Показ успеха:', message);
         if (this.successMessage) {
             this.successMessage.textContent = message;
             this.successMessage.style.display = 'block';
@@ -220,9 +220,11 @@ class SettingsManager {
     clearMessages() {
         if (this.errorMessage) {
             this.errorMessage.style.display = 'none';
+            this.errorMessage.textContent = '';
         }
         if (this.successMessage) {
             this.successMessage.style.display = 'none';
+            this.successMessage.textContent = '';
         }
     }
 }
