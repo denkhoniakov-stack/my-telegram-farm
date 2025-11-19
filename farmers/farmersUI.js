@@ -61,12 +61,18 @@ class FarmersUI {
     }
 
     attachEventListeners() {
-        // Открытие по клику на аватарку
+        // Точный поиск аватара по ID
         const avatar = document.getElementById('user-avatar');
+        
         if (avatar) {
-            avatar.addEventListener('click', () => this.open());
+            avatar.addEventListener('click', () => {
+                console.log('[FARMERS UI] Клик по аватару!');
+                this.open();
+            });
             avatar.style.cursor = 'pointer';
-            console.log('[FARMERS UI] Обработчик аватарки установлен');
+            console.log('[FARMERS UI] ✅ Обработчик аватарки установлен');
+        } else {
+            console.error('[FARMERS UI] ❌ Элемент #user-avatar не найден');
         }
 
         // Закрытие модального окна
@@ -91,6 +97,7 @@ class FarmersUI {
             });
         });
     }
+
 
     switchTab(tabName) {
         // Убираем active со всех вкладок
@@ -124,20 +131,30 @@ class FarmersUI {
     }
 
     updateDisplay() {
-        // Получаем список фермеров игрока (пока тестовые данные)
-        const playerFarmers = gameState.farmers || [];
+        // Инициализация gameState.farmers если его нет
+        if (typeof gameState === 'undefined') {
+            window.gameState = { farmers: [] };
+        }
+        if (!gameState.farmers) {
+            gameState.farmers = [];
+        }
+        
+        const playerFarmers = gameState.farmers;
         
         // Обновляем статистику
-        document.getElementById('total-farmers').textContent = playerFarmers.length;
-        document.getElementById('active-farmers').textContent = 
-            playerFarmers.filter(f => f.isActive).length;
-
-        // Отображаем коллекцию
-        this.renderCollection(playerFarmers);
+        const totalEl = document.getElementById('total-farmers');
+        const activeEl = document.getElementById('active-farmers');
         
-        // Отображаем активных фермеров
+        if (totalEl) totalEl.textContent = playerFarmers.length;
+        if (activeEl) {
+            activeEl.textContent = playerFarmers.filter(f => f.isActive).length;
+        }
+
+        // Отображаем коллекцию и слоты
+        this.renderCollection(playerFarmers);
         this.renderActiveSlots(playerFarmers);
     }
+
 
     renderCollection(farmers) {
         const grid = document.getElementById('farmers-grid');
