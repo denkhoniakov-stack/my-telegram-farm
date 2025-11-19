@@ -1013,6 +1013,12 @@ if (isAdmin) {
         });
     }
 }
+if (typeof farmersUI !== 'undefined') {
+        farmersUI.initialize();
+        console.log('✅ UI фермеров инициализирован');
+    } else {
+        console.warn('⚠️ farmersUI не найден');
+    }
 });
 
 
