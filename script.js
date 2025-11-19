@@ -673,6 +673,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tabId === 'inventory') {
                    initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
                 }
+                if (tabId === 'boosters') {
+                    if (typeof farmersShop !== 'undefined') {
+                        farmersShop.renderShop();
+                    }
+                }
             }
         });
     }
