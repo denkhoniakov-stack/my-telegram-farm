@@ -167,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
     async function loadGameData(callback) {
+        // ⚠️ ВРЕМЕННЫЙ КОД ДЛЯ ОЧИСТКИ - УДАЛИТЬ ПОСЛЕ ОДНОГО ЗАПУСКА!
+        if (tg.CloudStorage && typeof tg.CloudStorage.removeItem === 'function') {
+            tg.CloudStorage.removeItem('userName', () => {
+                console.log('🗑️ CloudStorage очищен для userName');
+            });
+        }
+        // ⚠️ КОНЕЦ ВРЕМЕННОГО КОДА
         // ШАГ 1: ЕДИНСТВЕННОЕ ДОБАВЛЕНИЕ - загружаем профиль ПЕРВЫМ
         await userProfile.initialize();
         console.log('[PROFILE] Профиль загружен. Имя:', userProfile.getUserName());
