@@ -16,28 +16,41 @@ class UserProfile {
     async initialize() {
         console.log('[PROFILE] 1. Начало инициализации профиля...');
         
-        const isCloud = typeof tg !== 'undefined' && tg.CloudStorage;
+        const isCloud = typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function';
         
         try {
             if (isCloud) {
-                // Загружаем из CloudStorage
+                // === TELEGRAM CLOUD STORAGE (СИНХРОНИЗИРОВАННЫЙ) ===
+                console.log('[PROFILE] Используется CloudStorage');
+                
                 this.userName = await this.getItemFromCloud('userName');
                 this.avatarId = await this.getItemFromCloud('userAvatar') || 'default';
-                console.log(`[PROFILE] 2. Загружено из CloudStorage: "${this.userName}"`);
-
-                // ТОЛЬКО если в облаке ПУСТО - генерируем новое имя
-                if (!this.userName || this.userName === 'null' || this.userName === 'undefined') {
-                    console.log('[PROFILE] 3. CloudStorage пустой, генерируем новое имя...');
+                
+                console.log(`[PROFILE] 2. Из CloudStorage: имя="${this.userName}"`);
+                
+                // Если пусто - генерируем
+                if (!this.userName || this.userName === 'null' || this.userName === 'undefined' || this.userName.trim() === '') {
+                    console.log('[PROFILE] 3. CloudStorage пустой. Генерируем имя...');
                     this.userName = this.generateRandomName();
                     await this.saveProfile();
-                    console.log('[PROFILE] 4. Новое имя сохранено в CloudStorage');
+                    console.log('[PROFILE] 4. Сохранено в CloudStorage');
+                }
+                
+                // ОЧИЩАЕМ СТАРЫЕ ДАННЫЕ ИЗ localStorage (однократно)
+                if (localStorage.getItem('userName')) {
+                    console.warn('[PROFILE] Найдены старые данные в localStorage. Удаляем...');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userAvatar');
                 }
                 
             } else {
-                // Локальная разработка - используем localStorage
+                // === ЛОКАЛЬНАЯ РАЗРАБОТКА (localStorage) ===
+                console.warn('[PROFILE] CloudStorage недоступен. Используется localStorage.');
+                
                 this.userName = localStorage.getItem('userName');
                 this.avatarId = localStorage.getItem('userAvatar') || 'default';
-                console.log(`[PROFILE] 2. Загружено из localStorage: ${this.userName}`);
+                
+                console.log(`[PROFILE] 2. Из localStorage: имя="${this.userName}"`);
                 
                 if (!this.userName) {
                     this.userName = this.generateRandomName();
@@ -46,15 +59,16 @@ class UserProfile {
             }
 
             this.isInitialized = true;
-            console.log(`[PROFILE] 5. ✅ Инициализация завершена. Финальное имя: "${this.userName}"`);
+            console.log(`[PROFILE] 5. ✅ Готово. Финальное имя: "${this.userName}"`);
             this.updateDisplay();
 
         } catch (error) {
             console.error('❌ [PROFILE] ОШИБКА:', error);
-            this.userName = localStorage.getItem('userName') || this.generateRandomName();
+            this.userName = this.generateRandomName();
             this.updateDisplay();
         }
     }
+
     
     async setUserName(newName) {
         if (newName && newName.trim().length > 0) {
