@@ -1,3 +1,34 @@
+// Поместите этот код в начало вашего script.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM загружен. Начинаем инициализацию приложения...");
+    initializeApp();
+});
+
+async function initializeApp() {
+    // 1. Показываем загрузчик (если есть)
+    // showLoader(); 
+
+    // 2. Асинхронно инициализируем профиль и ждем завершения
+    await userProfile.initialize();
+    
+    // 3. После загрузки профиля, инициализируем остальные модули
+    settingsManager.initialize();
+    
+    // 4. Подключаем кнопку настроек
+    const settingsButton = document.getElementById('nav-settings');
+    if (settingsButton) {
+        settingsButton.addEventListener('click', () => {
+            settingsManager.open();
+        });
+        console.log("✅ Кнопка настроек подключена.");
+    }
+
+    // 5. Запускаем остальную логику игры
+    // loadGameData();
+    // hideLoader();
+    console.log("🚀 Приложение полностью готово к работе!");
+}
 // НАЧНИТЕ КОПИРОВАТЬ ОТСЮДА
 
 document.addEventListener('DOMContentLoaded', () => {
