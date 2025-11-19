@@ -10,13 +10,9 @@ class UserProfile {
         this.userName = null;
         this.avatarId = 'default';
         this.isInitialized = false;
-
         this.userNameElement = document.getElementById('user-name');
     }
 
-    /**
-     * Асинхронная инициализация с миграцией данных.
-     */
     async initialize() {
         console.log('[PROFILE] 1. Начало инициализации профиля...');
         
@@ -24,54 +20,42 @@ class UserProfile {
         
         try {
             if (isCloud) {
-                // Пытаемся загрузить из CloudStorage
+                // Загружаем из CloudStorage
                 this.userName = await this.getItemFromCloud('userName');
                 this.avatarId = await this.getItemFromCloud('userAvatar') || 'default';
-                console.log(`[PROFILE] 2. Загружено из Cloud: ${this.userName}`);
+                console.log(`[PROFILE] 2. Загружено из CloudStorage: "${this.userName}"`);
 
-                // *** МИГРАЦИЯ ДАННЫХ ***
-                // Если в облаке пусто, а в localStorage что-то есть - переносим!
-                if (!this.userName && localStorage.getItem('userName')) {
-                    console.warn('[PROFILE] Облако пустое. Запускаем миграцию из localStorage...');
-                    const localName = localStorage.getItem('userName');
-                    const localAvatar = localStorage.getItem('userAvatar');
-                    
-                    this.userName = localName;
-                    if (localAvatar) this.avatarId = localAvatar;
-                    
-                    await this.saveProfile(); // Сохраняем перенесенные данные в облако
-                    console.log(`[PROFILE] ✅ Миграция завершена. Имя "${localName}" перенесено в CloudStorage.`);
+                // ТОЛЬКО если в облаке ПУСТО - генерируем новое имя
+                if (!this.userName || this.userName === 'null' || this.userName === 'undefined') {
+                    console.log('[PROFILE] 3. CloudStorage пустой, генерируем новое имя...');
+                    this.userName = this.generateRandomName();
+                    await this.saveProfile();
+                    console.log('[PROFILE] 4. Новое имя сохранено в CloudStorage');
                 }
                 
             } else {
-                // Для локальной отладки
+                // Локальная разработка - используем localStorage
                 this.userName = localStorage.getItem('userName');
                 this.avatarId = localStorage.getItem('userAvatar') || 'default';
                 console.log(`[PROFILE] 2. Загружено из localStorage: ${this.userName}`);
-            }
-
-            // Если имени все еще нет, генерируем новое
-            if (!this.userName) {
-                console.log('[PROFILE] 3. Имя не найдено, генерируем новое...');
-                this.userName = this.generateRandomName();
-                await this.saveProfile();
+                
+                if (!this.userName) {
+                    this.userName = this.generateRandomName();
+                    this.saveProfile();
+                }
             }
 
             this.isInitialized = true;
-            console.log(`[PROFILE] 4. Инициализация завершена. Финальное имя: ${this.userName}`);
+            console.log(`[PROFILE] 5. ✅ Инициализация завершена. Финальное имя: "${this.userName}"`);
             this.updateDisplay();
 
         } catch (error) {
-            console.error('❌ [PROFILE] КРИТИЧЕСКАЯ ОШИБКА ИНИЦИАЛИЗАЦИИ:', error);
-            // Запасной вариант при ошибках
+            console.error('❌ [PROFILE] ОШИБКА:', error);
             this.userName = localStorage.getItem('userName') || this.generateRandomName();
             this.updateDisplay();
         }
     }
     
-    /**
-     * Устанавливает новое имя и сохраняет его.
-     */
     async setUserName(newName) {
         if (newName && newName.trim().length > 0) {
             this.userName = newName.trim();
@@ -83,25 +67,20 @@ class UserProfile {
         return false;
     }
 
-    /**
-     * Сохраняет профиль в нужное хранилище.
-     */
     async saveProfile() {
-        console.log(`[PROFILE] Сохранение имени: ${this.userName}`);
+        console.log(`[PROFILE] Сохранение имени: "${this.userName}"`);
         const isCloud = typeof tg !== 'undefined' && tg.CloudStorage;
 
         if (isCloud) {
             await this.setItemToCloud('userName', this.userName);
             await this.setItemToCloud('userAvatar', this.avatarId);
-            console.log(`[PROFILE] Успешно сохранено в CloudStorage.`);
+            console.log(`[PROFILE] ✅ Успешно сохранено в CloudStorage.`);
         } else {
             localStorage.setItem('userName', this.userName);
             localStorage.setItem('userAvatar', this.avatarId);
-            console.log(`[PROFILE] Успешно сохранено в localStorage.`);
+            console.log(`[PROFILE] ✅ Успешно сохранено в localStorage.`);
         }
     }
-
-    // --- Вспомогательные методы ---
 
     getUserName() {
         return this.userName;
@@ -121,8 +100,6 @@ class UserProfile {
     generateRandomName() {
         return RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
     }
-
-    // --- Promise-обертки для CloudStorage ---
 
     getItemFromCloud(key) {
         return new Promise((resolve, reject) => {
