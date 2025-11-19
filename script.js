@@ -1,46 +1,30 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    // ========================================
-    // ✅ ЭМУЛЯТОР TELEGRAM API ДЛЯ ЛОКАЛЬНОЙ РАЗРАБОТКИ
-    // ========================================
+    // Используем НАСТОЯЩИЙ Telegram API (без эмулятора)
     let tg;
+    
     if (typeof window.Telegram === 'undefined' || typeof window.Telegram.WebApp === 'undefined') {
-        console.warn("Режим локальной разработки: API Telegram не найдено. Используется эмулятор.");
+        console.warn("⚠️ Telegram WebApp API не найден. Используется fallback.");
+        // Создаём минимальный fallback БЕЗ CloudStorage эмулятора
         tg = {
-            initDataUnsafe: { user: { id: 12345, first_name: "Local", last_name: "User", username: "localuser" } },
-            ready: () => console.log("Эмулятор TG: ready()"),
-            expand: () => console.log("Эмулятор TG: expand()"),
+            initDataUnsafe: { user: { id: 'local_user' } },
+            ready: () => console.log("Fallback: ready()"),
+            expand: () => console.log("Fallback: expand()"),
             showAlert: (message) => alert(message),
-            showPopup: (options) => alert(options.message),
-            showConfirm: (message, callback) => {
-                const result = confirm(message);
-                if (callback) callback(result);
-            },
             HapticFeedback: {
-                notificationOccurred: (type) => console.log(`Эмулятор тактильной отдачи: ${type}`)
-            },
-            CloudStorage: {
-                setItem: (key, value, callback) => {
-                    localStorage.setItem(key, value);
-                    if (callback) callback(null);
-                },
-                getItem: (key, callback) => {
-                    const value = localStorage.getItem(key);
-                    if (callback) callback(null, value);
-                },
-                removeItem: (key, callback) => {
-                    localStorage.removeItem(key);
-                    if (callback) callback(null);
-                }
+                notificationOccurred: (type) => console.log(`Fallback haptic: ${type}`)
             }
+            // ❌ НЕТ CloudStorage - профиль будет использовать localStorage напрямую
         };
     } else {
         tg = window.Telegram.WebApp;
+        console.log("✅ Используется настоящий Telegram WebApp API");
     }
     
     tg.ready();
     tg.expand();
+    
+    // Остальной код без изменений...
+
     const ADMIN_ID = 522564845; // ЗАМЕНИТЕ НА ВАШ TELEGRAM USER ID
     const isAdmin = tg.initDataUnsafe?.user?.id === ADMIN_ID;
 
