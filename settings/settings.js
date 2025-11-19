@@ -216,17 +216,24 @@ class SettingsManager {
 
   // Сохранение нового имени
   async saveName() {
+      console.log('🎯 Начало сохранения имени...');
+      
       const value = this.nameInput.value;
+      console.log('📝 Введённое значение:', value);
+      
       const result = nameValidator.validate(value);
+      console.log('✅ Результат валидации:', result);
       
       if (!result.valid) {
           this.errorMessage.textContent = result.errors[0];
           this.errorMessage.classList.add('show');
           this.nameInput.classList.add('error');
+          console.log('❌ Валидация не прошла');
           return;
       }
       
       const cleanName = result.cleanName;
+      console.log('✨ Очищенное имя:', cleanName);
       
       // Проверка на совпадение с текущим именем
       if (typeof userProfile !== 'undefined') {
@@ -235,6 +242,7 @@ class SettingsManager {
               this.errorMessage.textContent = '⚠️ Вы уже используете это имя!';
               this.errorMessage.classList.add('show');
               this.nameInput.classList.add('error');
+              console.log('⚠️ Имя совпадает с текущим');
               return;
           }
       }
@@ -244,6 +252,7 @@ class SettingsManager {
           this.errorMessage.textContent = '❌ Имя "' + cleanName + '" уже занято!';
           this.errorMessage.classList.add('show');
           this.nameInput.classList.add('error');
+          console.log('❌ Имя занято');
           return;
       }
       
@@ -251,19 +260,24 @@ class SettingsManager {
       this.saveButton.disabled = true;
       const originalText = this.saveButton.textContent;
       this.saveButton.textContent = 'Сохранение...';
+      console.log('🔒 Кнопка заблокирована');
       
       try {
           // Регистрация имени в реестре
           if (typeof nameRegistry !== 'undefined') {
               const userId = (typeof tg !== 'undefined' && tg.initDataUnsafe?.user?.id) || 'local_user';
-              await nameRegistry.registerName(cleanName, userId); // ← await обязателен!
+              console.log('📝 Регистрация имени для пользователя:', userId);
+              await nameRegistry.registerName(cleanName, userId);
+              console.log('✅ Имя зарегистрировано в реестре');
           }
           
           // Сохранение в профиль
           if (typeof userProfile !== 'undefined') {
-              const success = await userProfile.setUserName(cleanName); // ← await обязателен!
+              console.log('💾 Сохранение в профиль...');
+              const success = await userProfile.setUserName(cleanName);
               
               if (success) {
+                  console.log('✅ Имя успешно сохранено!');
                   this.successMessage.textContent = '✅ Сохранено!';
                   this.successMessage.classList.add('show');
                   this.errorMessage.classList.remove('show');
@@ -279,19 +293,22 @@ class SettingsManager {
                       this.nameInput.classList.remove('success');
                   }, 2000);
               } else {
+                  console.error('❌ userProfile.setUserName вернул false');
                   this.errorMessage.textContent = '❌ Ошибка сохранения';
                   this.errorMessage.classList.add('show');
               }
           }
       } catch (error) {
-          console.error('❌ Ошибка:', error);
+          console.error('❌ Ошибка при сохранении:', error);
           this.errorMessage.textContent = '❌ Ошибка: ' + error.message;
           this.errorMessage.classList.add('show');
       } finally {
           this.saveButton.disabled = false;
           this.saveButton.textContent = originalText;
+          console.log('🔓 Кнопка разблокирована');
       }
   }
+
 
 
 }
