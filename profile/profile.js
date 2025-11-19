@@ -73,26 +73,35 @@ class UserProfile {
   }
 
 
-  saveProfile() {
+  async saveProfile() {
       const userName = this.userName;
       const avatarId = this.avatarId;
       
       // Проверяем, доступен ли Telegram CloudStorage
       if (typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
-          // Сохраняем в CloudStorage (синхронизируется между устройствами)
-          tg.CloudStorage.setItem('userName', userName, (err) => {
-              if (!err) {
-                  console.log('✅ Имя сохранено в CloudStorage');
-              }
+          // Сохраняем в CloudStorage
+          return new Promise((resolve) => {
+              tg.CloudStorage.setItem('userName', userName, (err) => {
+                  if (!err) {
+                      console.log('✅ Имя сохранено в CloudStorage');
+                      tg.CloudStorage.setItem('userAvatar', avatarId, (err2) => {
+                          resolve(!err2);
+                      });
+                  } else {
+                      console.error('❌ Ошибка сохранения в CloudStorage:', err);
+                      resolve(false);
+                  }
+              });
           });
-          tg.CloudStorage.setItem('userAvatar', avatarId);
       } else {
           // Fallback на localStorage
           localStorage.setItem('userName', userName);
           localStorage.setItem('userAvatar', avatarId);
           console.log('✅ Имя сохранено в localStorage');
+          return Promise.resolve(true);
       }
   }
+
 
 
   updateDisplay() {
@@ -122,15 +131,15 @@ class UserProfile {
     }
   }
 
-  setUserName(newName) {
-    if (newName && newName.trim().length > 0) {
-      this.userName = newName.trim();
-      this.saveProfile();
-      this.updateDisplay(); // ← Обновляем отображение
-      console.log('✅ Имя успешно изменено на:', this.userName);
-      return true;
-    }
-    return false;
+  async setUserName(newName) {
+      if (newName && newName.trim().length > 0) {
+          this.userName = newName.trim();
+          await this.saveProfile(); // ← Добавили await!
+          this.updateDisplay();
+          console.log('✅ Имя изменено на:', this.userName);
+          return true;
+      }
+      return false;
   }
 
   setAvatar(avatarId) {
