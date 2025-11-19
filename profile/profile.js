@@ -77,30 +77,31 @@ class UserProfile {
       const userName = this.userName;
       const avatarId = this.avatarId;
       
-      // Проверяем, доступен ли Telegram CloudStorage
-      if (typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
-          // Сохраняем в CloudStorage
-          return new Promise((resolve) => {
-              tg.CloudStorage.setItem('userName', userName, (err) => {
-                  if (!err) {
-                      console.log('✅ Имя сохранено в CloudStorage');
+      return new Promise((resolve) => {
+          // Проверяем CloudStorage
+          if (typeof tg !== 'undefined' && tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
+              // Сохраняем в CloudStorage
+              tg.CloudStorage.setItem('userName', userName, (err1) => {
+                  if (!err1) {
                       tg.CloudStorage.setItem('userAvatar', avatarId, (err2) => {
+                          console.log('✅ Сохранено в CloudStorage');
                           resolve(!err2);
                       });
                   } else {
-                      console.error('❌ Ошибка сохранения в CloudStorage:', err);
+                      console.error('❌ Ошибка CloudStorage');
                       resolve(false);
                   }
               });
-          });
-      } else {
-          // Fallback на localStorage
-          localStorage.setItem('userName', userName);
-          localStorage.setItem('userAvatar', avatarId);
-          console.log('✅ Имя сохранено в localStorage');
-          return Promise.resolve(true);
-      }
+          } else {
+              // Локально
+              localStorage.setItem('userName', userName);
+              localStorage.setItem('userAvatar', avatarId);
+              console.log('✅ Сохранено в localStorage');
+              resolve(true);
+          }
+      });
   }
+
 
 
 
@@ -134,7 +135,7 @@ class UserProfile {
   async setUserName(newName) {
       if (newName && newName.trim().length > 0) {
           this.userName = newName.trim();
-          await this.saveProfile(); // ← Добавили await!
+          await this.saveProfile(); // ← ДОБАВИЛИ await!
           this.updateDisplay();
           console.log('✅ Имя изменено на:', this.userName);
           return true;
