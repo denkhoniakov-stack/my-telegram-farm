@@ -109,7 +109,7 @@ class FarmersShop {
                     <button class="buy-box-button ${!canAfford ? 'disabled' : ''}" 
                             data-box-id="${box.id}" 
                             ${!canAfford ? 'disabled' : ''}>
-                        ${box.cost.toFixed(0)} 💰
+                        ${box.cost.toFixed(0)} 🪙
                     </button>
                 </div>
             `;
@@ -154,20 +154,22 @@ class FarmersShop {
     }
 
     // Открытие ящика
+    // Открытие ящика
     async openBox(boxId) {
-        const state = this.getGameState();
-        if (!state) {
+        // Безопасно получаем gameState
+        if (typeof gameState === 'undefined' && typeof window.gameState === 'undefined') {
             console.error('[FARMERS SHOP] gameState не определен');
             this.showNotification('Ошибка: игра не инициализирована', 'error');
             return;
         }
+        const state = window.gameState || gameState;
 
         const boxes = this.getBoxes();
         const box = boxes.find(b => b.id === boxId);
         
         if (!box) return;
         
-        // Проверка монет (используем balance)
+        // Проверка монет
         if (state.balance < box.cost) {
             this.showNotification('Недостаточно монет!', 'error');
             return;
@@ -175,15 +177,23 @@ class FarmersShop {
 
         this.isOpening = true;
 
-        // Списываем монеты (используем balance)
+        // Списываем монеты из общего баланса
         state.balance -= box.cost;
-        
-        // Вызываем глобальные функции обновления
-        if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay(); // Обратите внимание: updateBalanceDisplay, а не updateCoinsDisplay
-        else if (typeof updateCoinsDisplay === 'function') updateCoinsDisplay();
-        
-        if (typeof saveGameState === 'function') saveGameState();
-        else if (typeof saveGameData === 'function') saveGameData();
+
+        // ✅ ПРАВИЛЬНО ОБНОВЛЯЕМ ОТОБРАЖЕНИЕ БАЛАНСА
+        if (typeof updateBalanceDisplay === 'function') {
+            updateBalanceDisplay();
+        } else if (typeof updateCoinsDisplay === 'function') {
+            // На случай, если где‑то всё-таки есть старая функция
+            updateCoinsDisplay();
+        }
+
+        // Сохраняем игру (используется твоя функция из script.js)
+        if (typeof saveGameData === 'function') {
+            saveGameData();
+        } else if (typeof saveGameState === 'function') {
+            saveGameState();
+        }
 
         // Определяем редкость выпавшего фермера
         const rarity = this.rollRarity(box.chances);
@@ -203,11 +213,12 @@ class FarmersShop {
         // Добавляем фермера в коллекцию
         this.addFarmerToCollection(farmer);
         
-        // Обновляем магазин
+        // Обновляем магазин (цены/кнопки после списания монет)
         this.renderShop();
         
         this.isOpening = false;
     }
+
 
     // Определение редкости по вероятностям
     rollRarity(chances) {

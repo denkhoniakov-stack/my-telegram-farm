@@ -180,3 +180,35 @@
     from { opacity: 0; }
     to { opacity: 1; }
 }
+/* Добавьте в конец файла */
+
+/* Уменьшаем вертикальные отступы у элемента списка */
+.box-item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 12px; /* Немного уменьшим отступ */
+}
+
+/* Уменьшаем иконку ящика */
+.box-icon {
+    font-size: 40px; /* Было 50px */
+    min-width: 50px; /* Было 60px */
+}
+
+/* Уменьшаем кнопку */
+.box-buy .buy-box-button {
+    padding: 10px; /* Было 12px */
+    min-width: 90px; /* Было 100px */
+    font-size: 15px; /* Было 16px */
+}
+
+/* Уменьшаем шрифты описания */
+.box-title {
+    font-size: 15px; /* Было 16px */
+}
+.box-description {
+    font-size: 11px; /* Было 12px */
+}
+.chances-list {
+    margin-top: 6px; /* Было 8px */
+}
