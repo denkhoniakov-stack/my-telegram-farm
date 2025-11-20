@@ -153,20 +153,18 @@ class FarmersShop {
         });
     }
 
-    // Открытие ящика
-    // Открытие ящика
+        // Открытие ящика
     async openBox(boxId) {
-        // Безопасно получаем gameState
-        if (typeof gameState === 'undefined' && typeof window.gameState === 'undefined') {
+        // Получаем доступ к глобальному gameState
+        const state = window.gameState;
+        
+        if (!state) {
             console.error('[FARMERS SHOP] gameState не определен');
-            this.showNotification('Ошибка: игра не инициализирована', 'error');
             return;
         }
-        const state = window.gameState || gameState;
 
         const boxes = this.getBoxes();
         const box = boxes.find(b => b.id === boxId);
-        
         if (!box) return;
         
         // Проверка монет
@@ -177,47 +175,66 @@ class FarmersShop {
 
         this.isOpening = true;
 
-        // Списываем монеты из общего баланса
+        // Списываем монеты
         state.balance -= box.cost;
 
-        // ✅ ПРАВИЛЬНО ОБНОВЛЯЕМ ОТОБРАЖЕНИЕ БАЛАНСА
-        if (typeof updateBalanceDisplay === 'function') {
-            updateBalanceDisplay();
-        } else if (typeof updateCoinsDisplay === 'function') {
-            // На случай, если где‑то всё-таки есть старая функция
-            updateCoinsDisplay();
+        // ✅ ВЫЗЫВАЕМ ГЛОБАЛЬНЫЕ ФУНКЦИИ (через window для надежности)
+        if (window.updateBalanceDisplay) {
+            window.updateBalanceDisplay();
+        } else {
+            console.warn('updateBalanceDisplay не найден!');
+            // Попытка обновить вручную, если функция не найдена
+            const el = document.getElementById('balance-amount');
+            if(el) el.innerText = state.balance.toFixed(2);
         }
 
-        // Сохраняем игру (используется твоя функция из script.js)
-        if (typeof saveGameData === 'function') {
-            saveGameData();
-        } else if (typeof saveGameState === 'function') {
-            saveGameState();
+        // ✅ СОХРАНЯЕМ СРАЗУ ПОСЛЕ СПИСАНИЯ
+        if (window.saveGameData) {
+            window.saveGameData();
         }
 
-        // Определяем редкость выпавшего фермера
+        // Определяем редкость и фермера
         const rarity = this.rollRarity(box.chances);
-        
-        // Выбираем случайного фермера этой редкости
         const farmer = this.getRandomFarmer(rarity);
         
         if (!farmer) {
-            console.error('Не удалось получить фермера');
             this.isOpening = false;
             return;
         }
 
-        // Показываем анимацию открытия
+        // Анимация
         await this.showOpeningAnimation(box, farmer);
         
-        // Добавляем фермера в коллекцию
+        // Добавляем фермера
         this.addFarmerToCollection(farmer);
         
-        // Обновляем магазин (цены/кнопки после списания монет)
+        // Обновляем магазин
         this.renderShop();
         
         this.isOpening = false;
     }
+    
+    // В метод addFarmerToCollection ТОЖЕ добавьте сохранение
+    addFarmerToCollection(farmer) {
+        const state = window.gameState;
+        if (!state) return;
+
+        if (!state.farmers) state.farmers = [];
+
+        const existing = state.farmers.find(f => f.id === farmer.id);
+        if (existing) {
+            existing.duplicates = (existing.duplicates || 0) + 1;
+        } else {
+            state.farmers.push(farmer);
+        }
+
+        // ✅ СОХРАНЯЕМ ПОСЛЕ ДОБАВЛЕНИЯ ФЕРМЕРА
+        if (window.saveGameData) {
+            window.saveGameData();
+            console.log('Игра сохранена после получения фермера');
+        }
+    }
+
 
 
     // Определение редкости по вероятностям
