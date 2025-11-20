@@ -5,6 +5,8 @@
 class FarmersShop {
     constructor() {
         this.isOpening = false;
+        // Используем функцию для получения актуального gameState
+        this.getGameState = () => window.gameState;
     }
 
     // Конфигурация ящиков
@@ -71,8 +73,18 @@ class FarmersShop {
 
     // Отображение ящиков в магазине
     renderShop() {
+        const state = this.getGameState();
+        
+        if (!state) {
+            console.error('[FARMERS SHOP] gameState не найден!');
+            return;
+        }
+
         const container = document.querySelector('#boosters-tab ul');
-        if (!container) return;
+        if (!container) {
+            console.error('[FARMERS SHOP] Контейнер #boosters-tab ul не найден');
+            return;
+        }
 
         container.innerHTML = '';
         const boxes = this.getBoxes();
@@ -81,7 +93,8 @@ class FarmersShop {
             const li = document.createElement('li');
             li.className = 'shop-item box-item';
             
-            const canAfford = gameState.coins >= box.cost;
+            // Используем state.balance вместо coins
+            const canAfford = state.balance >= box.cost;
             
             li.innerHTML = `
                 <div class="box-icon">${box.icon}</div>
@@ -106,6 +119,8 @@ class FarmersShop {
 
         // Добавляем обработчики
         this.attachBuyHandlers();
+        
+        console.log('[FARMERS SHOP] ✅ Магазин отображен, ящиков:', boxes.length);
     }
 
     renderChances(chances) {
@@ -140,23 +155,35 @@ class FarmersShop {
 
     // Открытие ящика
     async openBox(boxId) {
+        const state = this.getGameState();
+        if (!state) {
+            console.error('[FARMERS SHOP] gameState не определен');
+            this.showNotification('Ошибка: игра не инициализирована', 'error');
+            return;
+        }
+
         const boxes = this.getBoxes();
         const box = boxes.find(b => b.id === boxId);
         
         if (!box) return;
         
-        // Проверка монет
-        if (gameState.coins < box.cost) {
+        // Проверка монет (используем balance)
+        if (state.balance < box.cost) {
             this.showNotification('Недостаточно монет!', 'error');
             return;
         }
 
         this.isOpening = true;
 
-        // Списываем монеты
-        gameState.coins -= box.cost;
-        updateCoinsDisplay();
-        saveGameState();
+        // Списываем монеты (используем balance)
+        state.balance -= box.cost;
+        
+        // Вызываем глобальные функции обновления
+        if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay(); // Обратите внимание: updateBalanceDisplay, а не updateCoinsDisplay
+        else if (typeof updateCoinsDisplay === 'function') updateCoinsDisplay();
+        
+        if (typeof saveGameState === 'function') saveGameState();
+        else if (typeof saveGameData === 'function') saveGameData();
 
         // Определяем редкость выпавшего фермера
         const rarity = this.rollRarity(box.chances);
@@ -199,6 +226,12 @@ class FarmersShop {
 
     // Получение случайного фермера по редкости
     getRandomFarmer(rarity) {
+        // Проверяем доступность базы данных фермеров
+        if (typeof FARMERS_DATA === 'undefined') {
+            console.error('[FARMERS SHOP] FARMERS_DATA не загружен!');
+            return null;
+        }
+
         const farmersOfRarity = FARMERS_DATA.filter(f => f.rarity === rarity);
         if (farmersOfRarity.length === 0) return null;
         
@@ -216,12 +249,15 @@ class FarmersShop {
 
     // Добавление фермера в коллекцию
     addFarmerToCollection(farmer) {
-        if (!gameState.farmers) {
-            gameState.farmers = [];
+        const state = this.getGameState();
+        if (!state) return;
+
+        if (!state.farmers) {
+            state.farmers = [];
         }
 
         // Проверяем, есть ли уже такой фермер
-        const existing = gameState.farmers.find(f => f.id === farmer.id);
+        const existing = state.farmers.find(f => f.id === farmer.id);
         
         if (existing) {
             // Дубликат - увеличиваем счётчик
@@ -229,11 +265,12 @@ class FarmersShop {
             console.log(`Получен дубликат ${farmer.name}. Всего: ${existing.duplicates + 1}`);
         } else {
             // Новый фермер
-            gameState.farmers.push(farmer);
+            state.farmers.push(farmer);
             console.log(`Получен новый фермер: ${farmer.name}`);
         }
 
-        saveGameState();
+        if (typeof saveGameState === 'function') saveGameState();
+        else if (typeof saveGameData === 'function') saveGameData();
     }
 
     // Анимация открытия ящика
@@ -286,8 +323,11 @@ class FarmersShop {
     }
 
     showNotification(message, type) {
+        // Пытаемся найти глобальную функцию уведомлений
         if (typeof showNotification === 'function') {
             showNotification(message, type);
+        } else if (typeof showAlert === 'function') {
+            showAlert(message);
         } else {
             alert(message);
         }
