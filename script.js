@@ -307,23 +307,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    function updateBalanceDisplay() { balanceAmountElement.innerText = gameState.balance.toFixed(2); }
-
-
-    
-
-
-    // ДОБАВЬТЕ ЭТУ ФУНКЦИЮ ЗДЕСЬ
-    function saveGameData() {
-        const data = JSON.stringify(gameState);
-    
-    // Пробуем CloudStorage, если не работает — используем localStorage
-        if (tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
-            tg.CloudStorage.setItem('farmGame', data);
-        } else {
-            localStorage.setItem('farmGame', data);
+    function updateBalanceDisplay() {
+        const balanceElement = document.getElementById('balance-amount'); // Убедитесь, что ищем элемент заново
+        if (balanceElement) {
+            balanceElement.innerText = gameState.balance.toFixed(2);
         }
     }
+    // 🔥 ДЕЛАЕМ ГЛОБАЛЬНОЙ
+    window.updateBalanceDisplay = updateBalanceDisplay
+
+
+    
+
+
+    function saveGameData() {
+        const dataToSave = JSON.stringify(gameState);
+        
+        // Сохраняем локально
+        localStorage.setItem('farmGame', dataToSave);
+        
+        // Сохраняем в облако (если доступно)
+        if (tg.CloudStorage && typeof tg.CloudStorage.setItem === 'function') {
+            tg.CloudStorage.setItem('farmGame', dataToSave, (err) => {
+                if (err) console.error('Ошибка сохранения в облако:', err);
+            });
+        }
+    }
+    // 🔥 ДЕЛАЕМ ГЛОБАЛЬНОЙ
+    window.saveGameData = saveGameData;
 
 
 
