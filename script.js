@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '🥭': { name: 'Манго', growTime: 40, seedCost: 40.00, sellPrice: 61.60 }
     };
 
-    let gameState = {
+    window.gameState = {
         balance: 100,
         warehouse: {},
         seedInventory: { '🥕': 3, '🍅': 1, '🍆': 1, '🌽': 1, '🍓': 1 }, // Добавил семян для тестов
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hybridData: {} 
     };
 
-
+    let gameState = window.gameState; 
     // --- ПОЛУЧЕНИЕ ЭЛЕМЕНТОВ СТРАНИЦЫ ---
     const balanceAmountElement = document.getElementById('balance-amount');
     const gardenContainer = document.getElementById('garden-container');
@@ -151,12 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ ИСПРАВЛЕНИЕ: loadGameData теперь принимает callback
     async function loadGameData(callback) {
-        
+    
         // ШАГ 1: ЕДИНСТВЕННОЕ ДОБАВЛЕНИЕ - загружаем профиль ПЕРВЫМ
         await userProfile.initialize();
         console.log('[PROFILE] Профиль загружен. Имя:', userProfile.getUserName());
         
-        // ШАГ 2: ВСЯ ОРИГИНАЛЬНАЯ ЛОГИКА ЗАГРУЗКИ ИГРЫ (БЕЗ ИЗМЕНЕНИЙ!)
+        // ШАГ 2: ВСЯ ОРИГИНАЛЬНАЯ ЛОГИКА ЗАГРУЗКИ ИГРЫ
         if (tg.CloudStorage && typeof tg.CloudStorage.getItem === 'function') {
             tg.CloudStorage.getItem('farmGame', (err, data) => {
                 if (!err && data) {
@@ -168,6 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.items = loaded.items || {};
                         gameState.garden = loaded.garden || {};
                         gameState.unlockedBeds = loaded.unlockedBeds || 3;
+                        // ✅ ВСТАВИТЬ СЮДА 1: Загрузка фермеров из CloudStorage
+                        gameState.farmers = loaded.farmers || []; 
+                        
                         gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                         gameState.hybridData = loaded.hybridData || {};
 
@@ -184,11 +187,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error('Ошибка:', e);
                     }
                 } else {
+                    // Если данных нет (новая игра)
                     gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
+                    // ✅ ВСТАВИТЬ СЮДА 2: Инициализация для новой игры
+                    gameState.farmers = [];
                 }
+                
+                // ✅ ВАЖНАЯ ПРОВЕРКА ПЕРЕД CALLBACK (на всякий случай)
+                if (!gameState.farmers) gameState.farmers = [];
+                if (!gameState.unlockedBeds) gameState.unlockedBeds = 3;
                 
                 callback();
 
+                // ... (код setTimeout для настроек остается без изменений) ...
                 setTimeout(async () => {
                     // Инициализация реестра имён
                     if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
@@ -226,6 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     gameState.items = loaded.items || {};
                     gameState.garden = loaded.garden || {};
                     gameState.unlockedBeds = loaded.unlockedBeds || 3;
+                    // ✅ ВСТАВИТЬ СЮДА 3: Загрузка фермеров из localStorage
+                    gameState.farmers = loaded.farmers || [];
+
                     gameState.discoveredHybrids = loaded.discoveredHybrids || [];
                     gameState.hybridData = loaded.hybridData || {};
 
@@ -242,11 +256,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Ошибка:', e);
                 }
             } else {
+                // Если данных нет (новая игра)
                 gameState.hybridMixings = { epic: null, legendary: null, mythic: null };
+                // ✅ ВСТАВИТЬ СЮДА 4: Инициализация для новой игры
+                gameState.farmers = [];
             }
+            
+            // ✅ ВАЖНАЯ ПРОВЕРКА ПЕРЕД CALLBACK (на всякий случай)
+            if (!gameState.farmers) gameState.farmers = [];
+            if (!gameState.unlockedBeds) gameState.unlockedBeds = 3;
             
             callback();
 
+            // ... (код setTimeout для настроек остается без изменений) ...
             setTimeout(async () => {
                 // Инициализация реестра имён
                 if (typeof nameRegistry !== 'undefined' && typeof nameRegistry.initialize === 'function') {
@@ -274,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
     }
+
 
 
 
@@ -661,26 +684,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }));
     
-    // Переключение вкладок в магазине
+    // ✅ ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ВКЛАДОК МАГАЗИНА
+    // --- ОБРАБОТЧИК ВКЛАДОК МАГАЗИНА ---
     if (shopTabsContainer) {
         shopTabsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tab-button')) {
-                shopTabsContainer.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                e.target.classList.add('active');
-                const tabId = e.target.dataset.tab;
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'inventory') {
-                   initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
+            const btn = e.target.closest('.tab-button');
+            if (!btn) return;
+
+            // Убираем active везде
+            shopTabsContainer.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.shop-tab-content').forEach(c => c.classList.remove('active'));
+
+            // Добавляем active текущей кнопке
+            btn.classList.add('active');
+            const tabId = btn.dataset.tab;
+            
+            const content = document.getElementById(`${tabId}-tab`);
+            if (content) content.classList.add('active');
+
+            console.log(`[SHOP] Открыта вкладка: ${tabId}`);
+
+            // Логика вкладок
+            if (tabId === 'seeds') {
+                populateShopSeeds();
+            } 
+            else if (tabId === 'inventory') {
+                if (typeof initHybridLab === 'function') {
+                    initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_DATA);
                 }
-                if (tabId === 'boosters') {
-                    if (typeof farmersShop !== 'undefined') {
+            } 
+            else if (tabId === 'boosters') { // Вкладка "Фермеры"
+                console.log('[SHOP] Инициализация магазина фермеров...');
+                if (typeof farmersShop !== 'undefined') {
+                    // ВАЖНО: Проверяем gameState перед вызовом
+                    if (typeof gameState !== 'undefined') {
                         farmersShop.renderShop();
+                    } else {
+                        console.error('[SHOP] ОШИБКА: gameState не готов!');
                     }
+                } else {
+                    console.error('[SHOP] ОШИБКА: farmersShop не загружен!');
                 }
             }
         });
     }
+
+
 
 
     // Универсальный обработчик покупок
