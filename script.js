@@ -495,34 +495,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const plantInfo = PLANT_DATA[seed];
             const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
 
-            // === НАЧАЛО ИЗМЕНЕНИЙ ===
-            // Рассчитываем бонус скорости
-            let speedMultiplier = 1;
-            if (typeof calculateFarmerBonuses === 'function') {
-                speedMultiplier = calculateFarmerBonuses().growthSpeed || 1;
-            }
-            // Сохраняем ускоренное время роста
-            const reducedGrowTime = plantInfo.growTime / speedMultiplier;
-            // === КОНЕЦ ИЗМЕНЕНИЙ ===
-
+            // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
             gameState.garden[bedIndex] = {
                 seed: seed,
-                plantedAt: Date.now(),
-                // === НАЧАЛО ИЗМЕНЕНИЙ ===
-                customGrowTime: reducedGrowTime // Сохраняем это поле
-                // === КОНЕЦ ИЗМЕНЕНИЙ ===
+                plantedAt: Date.now()
+                // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
             };
-            
-            gameState.seedInventory[seed]--;
-            if (gameState.seedInventory[seed] <= 0) delete gameState.seedInventory[seed];
-            
-            updateBalanceDisplay();
-            renderPlant(bed, bedIndex);
             saveGameData();
-            hideSeedMenu();
-            
-            // Вибрация, если есть такая функция (оставляем как у вас может быть в других версиях)
-            if (typeof hapticFeedback === 'function') hapticFeedback('light');
+
+            // Рендерим растение
+            renderPlant(bed, bedIndex);
         }
 
 
@@ -544,70 +526,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function renderPlant(bed, bedIndex) {
             const plantData = gameState.garden[bedIndex];
-            
-            // Очистка грядки если данных нет
-            if (!plantData) {
-                bed.innerHTML = '';
-                bed.classList.remove('growing', 'ready');
-                return;
-            }
+            if (!plantData) return;
 
             const plantInfo = PLANT_DATA[plantData.seed];
             const elapsed = Date.now() - plantData.plantedAt;
             
-            // === НАЧАЛО ИЗМЕНЕНИЙ ===
-            // Используем ускоренное время, если оно записано, иначе стандартное
-            const growTimeSeconds = plantData.customGrowTime || plantInfo.growTime;
-            const growTimeMs = growTimeSeconds * 1000;
-            // === КОНЕЦ ИЗМЕНЕНИЙ ===
-            
-            // Дальше ВЕСЬ ВАШ СТАРЫЙ КОД без изменений
-            const remaining = Math.max(0, growTimeMs - elapsed);
+            // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
+            const growTimeSeconds = plantInfo.growTime;
+            const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
 
-            bed.innerHTML = ''; // Очищаем содержимое
+            bed.innerHTML = '';
+
+            const plantElement = document.createElement('div');
+            plantElement.classList.add('plant');
+            plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
 
             if (remaining > 0) {
-                // Растение растет
-                bed.classList.add('growing');
-                bed.classList.remove('ready');
-                
-                // Иконка (росток)
-                const icon = document.createElement('div');
-                icon.className = 'plant-icon';
-                icon.innerText = '🌱';
-                bed.appendChild(icon);
-                
-                // Таймер (Ваш старый дизайн)
-                const timer = document.createElement('div');
-                timer.className = 'timer';
-                timer.innerText = `${Math.ceil(remaining / 1000)}с`;
-                bed.appendChild(timer);
-                
-                // Перерисовка через 1 секунду
-                setTimeout(() => renderPlant(bed, bedIndex), 1000);
-            } else {
-                // Растение готово
-                bed.classList.remove('growing');
-                bed.classList.add('ready');
-                
-                // Иконка готового растения
-                const icon = document.createElement('div');
-                icon.className = 'plant-icon ready-crop';
-                icon.innerText = plantData.seed;
-                bed.appendChild(icon);
-                
-                // Обработчик сбора урожая
-                icon.onclick = (e) => {
-                    e.stopPropagation();
-                    harvestCrop(bed, bedIndex);
-                };
-                
-                // И на саму грядку тоже
-                bed.onclick = (e) => {
-                    if (!e.target.closest('.plant-menu')) {
-                        harvestCrop(bed, bedIndex);
+                const timerElement = document.createElement('div');
+                timerElement.classList.add('plant-timer');
+                bed.appendChild(plantElement);
+                bed.appendChild(timerElement);
+
+                let remainingTime = remaining;
+                timerElement.innerText = formatTime(remainingTime);
+
+                const timerInterval = setInterval(() => {
+                    remainingTime--;
+                    if (remainingTime >= 0) {
+                        timerElement.innerText = formatTime(remainingTime);
                     }
-                };
+                    
+                    if (remainingTime <= 0) {
+                        clearInterval(timerInterval);
+                        bed.removeAttribute('data-timer-id');
+                        
+                        if (timerElement.parentNode) {
+                            bed.removeChild(timerElement);
+                        }
+                        plantElement.innerText = plantData.seed;
+                        setupHarvest(plantElement, bed, bedIndex, plantData.seed);
+                    }
+                }, 1000);
+                
+                bed.setAttribute('data-timer-id', timerInterval);
+            } else {
+                bed.appendChild(plantElement);
+                setupHarvest(plantElement, bed, bedIndex, plantData.seed);
             }
         }
 
