@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!err && data) {
                     try {
                         const loaded = JSON.parse(data);
-                        gameState.balance = loaded.balance || 100;
+                        gameState.balance = loaded.balance || 100000;
                         gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                         gameState.warehouse = loaded.warehouse || {};
                         gameState.items = loaded.items || {};
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data) {
                 try {
                     const loaded = JSON.parse(data);
-                    gameState.balance = loaded.balance || 100;
+                    gameState.balance = loaded.balance || 100000;
                     gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                     gameState.warehouse = loaded.warehouse || {};
                     gameState.items = loaded.items || {};
@@ -491,21 +491,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function plantSeed(bed, seed) {
-        const plantInfo = PLANT_DATA[seed];
-        const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
+        function plantSeed(bed, seed) {
+            const plantInfo = PLANT_DATA[seed];
+            const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
+            
+            // === НОВЫЙ КОД: Расчет бонуса скорости ===
+            // Получаем текущие бонусы
+            let speedMultiplier = 1;
+            if (typeof calculateFarmerBonuses === 'function') {
+                const bonuses = calculateFarmerBonuses();
+                speedMultiplier = bonuses.growthSpeed || 1;
+            }
+            
+            // Уменьшаем время роста (например, 60 сек / 1.5 = 40 сек)
+            const reducedGrowTime = plantInfo.growTime / speedMultiplier;
+            // =========================================
 
-        // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
-        gameState.garden[bedIndex] = {
-            seed: seed,
-            plantedAt: Date.now()
-            // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
-        };
-        saveGameData();
+            gameState.garden[bedIndex] = {
+                seed: seed,
+                plantedAt: Date.now(),
+                customGrowTime: reducedGrowTime // Сохраняем ускоренное время
+            };
+            
+            gameState.seedInventory[seed]--;
+            if (gameState.seedInventory[seed] <= 0) delete gameState.seedInventory[seed];
+            
+            updateBalanceDisplay();
+            renderPlant(bed, bedIndex);
+            saveGameData();
+            hideSeedMenu();
+            
+            // Вибрация при посадке
+            hapticFeedback('light');
+        }
 
-        // Рендерим растение
-        renderPlant(bed, bedIndex);
-    }
 
 
     // ✅ НОВАЯ ФУНКЦИЯ: Очищает все активные таймеры
@@ -522,56 +541,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 
-    function renderPlant(bed, bedIndex) {
-        const plantData = gameState.garden[bedIndex];
-        if (!plantData) return;
-
-        const plantInfo = PLANT_DATA[plantData.seed];
-        const elapsed = Date.now() - plantData.plantedAt;
-        
-        // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
-        const growTimeSeconds = plantInfo.growTime;
-        const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
-
-        bed.innerHTML = '';
-
-        const plantElement = document.createElement('div');
-        plantElement.classList.add('plant');
-        plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
-
-        if (remaining > 0) {
-            const timerElement = document.createElement('div');
-            timerElement.classList.add('plant-timer');
-            bed.appendChild(plantElement);
-            bed.appendChild(timerElement);
-
-            let remainingTime = remaining;
-            timerElement.innerText = formatTime(remainingTime);
-
-            const timerInterval = setInterval(() => {
-                remainingTime--;
-                if (remainingTime >= 0) {
-                    timerElement.innerText = formatTime(remainingTime);
-                }
-                
-                if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    bed.removeAttribute('data-timer-id');
-                    
-                    if (timerElement.parentNode) {
-                        bed.removeChild(timerElement);
-                    }
-                    plantElement.innerText = plantData.seed;
-                    setupHarvest(plantElement, bed, bedIndex, plantData.seed);
-                }
-            }, 1000);
+        function renderPlant(bed, bedIndex) {
+            const plantData = gameState.garden[bedIndex];
             
-            bed.setAttribute('data-timer-id', timerInterval);
-        } else {
-            bed.appendChild(plantElement);
-            setupHarvest(plantElement, bed, bedIndex, plantData.seed);
+            // Очистка грядки если данных нет
+            if (!plantData) {
+                bed.innerHTML = '';
+                bed.classList.remove('growing', 'ready');
+                return;
+            }
+
+            const plantInfo = PLANT_DATA[plantData.seed];
+            const elapsed = Date.now() - plantData.plantedAt;
+            
+            // === НОВЫЙ КОД: Используем ускоренное время ===
+            // Берем customGrowTime, если оно есть (для новых посадок), иначе стандартное (для старых)
+            const growTimeSeconds = plantData.customGrowTime || plantInfo.growTime;
+            const growTimeMs = growTimeSeconds * 1000;
+            // =============================================
+            
+            const remaining = Math.max(0, growTimeMs - elapsed);
+            const progress = Math.min(100, (elapsed / growTimeMs) * 100);
+
+            bed.innerHTML = ''; // Очищаем содержимое перед перерисовкой
+
+            if (remaining > 0) {
+                // Растение растет
+                bed.classList.add('growing');
+                bed.classList.remove('ready');
+                
+                // Отображение иконки (росток)
+                const icon = document.createElement('div');
+                icon.className = 'plant-icon';
+                icon.innerText = '🌱';
+                bed.appendChild(icon);
+                
+                // Таймер
+                const timer = document.createElement('div');
+                timer.className = 'timer';
+                timer.innerText = `${Math.ceil(remaining / 1000)}с`;
+                bed.appendChild(timer);
+                
+                // Прогресс-бар
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                const fill = document.createElement('div');
+                fill.className = 'progress-fill';
+                fill.style.width = `${progress}%`;
+                progressBar.appendChild(fill);
+                bed.appendChild(progressBar);
+                
+                // Перерисовка через 1 секунду
+                setTimeout(() => renderPlant(bed, bedIndex), 1000);
+            } else {
+                // Растение готово
+                bed.classList.remove('growing');
+                bed.classList.add('ready');
+                
+                // Иконка готового растения
+                const icon = document.createElement('div');
+                icon.className = 'plant-icon ready-crop';
+                icon.innerText = plantData.seed;
+                bed.appendChild(icon);
+                
+                // Обработчик сбора урожая
+                icon.onclick = (e) => {
+                    e.stopPropagation(); // Чтобы не открывалось меню посадки
+                    harvestCrop(bed, bedIndex);
+                };
+            }
         }
-    }
+
 
 
 
@@ -1111,3 +1151,30 @@ setTimeout(() => {
     }
   }, 1000);
 }, 2000);
+
+
+// Функция для расчета бонусов
+function calculateFarmerBonuses() {
+    const bonuses = {
+        growthSpeed: 1, 
+        sellPrice: 1
+    };
+
+    if (!gameState || !gameState.farmers) return bonuses;
+
+    const activeFarmers = gameState.farmers.filter(f => f.isActive);
+
+    activeFarmers.forEach(farmer => {
+        if (farmer.bonusType === 'growth') {
+            bonuses.growthSpeed += (farmer.bonusValue / 100); 
+        }
+        if (farmer.bonusType === 'coins') {
+            bonuses.sellPrice += (farmer.bonusValue / 100);
+        }
+    });
+
+    return bonuses;
+}
+// Делаем глобальной
+window.calculateFarmerBonuses = calculateFarmerBonuses;
+
