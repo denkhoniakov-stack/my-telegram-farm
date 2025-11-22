@@ -212,3 +212,8 @@
 .chances-list {
     margin-top: 6px; /* Было 8px */
 }
+.box-image {
+    width: 60px;  /* Или другой размер по вашему вкусу */
+    height: 60px;
+    object-fit: contain;
+}

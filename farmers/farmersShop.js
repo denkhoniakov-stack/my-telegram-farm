@@ -15,57 +15,58 @@ class FarmersShop {
             {
                 id: 'wooden',
                 name: 'Деревянный ящик',
-                icon: '📦',
+                // ЗАМЕНИЛ icon НА image
+                image: 'images/boxes/wooden_box.png', 
                 cost: 100,
                 description: 'Базовый ящик',
                 chances: {
-                    common: 70,      // 70%
-                    rare: 25,        // 25%
-                    epic: 5,         // 5%
-                    legendary: 0,    // 0%
-                    mythic: 0        // 0%
+                    common: 70,
+                    rare: 25,
+                    epic: 5,
+                    legendary: 0,
+                    mythic: 0
                 }
             },
             {
                 id: 'silver',
                 name: 'Серебряный ящик',
-                icon: '🎁',
+                image: 'images/boxes/silver_box.png',
                 cost: 500,
                 description: 'Улучшенный ящик',
                 chances: {
-                    common: 40,      // 40%
-                    rare: 45,        // 45%
-                    epic: 14,        // 14%
-                    legendary: 1,    // 1%
-                    mythic: 0        // 0%
+                    common: 40,
+                    rare: 45,
+                    epic: 14,
+                    legendary: 1,
+                    mythic: 0
                 }
             },
             {
                 id: 'golden',
                 name: 'Золотой ящик',
-                icon: '🏆',
+                image: 'images/boxes/golden_box.png',
                 cost: 2000,
                 description: 'Редкий ящик',
                 chances: {
-                    common: 0,       // 0%
-                    rare: 50,        // 50%
-                    epic: 40,        // 40%
-                    legendary: 9,    // 9%
-                    mythic: 1        // 1%
+                    common: 0,
+                    rare: 50,
+                    epic: 40,
+                    legendary: 9,
+                    mythic: 1
                 }
             },
             {
                 id: 'diamond',
                 name: 'Алмазный ящик',
-                icon: '💎',
+                image: 'images/boxes/diamond_box.png',
                 cost: 10000,
                 description: 'Легендарный ящик',
                 chances: {
-                    common: 0,       // 0%
-                    rare: 0,         // 0%
-                    epic: 45,        // 45%
-                    legendary: 50,   // 50%
-                    mythic: 5        // 5%
+                    common: 0,
+                    rare: 0,
+                    epic: 45,
+                    legendary: 50,
+                    mythic: 5
                 }
             }
         ];
@@ -97,7 +98,9 @@ class FarmersShop {
             const canAfford = state.balance >= box.cost;
             
             li.innerHTML = `
-                <div class="box-icon">${box.icon}</div>
+                <div class="box-icon">
+                    <img src="${box.image}" alt="${box.name}" class="box-image">
+                </div>
                 <div class="box-details">
                     <div class="box-title">${box.name}</div>
                     <div class="box-description">${box.description}</div>
