@@ -494,11 +494,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function plantSeed(bed, seed) {
         const plantInfo = PLANT_DATA[seed];
         const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
-
+        let speedMultiplier = 1;
+        if (window.calculateFarmerBonuses) {
+            speedMultiplier = window.calculateFarmerBonuses().growthSpeed;
+        }
+        // Рассчитываем ускоренное время
+        const reducedGrowTime = plantInfo.growTime / speedMultiplier;
+     
         // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
         gameState.garden[bedIndex] = {
             seed: seed,
-            plantedAt: Date.now()
+            plantedAt: Date.now(),
+            customGrowTime: reducedGrowTime
             // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
         };
         saveGameData();
@@ -530,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const elapsed = Date.now() - plantData.plantedAt;
         
         // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
-        const growTimeSeconds = plantInfo.growTime;
+        const growTimeSeconds = plantData.customGrowTime || plantInfo.growTime;
         const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
 
         bed.innerHTML = '';
@@ -1138,3 +1145,29 @@ function calculateFarmerBonuses() {
 
     return bonuses;
 }
+// === ЛОГИКА ФЕРМЕРОВ: Подсчет бонусов ===
+window.calculateFarmerBonuses = function() {
+    const bonuses = {
+        growthSpeed: 1, // Множитель скорости (1 = 100%)
+        sellPrice: 1    // Множитель цены
+    };
+
+    // Если фермеров нет или игра не загружена - возвращаем стандарт
+    if (!window.gameState || !window.gameState.farmers) return bonuses;
+
+    // Ищем активных фермеров
+    const activeFarmers = window.gameState.farmers.filter(f => f.isActive);
+
+    activeFarmers.forEach(farmer => {
+        // Если бонус на скорость (например, 'growth')
+        if (farmer.bonusType === 'growth') {
+            bonuses.growthSpeed += (farmer.bonusValue / 100); 
+        }
+        // Если бонус на монеты (например, 'coins')
+        if (farmer.bonusType === 'coins') {
+            bonuses.sellPrice += (farmer.bonusValue / 100);
+        }
+    });
+
+    return bonuses;
+};
