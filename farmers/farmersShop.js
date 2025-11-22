@@ -307,13 +307,13 @@ class FarmersShop {
     // Анимация открытия ящика
     async showOpeningAnimation(box, farmer) {
         return new Promise((resolve) => {
-            // Создаём модальное окно анимации
             const modal = document.createElement('div');
             modal.className = 'box-opening-modal';
             modal.innerHTML = `
                 <div class="box-opening-content">
                     <div class="box-animation">
-                        <div class="box-icon-large shake">${box.icon}</div>
+                        <!-- ИСПОЛЬЗУЕМ КАРТИНКУ ВМЕСТО ИКОНКИ -->
+                        <img src="${box.image}" class="box-icon-large shake" alt="Box">
                         <div class="opening-text">Открываем...</div>
                     </div>
                 </div>

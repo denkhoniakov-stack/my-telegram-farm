@@ -217,3 +217,15 @@
     height: 60px;
     object-fit: contain;
 }
+.shop-box-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.box-icon-large {
+    width: 150px; /* Размер прыгающего ящика при открытии */
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
