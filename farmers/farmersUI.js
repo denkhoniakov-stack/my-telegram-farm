@@ -184,18 +184,67 @@ class FarmersUI {
         card.className = `farmer-card rarity-${farmer.rarity}`;
         card.style.borderColor = farmer.color;
         
+        const isActive = farmer.isActive;
+        const btnText = isActive ? '✓ Активен' : 'Активировать';
+        const btnClass = isActive ? 'activate-btn active' : 'activate-btn';
+
+        // Используем картинку если есть, иначе иконку
+        const iconHtml = farmer.image 
+            ? `<img src="${farmer.image}" class="farmer-card-img" alt="${farmer.name}">`
+            : `<div class="farmer-icon" style="font-size: 50px;">${farmer.icon}</div>`;
+
         card.innerHTML = `
-            <div class="farmer-icon" style="font-size: 50px;">${farmer.icon}</div>
+            ${iconHtml}
             <div class="farmer-name">${farmer.name}</div>
             <div class="farmer-rarity" style="color: ${farmer.color};">${this.getRarityText(farmer.rarity)}</div>
             <div class="farmer-bonus">${farmer.description}</div>
             ${farmer.duplicates > 0 ? `<div class="farmer-duplicates">+${farmer.duplicates} дубликатов</div>` : ''}
-            <button class="activate-btn" data-farmer-id="${farmer.id}">
-                ${farmer.isActive ? '✓ Активен' : 'Активировать'}
+            <button class="${btnClass}" data-farmer-id="${farmer.id}">
+                ${btnText}
             </button>
         `;
 
+        // Добавляем обработчик прямо здесь
+        const btn = card.querySelector('.activate-btn');
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Чтобы не срабатывал клик по карточке если он есть
+            this.toggleFarmerActivation(farmer.id);
+        });
+
         return card;
+    }
+
+    // Новый метод для переключения активации
+    toggleFarmerActivation(farmerId) {
+        if (typeof gameState === 'undefined') return;
+        
+        const farmer = gameState.farmers.find(f => f.id === farmerId);
+        if (!farmer) return;
+
+        if (farmer.isActive) {
+            // Деактивация
+            farmer.isActive = false;
+            this.showNotification(`Фермер ${farmer.name} отправлен отдыхать`);
+        } else {
+            // Активация (проверка на макс. количество слотов - например 3)
+            const activeCount = gameState.farmers.filter(f => f.isActive).length;
+            if (activeCount >= 3) {
+                this.showNotification('Нет свободных слотов! (Максимум 3)', 'error');
+                return;
+            }
+            farmer.isActive = true;
+            this.showNotification(`Фермер ${farmer.name} принялся за работу!`);
+        }
+
+        // Сохраняем и обновляем UI
+        if (typeof saveGameState === 'function') saveGameState();
+        this.updateDisplay();
+    }
+
+    showNotification(message, type = 'success') {
+        // Используем вашу глобальную функцию или alert
+        if (typeof showAlert === 'function') showAlert(message);
+        else alert(message);
     }
 
     getRarityText(rarity) {
