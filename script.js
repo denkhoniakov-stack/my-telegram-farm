@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!err && data) {
                     try {
                         const loaded = JSON.parse(data);
-                        gameState.balance = loaded.balance || 100000;
+                        gameState.balance = loaded.balance || 100;
                         gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                         gameState.warehouse = loaded.warehouse || {};
                         gameState.items = loaded.items || {};
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data) {
                 try {
                     const loaded = JSON.parse(data);
-                    gameState.balance = loaded.balance || 100000;
+                    gameState.balance = loaded.balance || 100;
                     gameState.seedInventory = loaded.seedInventory || { '🌾': 3, '🍅': 1, '🥕': 1, '🌽': 1, '🥔': 1 };
                     gameState.warehouse = loaded.warehouse || {};
                     gameState.items = loaded.items || {};
@@ -491,23 +491,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-        function plantSeed(bed, seed) {
-            const plantInfo = PLANT_DATA[seed];
-            const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
+    function plantSeed(bed, seed) {
+        const plantInfo = PLANT_DATA[seed];
+        const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
 
-            // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
-            gameState.garden[bedIndex] = {
-                seed: seed,
-                plantedAt: Date.now()
-                // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
-            };
-            saveGameData();
+        // ✅ СОХРАНЯЕМ ТОЛЬКО seed и plantedAt
+        gameState.garden[bedIndex] = {
+            seed: seed,
+            plantedAt: Date.now()
+            // НЕ СОХРАНЯЕМ growTime - берём из PLANT_DATA
+        };
+        saveGameData();
 
-            // Рендерим растение
-            renderPlant(bed, bedIndex);
-        }
-
-
+        // Рендерим растение
+        renderPlant(bed, bedIndex);
+    }
 
 
     // ✅ НОВАЯ ФУНКЦИЯ: Очищает все активные таймеры
@@ -524,58 +522,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 
-        function renderPlant(bed, bedIndex) {
-            const plantData = gameState.garden[bedIndex];
-            if (!plantData) return;
+    function renderPlant(bed, bedIndex) {
+        const plantData = gameState.garden[bedIndex];
+        if (!plantData) return;
 
-            const plantInfo = PLANT_DATA[plantData.seed];
-            const elapsed = Date.now() - plantData.plantedAt;
-            
-            // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
-            const growTimeSeconds = plantInfo.growTime;
-            const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
+        const plantInfo = PLANT_DATA[plantData.seed];
+        const elapsed = Date.now() - plantData.plantedAt;
+        
+        // ✅ БЕРЁМ growTime ИЗ PLANT_DATA (в секундах)
+        const growTimeSeconds = plantInfo.growTime;
+        const remaining = Math.max(0, Math.floor(growTimeSeconds - (elapsed / 1000)));
 
-            bed.innerHTML = '';
+        bed.innerHTML = '';
 
-            const plantElement = document.createElement('div');
-            plantElement.classList.add('plant');
-            plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
+        const plantElement = document.createElement('div');
+        plantElement.classList.add('plant');
+        plantElement.innerText = remaining > 0 ? '🌱' : plantData.seed;
 
-            if (remaining > 0) {
-                const timerElement = document.createElement('div');
-                timerElement.classList.add('plant-timer');
-                bed.appendChild(plantElement);
-                bed.appendChild(timerElement);
+        if (remaining > 0) {
+            const timerElement = document.createElement('div');
+            timerElement.classList.add('plant-timer');
+            bed.appendChild(plantElement);
+            bed.appendChild(timerElement);
 
-                let remainingTime = remaining;
-                timerElement.innerText = formatTime(remainingTime);
+            let remainingTime = remaining;
+            timerElement.innerText = formatTime(remainingTime);
 
-                const timerInterval = setInterval(() => {
-                    remainingTime--;
-                    if (remainingTime >= 0) {
-                        timerElement.innerText = formatTime(remainingTime);
-                    }
-                    
-                    if (remainingTime <= 0) {
-                        clearInterval(timerInterval);
-                        bed.removeAttribute('data-timer-id');
-                        
-                        if (timerElement.parentNode) {
-                            bed.removeChild(timerElement);
-                        }
-                        plantElement.innerText = plantData.seed;
-                        setupHarvest(plantElement, bed, bedIndex, plantData.seed);
-                    }
-                }, 1000);
+            const timerInterval = setInterval(() => {
+                remainingTime--;
+                if (remainingTime >= 0) {
+                    timerElement.innerText = formatTime(remainingTime);
+                }
                 
-                bed.setAttribute('data-timer-id', timerInterval);
-            } else {
-                bed.appendChild(plantElement);
-                setupHarvest(plantElement, bed, bedIndex, plantData.seed);
-            }
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    bed.removeAttribute('data-timer-id');
+                    
+                    if (timerElement.parentNode) {
+                        bed.removeChild(timerElement);
+                    }
+                    plantElement.innerText = plantData.seed;
+                    setupHarvest(plantElement, bed, bedIndex, plantData.seed);
+                }
+            }, 1000);
+            
+            bed.setAttribute('data-timer-id', timerInterval);
+        } else {
+            bed.appendChild(plantElement);
+            setupHarvest(plantElement, bed, bedIndex, plantData.seed);
         }
-
-
+    }
 
 
 
@@ -1120,8 +1116,9 @@ setTimeout(() => {
 // Функция для расчета бонусов
 function calculateFarmerBonuses() {
     const bonuses = {
-        growthSpeed: 1, 
-        sellPrice: 1
+        growthSpeed: 1, // Множитель скорости роста (1 = 100%)
+        sellPrice: 1,   // Множитель цены продажи
+        harvestAmount: 1 // Множитель урожая
     };
 
     if (!gameState || !gameState.farmers) return bonuses;
@@ -1129,16 +1126,15 @@ function calculateFarmerBonuses() {
     const activeFarmers = gameState.farmers.filter(f => f.isActive);
 
     activeFarmers.forEach(farmer => {
+        // Пример логики бонусов (зависит от того, какие bonusType у вас в farmersData.js)
         if (farmer.bonusType === 'growth') {
             bonuses.growthSpeed += (farmer.bonusValue / 100); 
         }
         if (farmer.bonusType === 'coins') {
             bonuses.sellPrice += (farmer.bonusValue / 100);
         }
+        // Добавьте другие типы бонусов
     });
 
     return bonuses;
 }
-// Делаем глобальной
-window.calculateFarmerBonuses = calculateFarmerBonuses;
-
