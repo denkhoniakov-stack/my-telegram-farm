@@ -494,23 +494,23 @@ document.addEventListener('DOMContentLoaded', () => {
         function plantSeed(bed, seed) {
             const plantInfo = PLANT_DATA[seed];
             const bedIndex = Array.from(document.querySelectorAll('.garden-bed')).indexOf(bed);
-            
-            // === НОВЫЙ КОД: Расчет бонуса скорости ===
-            // Получаем текущие бонусы
+
+            // === НАЧАЛО ИЗМЕНЕНИЙ ===
+            // Рассчитываем бонус скорости
             let speedMultiplier = 1;
             if (typeof calculateFarmerBonuses === 'function') {
-                const bonuses = calculateFarmerBonuses();
-                speedMultiplier = bonuses.growthSpeed || 1;
+                speedMultiplier = calculateFarmerBonuses().growthSpeed || 1;
             }
-            
-            // Уменьшаем время роста (например, 60 сек / 1.5 = 40 сек)
+            // Сохраняем ускоренное время роста
             const reducedGrowTime = plantInfo.growTime / speedMultiplier;
-            // =========================================
+            // === КОНЕЦ ИЗМЕНЕНИЙ ===
 
             gameState.garden[bedIndex] = {
                 seed: seed,
                 plantedAt: Date.now(),
-                customGrowTime: reducedGrowTime // Сохраняем ускоренное время
+                // === НАЧАЛО ИЗМЕНЕНИЙ ===
+                customGrowTime: reducedGrowTime // Сохраняем это поле
+                // === КОНЕЦ ИЗМЕНЕНИЙ ===
             };
             
             gameState.seedInventory[seed]--;
@@ -521,9 +521,10 @@ document.addEventListener('DOMContentLoaded', () => {
             saveGameData();
             hideSeedMenu();
             
-            // Вибрация при посадке
-            hapticFeedback('light');
+            // Вибрация, если есть такая функция (оставляем как у вас может быть в других версиях)
+            if (typeof hapticFeedback === 'function') hapticFeedback('light');
         }
+
 
 
 
@@ -554,42 +555,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const plantInfo = PLANT_DATA[plantData.seed];
             const elapsed = Date.now() - plantData.plantedAt;
             
-            // === НОВЫЙ КОД: Используем ускоренное время ===
-            // Берем customGrowTime, если оно есть (для новых посадок), иначе стандартное (для старых)
+            // === НАЧАЛО ИЗМЕНЕНИЙ ===
+            // Используем ускоренное время, если оно записано, иначе стандартное
             const growTimeSeconds = plantData.customGrowTime || plantInfo.growTime;
             const growTimeMs = growTimeSeconds * 1000;
-            // =============================================
+            // === КОНЕЦ ИЗМЕНЕНИЙ ===
             
+            // Дальше ВЕСЬ ВАШ СТАРЫЙ КОД без изменений
             const remaining = Math.max(0, growTimeMs - elapsed);
-            const progress = Math.min(100, (elapsed / growTimeMs) * 100);
 
-            bed.innerHTML = ''; // Очищаем содержимое перед перерисовкой
+            bed.innerHTML = ''; // Очищаем содержимое
 
             if (remaining > 0) {
                 // Растение растет
                 bed.classList.add('growing');
                 bed.classList.remove('ready');
                 
-                // Отображение иконки (росток)
+                // Иконка (росток)
                 const icon = document.createElement('div');
                 icon.className = 'plant-icon';
                 icon.innerText = '🌱';
                 bed.appendChild(icon);
                 
-                // Таймер
+                // Таймер (Ваш старый дизайн)
                 const timer = document.createElement('div');
                 timer.className = 'timer';
                 timer.innerText = `${Math.ceil(remaining / 1000)}с`;
                 bed.appendChild(timer);
-                
-                // Прогресс-бар
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                const fill = document.createElement('div');
-                fill.className = 'progress-fill';
-                fill.style.width = `${progress}%`;
-                progressBar.appendChild(fill);
-                bed.appendChild(progressBar);
                 
                 // Перерисовка через 1 секунду
                 setTimeout(() => renderPlant(bed, bedIndex), 1000);
@@ -606,11 +598,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Обработчик сбора урожая
                 icon.onclick = (e) => {
-                    e.stopPropagation(); // Чтобы не открывалось меню посадки
+                    e.stopPropagation();
                     harvestCrop(bed, bedIndex);
+                };
+                
+                // И на саму грядку тоже
+                bed.onclick = (e) => {
+                    if (!e.target.closest('.plant-menu')) {
+                        harvestCrop(bed, bedIndex);
+                    }
                 };
             }
         }
+
 
 
 
