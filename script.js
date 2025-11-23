@@ -962,6 +962,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const plant = PLANT_DATA[crop];
                 const maxCount = gameState.warehouse[crop];
 
+                // --- РАСЧЕТ БОНУСА ФЕРМЕРА ДЛЯ ОТОБРАЖЕНИЯ ЦЕНЫ ---
+                let bonusMultiplier = 1;
+                if (gameState.farmers && Array.isArray(gameState.farmers)) {
+                    gameState.farmers.forEach(farmer => {
+                        if ((farmer.isActive === true || farmer.isActive === 'true') && farmer.bonusType === 'coins') {
+                            bonusMultiplier += farmer.bonusValue / 100;
+                        }
+                    });
+                }
+                // Новая цена за штуку с учетом бонуса
+                const finalPricePerItem = plant.sellPrice * bonusMultiplier;
+                // -----------------------------------------------------
+
                 const li = document.createElement('li');
                 li.style.cssText = `
                     display: flex;
@@ -977,7 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <div style="font-weight: bold;">${plant.name}</div>
                             <div style="font-size: 12px; color: #666;">
-                                ${maxCount} шт. • ${plant.sellPrice.toFixed(2)} за шт.
+                                ${maxCount} шт. • <span style="${bonusMultiplier > 1 ? 'color: #4CAF50; font-weight:bold;' : ''}">${finalPricePerItem.toFixed(2)}</span> за шт.
                             </div>
                         </div>
                     </div>
@@ -1015,9 +1028,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             hybridItems.forEach(crop => {
                 const hybrid = getHybridData(crop, gameState);
-                const sellPrice = hybrid ? hybrid.sellPrice : 0;
+                const baseSellPrice = hybrid ? hybrid.sellPrice : 0;
                 const name = getHybridName(crop, gameState);
                 const maxCount = gameState.warehouse[crop];
+
+                // --- РАСЧЕТ БОНУСА ФЕРМЕРА ДЛЯ ОТОБРАЖЕНИЯ ЦЕНЫ ---
+                let bonusMultiplier = 1;
+                if (gameState.farmers && Array.isArray(gameState.farmers)) {
+                    gameState.farmers.forEach(farmer => {
+                        if ((farmer.isActive === true || farmer.isActive === 'true') && farmer.bonusType === 'coins') {
+                            bonusMultiplier += farmer.bonusValue / 100;
+                        }
+                    });
+                }
+                // Новая цена за штуку с учетом бонуса
+                const finalPricePerItem = baseSellPrice * bonusMultiplier;
+                // -----------------------------------------------------
 
                 const li = document.createElement('li');
                 li.style.cssText = `
@@ -1034,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <div style="font-weight: bold;">${name}</div>
                             <div style="font-size: 12px; color: #666;">
-                                ${maxCount} шт. • ${sellPrice.toFixed(2)} за шт.
+                                ${maxCount} шт. • <span style="${bonusMultiplier > 1 ? 'color: #4CAF50; font-weight:bold;' : ''}">${finalPricePerItem.toFixed(2)}</span> за шт.
                             </div>
                         </div>
                     </div>
@@ -1089,7 +1115,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hybrid = getHybridData(crop, gameState);
                 const sellPrice = plant ? plant.sellPrice : (hybrid ? hybrid.sellPrice : 0);
                 
-                gameState.balance += sellPrice * sellCount;
+                // 1. Считаем базовую прибыль
+                let totalProfit = sellPrice * sellCount;
+
+                // 2. --- БОНУС ФЕРМЕРОВ ---
+                let coinBonusPercent = 0;
+                if (gameState.farmers && Array.isArray(gameState.farmers)) {
+                    gameState.farmers.forEach(farmer => {
+                        // Проверяем активен ли фермер (учитываем строку 'true' и булево true)
+                        if ((farmer.isActive === true || farmer.isActive === 'true') && farmer.bonusType === 'coins') {
+                            coinBonusPercent += farmer.bonusValue;
+                        }
+                    });
+                }
+
+                // Если есть бонус, увеличиваем прибыль
+                let bonusAmount = 0;
+                if (coinBonusPercent > 0) {
+                    bonusAmount = totalProfit * (coinBonusPercent / 100);
+                    totalProfit += bonusAmount;
+                    // Можно показать маленькое уведомление про бонус, если хотите:
+                    // showAlert(`Продано! +${totalProfit.toFixed(1)} 💰 (бонус +${bonusAmount.toFixed(1)})`);
+                }
+                // --------------------------
+                
+                gameState.balance += totalProfit;
                 gameState.warehouse[crop] -= sellCount;
                 
                 if (gameState.warehouse[crop] <= 0) {
