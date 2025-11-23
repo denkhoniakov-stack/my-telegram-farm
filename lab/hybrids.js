@@ -548,9 +548,28 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             if (gameState.warehouse[crop1] <= 0) delete gameState.warehouse[crop1];
             if (gameState.warehouse[crop2] <= 0) delete gameState.warehouse[crop2];
             
+            
+            // --- БОНУС: Ускорение лаборатории (lab) ---
+            let duration = stats.growTime;
+            let labSpeedBonus = 0;
+
+            if (gameState.farmers) {
+                gameState.farmers.forEach(farmer => {
+                    if (farmer.bonusType === 'lab') {
+                        labSpeedBonus += farmer.bonusValue;
+                    }
+                });
+            }
+
+            if (labSpeedBonus > 0) {
+                // Уменьшаем время на процент бонуса
+                duration = duration * (1 - labSpeedBonus / 100);
+            }
+            // ------------------------------------------
+
             gameState.hybridMixings[activeRarity] = { 
                 startTime: Date.now(), 
-                duration: stats.growTime, 
+                duration: duration, 
                 resultEmoji: stats.resultEmoji, 
                 resultName: stats.name, 
                 crop1: crop1, 
