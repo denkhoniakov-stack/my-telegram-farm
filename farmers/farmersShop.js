@@ -323,9 +323,14 @@ class FarmersShop {
 
             // Через 2 секунды показываем результат
             setTimeout(() => {
+                // ✅ ИСПОЛЬЗУЕМ КАРТИНКУ ВМЕСТО ИКОНКИ
+                const farmerDisplay = farmer.image 
+                    ? `<img src="${farmer.image}" alt="${farmer.name}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 15px;">`
+                    : `<div style="font-size: 80px;">${farmer.icon || '👨‍🌾'}</div>`;
+
                 modal.querySelector('.box-animation').innerHTML = `
                     <div class="farmer-reveal" style="border-color: ${farmer.color}">
-                        <div class="reveal-icon" style="font-size: 80px;">${farmer.icon}</div>
+                        <div class="reveal-icon">${farmerDisplay}</div>
                         <div class="reveal-name" style="color: ${farmer.color}">${farmer.name}</div>
                         <div class="reveal-rarity">${this.getRarityText(farmer.rarity)}</div>
                         <div class="reveal-bonus">${farmer.description}</div>

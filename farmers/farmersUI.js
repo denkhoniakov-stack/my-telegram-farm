@@ -190,8 +190,8 @@ class FarmersUI {
 
         // Используем картинку если есть, иначе иконку
         const iconHtml = farmer.image 
-            ? `<img src="${farmer.image}" class="farmer-card-img" alt="${farmer.name}">`
-            : `<div class="farmer-icon" style="font-size: 50px;">${farmer.icon}</div>`;
+            ? `<img src="${farmer.image}" class="farmer-card-img" alt="${farmer.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px;">`
+            : `<div class="farmer-icon" style="font-size: 50px;">${farmer.icon || '👨‍🌾'}</div>`;
 
         card.innerHTML = `
             ${iconHtml}
