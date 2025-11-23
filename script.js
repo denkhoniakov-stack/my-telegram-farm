@@ -587,7 +587,35 @@ document.addEventListener('DOMContentLoaded', () => {
          plantElement.addEventListener('click', (e) => {
             e.stopPropagation();
             animateHarvest(plantElement, seed);
-            gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + 1;
+            let harvestAmount = 1;
+            let bonusChance = 0;
+            
+            // Проверяем только АКТИВНЫХ фермеров (isActive)
+            if (gameState.farmers) {
+                gameState.farmers.forEach(farmer => {
+                    if (farmer.isActive && farmer.bonusType === 'doubleChance') {
+                        bonusChance += farmer.bonusValue;
+                    }
+                });
+            }
+
+            let isDouble = false;
+            if (bonusChance > 0 && Math.random() * 100 < bonusChance) {
+                harvestAmount = 2;
+                isDouble = true;
+            }
+
+            gameState.warehouse[seed] = (gameState.warehouse[seed] || 0) + harvestAmount;
+            
+            if (isDouble) {
+               // Если у вас есть функция показа уведомлений, можно раскомментировать
+               if (typeof showPopup === 'function') {
+                    showPopup({ message: `🍀 Двойной урожай! (+${harvestAmount})` });
+               } else if (typeof showAlert === 'function') {
+                   // Или используем showAlert, если showPopup нет
+                   // showAlert(`🍀 Двойной урожай!`); 
+               }
+            }
             gameState.garden[bedIndex] = null;
             saveGameData();
             bed.innerHTML = '';
@@ -816,6 +844,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     
         if (totalProfit === 0) return;
+        let coinBonusPercent = 0;
+        
+        // Проверяем только АКТИВНЫХ фермеров (isActive)
+        if (gameState.farmers) {
+            gameState.farmers.forEach(farmer => {
+                if (farmer.isActive && farmer.bonusType === 'coins') {
+                    coinBonusPercent += farmer.bonusValue;
+                }
+            });
+        }
+
+        let bonusAmount = 0;
+        if (coinBonusPercent > 0) {
+            bonusAmount = totalProfit * (coinBonusPercent / 100);
+            totalProfit += bonusAmount;
+        }
     
         gameState.balance += totalProfit;
         gameState.warehouse = {};
@@ -823,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBalanceDisplay();
         updateWarehouseDisplay();
     
-        showAlert(`Урожай продан! Вы заработали ${totalProfit.toFixed(2)} монет ${totalProfit > 100 ? '🎉' : ''}`);
+        showAlert(`Урожай продан! Вы заработали ${totalProfit.toFixed(2)} монет${bonusAmount > 0 ? ' (бонус +' + bonusAmount.toFixed(2) + ')' : ''} ${totalProfit > 100 ? '🎉' : ''}`)
     });   
     document.querySelectorAll('.modal').forEach(modal => {
         modal.querySelector('.close-button').addEventListener('click', () => {
