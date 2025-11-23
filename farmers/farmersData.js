@@ -208,9 +208,9 @@ const FARMERS_DATA = [
         rarity: 'mythic',
         color: '#F44336',
         icon: '🧑‍🌾',
-        bonusType: 'autoHarvest',
-        bonusValue: 30,
-        description: 'Автоматически собирает урожай каждые 30 секунд'
+        bonusType: 'coins',       
+        bonusValue: 40,           
+        description: 'Увеличивает доход от продажи на 40%'
     }
 ];
 
