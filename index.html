@@ -7,7 +7,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
     <title>Моя Ферма</title>
-   
+    <!-- Новая версия для сброса кэша -->
+    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="stylesheet" href="lab/hybrids.css?v=11">
+    <link rel="stylesheet" href="profile/profile.css?v=11">
+    <!-- Стили настроек -->
+    <link rel="stylesheet" href="settings/settings.css?v=11">
+    <link rel="stylesheet" href="farmers/farmers.css?v=11">
+    <link rel="stylesheet" href="farmers/farmersShop.css?v=11">
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
@@ -131,57 +138,24 @@
             <span class="nav-label">Настройки</span>
         </button>
     </footer>
-
-    <script>
-        // ------------------------------------------------------------------
-        // МЕНЯЙ ВЕРСИЮ ТОЛЬКО ЗДЕСЬ — ОНА ОБНОВИТСЯ ВО ВСЕХ ФАЙЛАХ СРАЗУ
-        const APP_VERSION = '10.07'; 
-        // ------------------------------------------------------------------
-
-        // 1. Список твоих CSS файлов (стили)
-        const cssFiles = [
-            'styles.css',
-            'farmers.css',
-            'farmersShop.css'
-            // Если будут новые стили, добавляй их сюда, например: 'newStyle.css'
-        ];
-
-        // 2. Список твоих JS файлов (скрипты)
-        // ВАЖНО: Соблюдай порядок! Сначала данные, потом логика, потом основной скрипт.
-        const jsFiles = [
-            'farmersData.js',  // Данные фермеров
-            'farmersUI.js',    // Интерфейс фермеров
-            'farmersShop.js',  // Магазин
-            'hybrids.js',      // Лаборатория
-            'script.js'        // Основная игра (должен быть последним!)
-        ];
-
-        // Функция для подключения CSS с версией
-        function loadCSS(file) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `${file}?v=${APP_VERSION}`;
-            document.head.appendChild(link);
-        }
-
-        // Функция для подключения JS с версией
-        function loadJS(file) {
-            const script = document.createElement('script');
-            script.src = `${file}?v=${APP_VERSION}`;
-            script.async = false; // Важно: загружать по порядку (синхронно)
-            document.body.appendChild(script);
-        }
-
-        // Загружаем всё автоматически
-        cssFiles.forEach(loadCSS);
-        jsFiles.forEach(loadJS);
-        
-        console.log(`🚀 App loaded with version: ${APP_VERSION}`);
-    </script>
     
 
     
+    <!-- Новая версия для сброса кэша -->
+    <script src="lab/hybrids.js?v=11"></script>
+    <!-- Скрипты профиля -->
+     
+    <script src="profile/avatars.js?v=11"></script>
+    <script src="profile/nameRegistry.js?v=11"></script>
     
+    <script src="profile/profile.js?v=11"></script>
+    <!-- Скрипты настроек -->
+    <script src="settings/validation.js?v=11"></script>
+    <script src="settings/settings.js?v=11"></script>
+    <script src="farmers/farmersData.js?v=11"></script>
+    <script src="farmers/farmersUI.js?v=11"></script>
+    <script src="farmers/farmersShop.js?v=11"></script>
+    <script src="script.js?v=11"></script>
 
     
         
