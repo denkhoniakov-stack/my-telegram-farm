@@ -816,9 +816,23 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(PLANT_DATA).forEach(seed => {
             const plant = PLANT_DATA[seed];
             const currentSeeds = gameState.seedInventory[seed] || 0;
+            
+            // --- РАСЧЕТ БОНУСА ФЕРМЕРА ---
+            let bonusMultiplier = 1;
+            if (gameState.farmers && Array.isArray(gameState.farmers)) {
+                gameState.farmers.forEach(farmer => {
+                    if ((farmer.isActive === true || farmer.isActive === 'true') && farmer.bonusType === 'coins') {
+                        bonusMultiplier += farmer.bonusValue / 100;
+                    }
+                });
+            }
+            const finalSellPrice = plant.sellPrice * bonusMultiplier;
+            const bonusStyle = bonusMultiplier > 1 ? 'color: #4CAF50; font-weight: bold;' : '';
+            // -----------------------------
+
             const li = document.createElement('li');
             li.className = 'shop-item';
-            li.innerHTML = `<div class="shop-item-icon">${seed}</div><div class="shop-item-details"><div class="shop-item-title">Семена ${plant.name.toLowerCase()}</div><div class="shop-item-info"><span>Рост: ${plant.growTime}с</span> | <span>Продажа: ${plant.sellPrice.toFixed(2)} 🪙</span></div></div><div class="shop-item-buy"><button class="buy-button" data-seed="${seed}">${plant.seedCost.toFixed(2)} 🪙</button><div class="seed-inventory-count" id="inv-count-${seed}">В наличии: ${currentSeeds}</div></div>`;
+            li.innerHTML = `<div class="shop-item-icon">${seed}</div><div class="shop-item-details"><div class="shop-item-title">Семена ${plant.name.toLowerCase()}</div><div class="shop-item-info"><span>Рост: ${plant.growTime}с</span> | <span>Продажа: <span style="${bonusStyle}">${finalSellPrice.toFixed(2)}</span> 🪙</span></div></div><div class="shop-item-buy"><button class="buy-button" data-seed="${seed}">${plant.seedCost.toFixed(2)} 🪙</button><div class="seed-inventory-count" id="inv-count-${seed}">В наличии: ${currentSeeds}</div></div>`;
             shopListContainer.appendChild(li);
         });
     }
