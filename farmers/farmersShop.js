@@ -17,7 +17,7 @@ class FarmersShop {
                 name: 'Деревянный ящик',
                 // ЗАМЕНИЛ icon НА image
                 image: 'images/boxes/wooden_box.png', 
-                cost: 100,
+                cost: 1,
                 description: 'Базовый ящик',
                 chances: {
                     common: 70,
@@ -31,7 +31,7 @@ class FarmersShop {
                 id: 'silver',
                 name: 'Серебряный ящик',
                 image: 'images/boxes/silver_box.png',
-                cost: 500,
+                cost: 1,
                 description: 'Улучшенный ящик',
                 chances: {
                     common: 40,
@@ -45,7 +45,7 @@ class FarmersShop {
                 id: 'golden',
                 name: 'Золотой ящик',
                 image: 'images/boxes/golden_box.png',
-                cost: 2000,
+                cost: 1,
                 description: 'Редкий ящик',
                 chances: {
                     common: 0,
@@ -59,7 +59,7 @@ class FarmersShop {
                 id: 'diamond',
                 name: 'Алмазный ящик',
                 image: 'images/boxes/diamond_box.png',
-                cost: 10000,
+                cost: 1,
                 description: 'Легендарный ящик',
                 chances: {
                     common: 0,
