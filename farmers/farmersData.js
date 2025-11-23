@@ -9,7 +9,7 @@ const FARMERS_DATA = [
         name: 'Добрыня',
         rarity: 'common',
         color: '#9e9e9e',
-        icon: '👨‍🌾',
+        image: 'images/farmers/1.png',
         bonusType: 'growth',
         bonusValue: 5,
         description: 'Ускоряет рост растений на 5%'
@@ -19,7 +19,7 @@ const FARMERS_DATA = [
         name: 'Ратибор',
         rarity: 'common',
         color: '#9e9e9e',
-        icon: '👨‍🌾',
+        image: 'images/farmers/2.png',
         bonusType: 'coins',
         bonusValue: 3,
         description: 'Увеличивает доход от продажи на 3%'
@@ -29,7 +29,7 @@ const FARMERS_DATA = [
         name: 'Всеволод',
         rarity: 'common',
         color: '#9e9e9e',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/3.png',
         bonusType: 'growth',
         bonusValue: 5,
         description: 'Ускоряет рост растений на 5%'
@@ -39,7 +39,7 @@ const FARMERS_DATA = [
         name: 'Любомир',
         rarity: 'common',
         color: '#9e9e9e',
-        icon: '👨‍🌾',
+        image: 'images/farmers/4.png',
         bonusType: 'coins',
         bonusValue: 3,
         description: 'Увеличивает доход от продажи на 3%'
@@ -49,7 +49,7 @@ const FARMERS_DATA = [
         name: 'Радомир',
         rarity: 'common',
         color: '#9e9e9e',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/5.png',
         bonusType: 'growth',
         bonusValue: 5,
         description: 'Ускоряет рост растений на 5%'
@@ -61,7 +61,7 @@ const FARMERS_DATA = [
         name: 'Святослав',
         rarity: 'rare',
         color: '#2196F3',
-        icon: '👨‍🌾',
+        image: 'images/farmers/6.png',
         bonusType: 'growth',
         bonusValue: 10,
         description: 'Ускоряет рост растений на 10%'
@@ -71,7 +71,7 @@ const FARMERS_DATA = [
         name: 'Мстислав',
         rarity: 'rare',
         color: '#2196F3',
-        icon: '👩‍🌾',
+        image: 'images/farmers/7.png',
         bonusType: 'lab',
         bonusValue: 8,
         description: 'Ускоряет работу лаборатории на 8%'
@@ -81,7 +81,7 @@ const FARMERS_DATA = [
         name: 'Владимир',
         rarity: 'rare',
         color: '#2196F3',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/8.png',
         bonusType: 'coins',
         bonusValue: 8,
         description: 'Увеличивает доход от продажи на 8%'
@@ -91,7 +91,7 @@ const FARMERS_DATA = [
         name: 'Ярослав',
         rarity: 'rare',
         color: '#2196F3',
-        icon: '👨‍🌾',
+        image: 'images/farmers/9.png',
         bonusType: 'growth',
         bonusValue: 10,
         description: 'Ускоряет рост растений на 10%'
@@ -101,7 +101,7 @@ const FARMERS_DATA = [
         name: 'Борислав',
         rarity: 'rare',
         color: '#2196F3',
-        icon: '👩‍🌾',
+        image: 'images/farmers/10.png',
         bonusType: 'doubleChance',
         bonusValue: 10,
         description: 'Шанс двойного урожая 10%'
@@ -113,7 +113,7 @@ const FARMERS_DATA = [
         name: 'Вячеслав',
         rarity: 'epic',
         color: '#9C27B0',
-        icon: '👨‍🌾',
+        image: 'images/farmers/11.png',
         bonusType: 'growth',
         bonusValue: 15,
         description: 'Ускоряет рост растений на 15%'
@@ -123,7 +123,7 @@ const FARMERS_DATA = [
         name: 'Изяслав',
         rarity: 'epic',
         color: '#9C27B0',
-        icon: '👩‍🌾',
+        image: 'images/farmers/12.png',
         bonusType: 'lab',
         bonusValue: 15,
         description: 'Ускоряет работу лаборатории на 15%'
@@ -133,7 +133,7 @@ const FARMERS_DATA = [
         name: 'Ростислав',
         rarity: 'epic',
         color: '#9C27B0',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/13.png',
         bonusType: 'coins',
         bonusValue: 15,
         description: 'Увеличивает доход от продажи на 15%'
@@ -143,7 +143,7 @@ const FARMERS_DATA = [
         name: 'Богдан',
         rarity: 'epic',
         color: '#9C27B0',
-        icon: '👨‍🌾',
+        image: 'images/farmers/14.png',
         bonusType: 'doubleChance',
         bonusValue: 20,
         description: 'Шанс двойного урожая 20%'
@@ -155,7 +155,7 @@ const FARMERS_DATA = [
         name: 'Светозар',
         rarity: 'legendary',
         color: '#FFC107',
-        icon: '👨‍🌾',
+        image: 'images/farmers/15.png',
         bonusType: 'growth',
         bonusValue: 25,
         description: 'Ускоряет рост растений на 25%'
@@ -165,7 +165,7 @@ const FARMERS_DATA = [
         name: 'Пересвет',
         rarity: 'legendary',
         color: '#FFC107',
-        icon: '👩‍🌾',
+        image: 'images/farmers/16.png',
         bonusType: 'lab',
         bonusValue: 25,
         description: 'Ускоряет работу лаборатории на 25%'
@@ -175,7 +175,7 @@ const FARMERS_DATA = [
         name: 'Велимир',
         rarity: 'legendary',
         color: '#FFC107',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/17.png',
         bonusType: 'coins',
         bonusValue: 25,
         description: 'Увеличивает доход от продажи на 25%'
@@ -187,7 +187,7 @@ const FARMERS_DATA = [
         name: 'Даждьбог',
         rarity: 'mythic',
         color: '#F44336',
-        icon: '👨‍🌾',
+        image: 'images/farmers/18.png',
         bonusType: 'growth',
         bonusValue: 40,
         description: 'Ускоряет рост растений на 40%'
@@ -197,7 +197,7 @@ const FARMERS_DATA = [
         name: 'Сварог',
         rarity: 'mythic',
         color: '#F44336',
-        icon: '👩‍🌾',
+        image: 'images/farmers/19.png',
         bonusType: 'lab',
         bonusValue: 40,
         description: 'Ускоряет работу лаборатории на 40%'
@@ -207,7 +207,7 @@ const FARMERS_DATA = [
         name: 'Перун',
         rarity: 'mythic',
         color: '#F44336',
-        icon: '🧑‍🌾',
+        image: 'images/farmers/20.png',
         bonusType: 'coins',       
         bonusValue: 40,           
         description: 'Увеличивает доход от продажи на 40%'
