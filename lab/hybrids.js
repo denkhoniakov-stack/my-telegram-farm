@@ -549,26 +549,35 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             if (gameState.warehouse[crop2] <= 0) delete gameState.warehouse[crop2];
             
             
+        
             // --- БОНУС: Ускорение лаборатории (lab) ---
             let duration = stats.growTime;
             let labSpeedBonus = 0;
 
-            // Проверяем только АКТИВНЫХ фермеров
-            if (gameState.farmers) {
+            // Проверяем, что farmers существует и это массив
+            if (gameState.farmers && Array.isArray(gameState.farmers)) {
                 gameState.farmers.forEach(farmer => {
-                    if (farmer.isActive && farmer.bonusType === 'lab') {
-                        labSpeedBonus += farmer.bonusValue;
+                    // Проверка на активность и тип бонуса
+                    if ((farmer.isActive === true || farmer.isActive === 'true') && farmer.bonusType === 'lab') {
+                        labSpeedBonus += parseFloat(farmer.bonusValue) || 0;
                     }
                 });
             }
 
             if (labSpeedBonus > 0) {
-                // Уменьшаем время на процент бонуса
+                if (labSpeedBonus > 99) labSpeedBonus = 99;
                 duration = duration * (1 - labSpeedBonus / 100);
             }
-            // ------------------------------------------
 
-            $1duration$3
+            
+            gameState.hybridMixings[activeRarity] = { 
+                startTime: Date.now(), 
+                duration: duration, 
+                resultEmoji: stats.resultEmoji, 
+                resultName: stats.name, 
+                crop1: crop1, 
+                crop2: crop2 
+            };
             
             updateBalanceDisplay();
             saveGameData();
@@ -578,6 +587,7 @@ function initHybridLab(gameState, tg, updateBalanceDisplay, saveGameData, PLANT_
             slot1El.style.pointerEvents = 'none';
             slot2El.style.pointerEvents = 'none';
             
+            console.log("Запуск таймера скрещивания..."); // Проверка в консоли
             startMixingTimer(activeRarity, gameState, tg, saveGameData, msgEl, mixBtn, slot1El, slot2El);
         };
 
