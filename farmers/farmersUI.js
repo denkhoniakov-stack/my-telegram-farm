@@ -276,14 +276,18 @@ class FarmersUI {
                 // Используем картинку если есть, иначе иконку
                 const iconHtml = farmer.image
                     ? `<img src="${farmer.image}" class="farmer-slot-img" alt="${farmer.name}">`
-                    : `<div class="slot-icon">${farmer.icon || '👨‍🌾'}</div>`;
+                    : `<div class="farmer-slot-fallback">${farmer.icon || '👨‍🌾'}</div>`;
 
                 slot.style.borderColor = farmer.color;
                 slot.innerHTML = `
-                    <div class="slot-icon">${iconHtml}</div>
-                    <div class="slot-name">${farmer.name}</div>
-                    <div class="slot-bonus">${farmer.description}</div>
-                    <button class="deactivate-btn" data-farmer-id="${farmer.id}">Убрать</button>
+                    <div class="active-slot-left">
+                        <div class="slot-icon">${iconHtml}</div>
+                        <div class="slot-name">${farmer.name}</div>
+                    </div>
+                    <div class="active-slot-right">
+                        <div class="slot-bonus">${farmer.description}</div>
+                        <button class="deactivate-btn" data-farmer-id="${farmer.id}">Убрать</button>
+                    </div>
                 `;
             } else {
                 slot.classList.add('empty');

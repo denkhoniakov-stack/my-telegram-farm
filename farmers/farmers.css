@@ -272,3 +272,105 @@
     cursor: pointer;
     font-size: 12px;
 }
+/* --- Активные фермеры: карточки --- */
+
+.active-slot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 2px solid #e0d3b5;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    box-sizing: border-box;
+}
+
+.active-slot.empty {
+    border-style: dashed;
+    border-color: #d0c7ac;
+    background: #faf4e4;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 90px;
+}
+
+.active-slot-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+}
+
+.slot-icon {
+    margin-bottom: 6px;
+}
+
+.farmer-slot-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+}
+
+.farmer-slot-fallback {
+    font-size: 50px;
+}
+
+.slot-name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+}
+
+.active-slot-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex: 1;
+    gap: 8px;
+}
+
+.slot-bonus {
+    font-size: 13px;
+    color: #555;
+    text-align: right;
+    max-width: 200px;
+}
+
+.deactivate-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.deactivate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(238, 90, 82, 0.4);
+}
+
+.slot-placeholder {
+    font-size: 15px;
+    font-weight: 600;
+    color: #a2957a;
+}
+
+.slot-hint {
+    font-size: 12px;
+    color: #b3a58a;
+    margin-top: 4px;
+    text-align: center;
+}
